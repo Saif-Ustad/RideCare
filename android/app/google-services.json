@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "404727318981",
+    "project_id": "ridecare-74ef9",
+    "storage_bucket": "ridecare-74ef9.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:404727318981:android:fc03c4e03ecd54d38423ac",
+        "android_client_info": {
+          "package_name": "com.example.ridecare"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA2N9prdjo-iqydPuLunsY7GJxKuBYoOec"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
