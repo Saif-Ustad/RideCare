@@ -1,24 +1,89 @@
 import 'package:flutter/material.dart';
+import '../../../core/configs/theme/app_colors.dart';
 
-class BottomNavigationBarSection extends StatelessWidget {
+class BottomNavigationBarSection extends StatefulWidget {
   const BottomNavigationBarSection({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    return _buildBottomNavigationBar();
+  _BottomNavigationBarSectionState createState() =>
+      _BottomNavigationBarSectionState();
+}
+
+class _BottomNavigationBarSectionState
+    extends State<BottomNavigationBarSection> {
+  int _selectedIndex = 0;
+
+  final List<IconData> _icons = [
+    Icons.home,
+    Icons.explore,
+    Icons.bookmark,
+    Icons.person,
+  ];
+
+  final List<String> _labels = ["Home", "Explore", "Bookmark", "Profile"];
+
+  void _onItemTapped(int index) {
+    setState(() => _selectedIndex = index);
   }
 
-  Widget _buildBottomNavigationBar() {
-    return BottomNavigationBar(
-      currentIndex: 0,
-      selectedItemColor: Colors.deepPurple,
-      unselectedItemColor: Colors.grey,
-      items: [
-        BottomNavigationBarItem(icon: Icon(Icons.home), label: "Home"),
-        BottomNavigationBarItem(icon: Icon(Icons.explore), label: "Explore"),
-        BottomNavigationBarItem(icon: Icon(Icons.bookmark), label: "Bookmark"),
-        BottomNavigationBarItem(icon: Icon(Icons.person), label: "Profile"),
-      ],
+  @override
+  Widget build(BuildContext context) {
+    return Theme(
+      data: Theme.of(context).copyWith(
+        splashColor: Colors.transparent, // Removes splash effect
+        highlightColor: Colors.transparent, // Removes touch highlight
+        hoverColor: Colors.transparent, // Prevents hover effect
+      ),
+      child: Container(
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.vertical(top: Radius.circular(15)),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.1),
+              blurRadius: 10,
+              spreadRadius: 2,
+            ),
+          ],
+        ),
+        child: ClipRRect(
+          borderRadius: BorderRadius.vertical(top: Radius.circular(15)),
+          child: BottomNavigationBar(
+            currentIndex: _selectedIndex,
+            onTap: _onItemTapped,
+            selectedItemColor: AppColors.primary,
+            unselectedItemColor: Colors.grey,
+            showUnselectedLabels: true,
+            type: BottomNavigationBarType.fixed,
+            backgroundColor: Colors.white,
+            selectedLabelStyle: TextStyle(fontSize: 10),
+            unselectedLabelStyle: TextStyle(fontSize: 10),
+            elevation: 10,
+            items: List.generate(
+              _icons.length,
+                  (index) => BottomNavigationBarItem(
+                icon: _buildIcon(index),
+                label: _labels[index],
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildIcon(int index) {
+    bool isSelected = index == _selectedIndex;
+    return Container(
+      padding: EdgeInsets.all(5),
+      decoration: BoxDecoration(
+        color:
+        isSelected
+            ? Color(0xFF8A6CFF).withOpacity(0.2)
+            : Colors.transparent,
+        borderRadius: BorderRadius.circular(10),
+      ),
+      child: Icon(_icons[index], size: 20,),
     );
   }
 }

@@ -153,7 +153,7 @@ class SpecialOfferSection extends StatelessWidget {
           Text(
             title,
             style: TextStyle(
-              fontSize: 14,
+              fontSize: 16,
               fontWeight: FontWeight.w600,
               color: AppColors.black,
             ),

@@ -21,10 +21,10 @@ class PopularServiceProviderSection extends StatelessWidget {
         SizedBox(height: 10),
         CarouselSlider(
           options: CarouselOptions(
-            height: 160,
+            height: 140,
             autoPlay: false,
             enlargeCenterPage: false,
-            viewportFraction: 0.75,
+            viewportFraction: 0.65,
             enableInfiniteScroll: true,
           ),
           items:
@@ -131,7 +131,7 @@ class PopularServiceProviderSection extends StatelessWidget {
           Text(
             title,
             style: TextStyle(
-              fontSize: 14,
+              fontSize: 16,
               fontWeight: FontWeight.w600,
               color: AppColors.black,
             ),
