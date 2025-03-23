@@ -10,6 +10,7 @@ import 'package:ridecare/presentation/auth/pages/form.dart';
 import 'package:ridecare/presentation/auth/pages/signin.dart';
 import 'package:ridecare/presentation/auth/pages/signup.dart';
 import 'package:ridecare/presentation/auth/pages/verify.dart';
+import 'package:ridecare/presentation/explore/pages/explore.dart';
 import 'package:ridecare/presentation/home/pages/home.dart';
 import 'package:ridecare/presentation/splash/pages/splash.dart';
 import 'package:ridecare/core/configs/theme/app_theme.dart';
@@ -55,7 +56,7 @@ class MyApp extends StatelessWidget {
         theme: AppTheme.lightTheme,
         debugShowCheckedModeBanner: false,
         title: 'RideCare',
-        home:  HomePage(),
+        home:  ExplorePage(),
       ),
     );
   }
