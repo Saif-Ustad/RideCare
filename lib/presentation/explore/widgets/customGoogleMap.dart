@@ -18,9 +18,9 @@ class _CustomGoogleMapState extends State<CustomGoogleMap> {
   final Set<Marker> _markers = {}; // Store markers
 
   final List<Map<String, dynamic>> serviceProviders = [
-    {"name": "Bajaj Service Center", "location": LatLng(18.4650, 73.8950)},
-    {"name": "Honda Service Center", "location": LatLng(18.4615, 73.8920)},
-    {"name": "Toyota Service Center", "location": LatLng(18.4680, 73.8985)},
+    {"name": "Bajaj Service Center", "location": LatLng(18.494698, 73.834732)},
+    {"name": "Honda Service Center", "location": LatLng(18.474748, 73.855292)},
+    {"name": "Toyota Service Center", "location": LatLng(18.452000, 73.847208)},
   ];
 
   @override
