@@ -1,0 +1,141 @@
+import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
+import 'package:go_router/go_router.dart';
+import 'package:ridecare/core/configs/assets/app_images.dart';
+import '../../../common/widgets/bottomNavigationBar/bottomNavigationBar.dart';
+import '../../../core/configs/theme/app_colors.dart';
+import '../widgets/serviceCard.dart';
+import '../widgets/serviceModel.dart';
+
+class BookmarkPage extends StatefulWidget {
+  const BookmarkPage({super.key});
+
+  @override
+  State<BookmarkPage> createState() => _BookmarkPageState();
+}
+
+class _BookmarkPageState extends State<BookmarkPage> {
+
+  final ScrollController _scrollController = ScrollController();
+  bool _isNavBarVisible = true;
+
+  @override
+  void initState() {
+    super.initState();
+
+    _scrollController.addListener(() {
+      if (_scrollController.position.userScrollDirection ==
+          ScrollDirection.reverse) {
+        if (_isNavBarVisible) {
+          setState(() => _isNavBarVisible = false);
+        }
+      } else if (_scrollController.position.userScrollDirection ==
+          ScrollDirection.forward) {
+        if (!_isNavBarVisible) {
+          setState(() => _isNavBarVisible = true);
+        }
+      }
+    });
+  }
+
+
+  final services = [
+    ServiceModel(
+      AppImages.popularServiceProvider1,
+      4.6,
+      "Bajaj Service Center",
+      "0.5 km",
+      "2 Mins",
+      "100-1200",
+    ),
+    ServiceModel(
+      AppImages.popularServiceProvider2,
+      4.8,
+      "Honda Service Center",
+      "1.5 km",
+      "8 Mins",
+      "200-1500",
+    ),
+
+  ];
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: Colors.white,
+      appBar: AppBar(
+        backgroundColor: Colors.white,
+        elevation: 0,
+        leading: buildLeadingIconButton(() => context.go('/home')),
+        title: const Text(
+          "Bookmark",
+          style: TextStyle(
+            fontSize: 18,
+            fontWeight: FontWeight.w500,
+            color: Colors.black,
+          ),
+        ),
+        centerTitle: true,
+        actions: [buildActionIconButton(() {})],
+      ),
+
+      body: Stack(
+        children: [
+          Padding(
+            padding: const EdgeInsets.all(15),
+            child: ListView.builder(
+              controller: _scrollController,
+              clipBehavior: Clip.none,
+              itemCount: services.length,
+              itemBuilder:
+                  (context, index) => Padding(
+                    padding: const EdgeInsets.only(bottom: 12),
+                    child: ServiceCard(service: services[index]),
+                  ),
+            ),
+          ),
+        ],
+      ),
+
+      bottomNavigationBar: AnimatedContainer(
+        duration: Duration(milliseconds: 300),
+        height: _isNavBarVisible ? kBottomNavigationBarHeight : 0,
+        // Animate height
+        child: Wrap(
+          children: [
+            Opacity(
+              opacity: _isNavBarVisible ? 1.0 : 0.0, // Fade effect
+              child: BottomNavigationBarSection(),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget buildLeadingIconButton(VoidCallback onPressed) => Padding(
+    padding: const EdgeInsets.only(left: 15),
+    child: circleIconButton(Icons.arrow_back, onPressed),
+  );
+
+  Widget buildActionIconButton(VoidCallback onPressed) => Padding(
+    padding: const EdgeInsets.only(right: 15),
+    child: circleIconButton(Icons.search, onPressed),
+  );
+
+  Widget circleIconButton(IconData icon, VoidCallback onPressed) => Container(
+    height: 40,
+    width: 40,
+    decoration: BoxDecoration(
+      shape: BoxShape.circle,
+      border: Border.all(color: AppColors.darkGrey, width: 1),
+      color: Colors.white,
+    ),
+    child: IconButton(
+      icon: Icon(icon, color: Colors.black, size: 20),
+      onPressed: onPressed,
+      constraints: const BoxConstraints(),
+      padding: EdgeInsets.zero,
+    ),
+  );
+}

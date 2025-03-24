@@ -10,4 +10,6 @@ class AppImages {
   static const String popularServiceProvider2 = '${basePath}popularServiceProvider2.png';
   static const String popularServiceProvider3 = '${basePath}popularServiceProvider3.png';
 
+  static const String profilePhoto = '${basePath}profile.png';
+
 }

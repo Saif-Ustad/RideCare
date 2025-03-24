@@ -2,8 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:ridecare/presentation/auth/pages/signin.dart';
+import 'package:ridecare/presentation/bookmark/pages/bookmark.dart';
 import 'package:ridecare/presentation/home/pages/home.dart';
 import 'package:ridecare/presentation/explore/pages/explore.dart';
+import 'package:ridecare/presentation/profile/pages/profile.dart';
 import 'package:ridecare/presentation/splash/pages/splash.dart';
 import '../../../common/helper/prefService.dart';
 import '../../../presentation/auth/pages/form.dart';
@@ -15,10 +17,14 @@ final GoRouter router = GoRouter(
   routes: [
     GoRoute(path: '/splash', builder: (context, state) => const SplashPage()),
     GoRoute(path: '/onboarding', builder: (context, state) => OnboardingPage()),
+
     GoRoute(path: '/signin', builder: (context, state) => const SignInPage()),
     GoRoute(path: '/userform', builder: (context, state) => const UserFormPage(),),
+
     GoRoute(path: '/home', builder: (context, state) => const HomePage()),
     GoRoute(path: '/explore', builder: (context, state) => const ExplorePage()),
+    GoRoute(path: '/bookmark', builder: (context, state) =>  BookmarkPage()),
+    GoRoute(path: '/profile', builder: (context, state) => const ProfilePage()),
   ],
 
   redirect: (context, state) async {

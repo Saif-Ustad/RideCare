@@ -43,11 +43,56 @@ class ServiceProviderCard extends StatelessWidget {
   Widget _buildImage() {
     return ClipRRect(
       borderRadius: BorderRadius.circular(10),
-      child: Image.asset(
-        image,
-        height: 100,
-        width: double.infinity,
-        fit: BoxFit.cover,
+      child: Stack(
+        children: [
+          Image.asset(
+            image,
+            height: 100,
+            width: double.infinity,
+            fit: BoxFit.cover,
+          ),
+
+          // ratings Badge
+          Positioned(
+            top: 8,
+            left: 8,
+            child: Container(
+              padding: EdgeInsets.all(3),
+              decoration: BoxDecoration(
+                color: Colors.white.withOpacity(0.8),
+                borderRadius: BorderRadius.circular(5),
+              ),
+              child: Row(
+                children: [
+                  Icon(Icons.star_rounded, color: AppColors.golden, size: 14),
+                  SizedBox(width: 3),
+                  Text(
+                    "4.8",
+                    style: TextStyle(
+                      fontSize: 8,
+                      fontWeight: FontWeight.w600,
+                      color: AppColors.black,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+
+          // Bookmark Button
+          Positioned(
+            top: 8,
+            right: 8,
+            child: Container(
+              padding: EdgeInsets.all(3),
+              decoration: BoxDecoration(
+                color: Colors.white.withOpacity(0.8),
+                borderRadius: BorderRadius.circular(5),
+              ),
+              child: Icon(Icons.bookmark, color: AppColors.primary, size: 14),
+            ),
+          ),
+        ],
       ),
     );
   }
