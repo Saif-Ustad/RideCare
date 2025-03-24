@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 import 'package:ridecare/core/configs/assets/app_vectors.dart';
 import 'package:ridecare/core/configs/theme/app_colors.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 
+import '../../../common/helper/prefService.dart';
 import '../../../common/widgets/button/squareButton.dart';
 import '../../auth/pages/signin.dart';
 import '../bloc/onboarding_bloc.dart';
@@ -78,17 +80,20 @@ class OnboardingPage extends StatelessWidget {
           child: BlocBuilder<OnboardingBloc, OnboardingState>(
             builder: (context, state) {
               return SquareButton(
-                onPressed: () {
+                onPressed: () async  {
                   if (state.currentPage < 2) {
                     _pageController.nextPage(
                       duration: const Duration(milliseconds: 300),
                       curve: Curves.easeInOut,
                     );
                   } else {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (context) => const SignInPage()),
-                    );
+                    // Mark onboarding as seen
+                    await PrefService.setOnboardingSeen();
+
+                    // Redirect to SignInPage
+                    if (context.mounted) {
+                      context.go('/signin');
+                    }
                   }
                 },
                 buttonText:

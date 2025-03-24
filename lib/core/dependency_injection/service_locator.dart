@@ -1,5 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:get_it/get_it.dart';
+import 'package:go_router/go_router.dart';
 import 'package:ridecare/data/datasources/auth_remote_datasource.dart';
 import 'package:ridecare/data/repositories/auth_repository_impl.dart';
 import 'package:ridecare/domain/repositories/auth_repository.dart';
@@ -9,6 +10,8 @@ import 'package:ridecare/domain/usecases/sign_out.dart';
 import 'package:ridecare/presentation/auth/bloc/auth_bloc.dart';
 import 'package:ridecare/presentation/auth/bloc/otp_bloc.dart';
 import 'package:ridecare/presentation/auth/bloc/password_toggle_bloc.dart';
+import 'package:ridecare/presentation/auth/pages/signin.dart';
+import 'package:ridecare/presentation/home/pages/home.dart';
 import 'package:ridecare/presentation/onboarding/bloc/onboarding_bloc.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
@@ -51,4 +54,13 @@ void setupServiceLocator() {
       signOut: sl<SignOut>(),
     ),
   );
+
+
+  sl.registerLazySingleton<GoRouter>(() => GoRouter(
+    routes: [
+      GoRoute(path: '/home', builder: (context, state) => HomePage()),
+      GoRoute(path: '/signin', builder: (context, state) => SignInPage()),
+    ],
+  ));
+
 }

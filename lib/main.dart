@@ -3,6 +3,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:ridecare/core/configs/routes/router.dart';
 import 'package:ridecare/presentation/auth/bloc/auth_bloc.dart';
 import 'package:ridecare/presentation/auth/bloc/password_toggle_bloc.dart';
 import 'package:ridecare/presentation/auth/bloc/otp_bloc.dart';
@@ -52,11 +53,12 @@ class MyApp extends StatelessWidget {
           create: (context) => sl<AuthBloc>(),
         ),
       ],
-      child: MaterialApp(
+      child: MaterialApp.router(
         theme: AppTheme.lightTheme,
         debugShowCheckedModeBanner: false,
         title: 'RideCare',
-        home:  ExplorePage(),
+        // home:  HomePage(),
+        routerConfig: router,
       ),
     );
   }

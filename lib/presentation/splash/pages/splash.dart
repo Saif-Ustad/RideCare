@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:go_router/go_router.dart';
 import 'package:ridecare/core/configs/assets/app_vectors.dart';
-import '../../onboarding/pages/onboarding.dart';
 
 class SplashPage extends StatefulWidget {
   const SplashPage({super.key});
@@ -14,18 +14,14 @@ class _SplashPageState extends State<SplashPage> {
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      _navigateToOnboarding();
-    });
+    _navigateToNext();
   }
 
-  void _navigateToOnboarding() async {
+  Future<void> _navigateToNext() async {
     await Future.delayed(const Duration(seconds: 3));
-    if (!mounted) return;
-    Navigator.pushReplacement(
-      context,
-      MaterialPageRoute(builder: (context) =>  OnboardingPage()),
-    );
+    if (mounted) {
+      context.go('/home');
+    }
   }
 
   @override

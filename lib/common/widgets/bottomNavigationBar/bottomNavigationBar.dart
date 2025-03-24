@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import '../../../core/configs/theme/app_colors.dart';
 
 class BottomNavigationBarSection extends StatefulWidget {
@@ -9,10 +10,7 @@ class BottomNavigationBarSection extends StatefulWidget {
       _BottomNavigationBarSectionState();
 }
 
-class _BottomNavigationBarSectionState
-    extends State<BottomNavigationBarSection> {
-  int _selectedIndex = 0;
-
+class _BottomNavigationBarSectionState extends State<BottomNavigationBarSection> {
   final List<IconData> _icons = [
     Icons.home,
     Icons.explore,
@@ -22,17 +20,34 @@ class _BottomNavigationBarSectionState
 
   final List<String> _labels = ["Home", "Explore", "Bookmark", "Profile"];
 
+  final List<String> _routes = [
+    "/home",
+    "/explore",
+    "/bookmark",
+    "/profile",
+  ];
+
+  int _getSelectedIndex(BuildContext context) {
+    final GoRouter router = GoRouter.of(context);
+    final String currentRoute = router.routeInformationProvider.value.uri.toString();
+    return _routes.indexWhere((route) => currentRoute.startsWith(route));
+  }
+
   void _onItemTapped(int index) {
-    setState(() => _selectedIndex = index);
+    if (index != _getSelectedIndex(context)) {
+      context.go(_routes[index]);
+    }
   }
 
   @override
   Widget build(BuildContext context) {
+    int selectedIndex = _getSelectedIndex(context);
+
     return Theme(
       data: Theme.of(context).copyWith(
-        splashColor: Colors.transparent, // Removes splash effect
-        highlightColor: Colors.transparent, // Removes touch highlight
-        hoverColor: Colors.transparent, // Prevents hover effect
+        splashColor: Colors.transparent,
+        highlightColor: Colors.transparent,
+        hoverColor: Colors.transparent,
       ),
       child: Align(
         alignment: Alignment.bottomCenter,
@@ -51,7 +66,7 @@ class _BottomNavigationBarSectionState
           child: ClipRRect(
             borderRadius: BorderRadius.vertical(top: Radius.circular(15)),
             child: BottomNavigationBar(
-              currentIndex: _selectedIndex,
+              currentIndex: selectedIndex >= 0 ? selectedIndex : 0,
               onTap: _onItemTapped,
               selectedItemColor: AppColors.primary,
               unselectedItemColor: Colors.grey,
@@ -64,7 +79,7 @@ class _BottomNavigationBarSectionState
               items: List.generate(
                 _icons.length,
                     (index) => BottomNavigationBarItem(
-                  icon: _buildIcon(index),
+                  icon: _buildIcon(index, selectedIndex),
                   label: _labels[index],
                 ),
               ),
@@ -75,18 +90,15 @@ class _BottomNavigationBarSectionState
     );
   }
 
-  Widget _buildIcon(int index) {
-    bool isSelected = index == _selectedIndex;
+  Widget _buildIcon(int index, int selectedIndex) {
+    bool isSelected = index == selectedIndex;
     return Container(
       padding: EdgeInsets.all(5),
       decoration: BoxDecoration(
-        color:
-        isSelected
-            ? Color(0xFF8A6CFF).withOpacity(0.2)
-            : Colors.transparent,
+        color: isSelected ? Color(0xFF8A6CFF).withOpacity(0.2) : Colors.transparent,
         borderRadius: BorderRadius.circular(10),
       ),
-      child: Icon(_icons[index], size: 20,),
+      child: Icon(_icons[index], size: 20),
     );
   }
 }

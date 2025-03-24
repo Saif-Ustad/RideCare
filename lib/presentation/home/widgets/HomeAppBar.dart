@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:get_it/get_it.dart';
+import 'package:go_router/go_router.dart';
+import 'package:ridecare/domain/usecases/sign_out.dart';
 
 import '../../../core/configs/theme/app_colors.dart';
+
 
 class HomeAppBar extends StatelessWidget {
   const HomeAppBar({super.key});
@@ -24,7 +28,7 @@ class HomeAppBar extends StatelessWidget {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             crossAxisAlignment: CrossAxisAlignment.start,
-            children: [_buildLocationInfo(), _buildNotificationIcon()],
+            children: [_buildLocationInfo(), _buildNotificationIcon(context)],
           ),
         ),
       ),
@@ -75,7 +79,7 @@ class HomeAppBar extends StatelessWidget {
     );
   }
 
-  Widget _buildNotificationIcon({bool hasNotification = true}) {
+  Widget _buildNotificationIcon(BuildContext context, {bool hasNotification = true}) {
     return Stack(
       children: [
         Container(
@@ -87,7 +91,14 @@ class HomeAppBar extends StatelessWidget {
           ),
           child: IconButton(
             icon: Icon(Icons.notifications, color: Colors.white),
-            onPressed: () {},
+            onPressed: () async {
+              final signOutUseCase = GetIt.instance<SignOut>();
+              await signOutUseCase();
+
+              if (context.mounted) {  // Ensure context is valid
+                GoRouter.of(context).go('/signin'); // Redirect to Sign-In Page
+              }
+            },
           ),
         ),
 

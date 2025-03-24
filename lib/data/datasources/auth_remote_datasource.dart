@@ -28,6 +28,7 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
         'firstName': firstName,
         'lastName': lastName,
         'email': email,
+        'createdAt': DateTime.now(),
       });
     } catch (e) {
       rethrow;
