@@ -69,7 +69,7 @@ class ServiceProviderCard extends StatelessWidget {
                   Text(
                     "4.8",
                     style: TextStyle(
-                      fontSize: 8,
+                      fontSize: 10,
                       fontWeight: FontWeight.w600,
                       color: AppColors.black,
                     ),

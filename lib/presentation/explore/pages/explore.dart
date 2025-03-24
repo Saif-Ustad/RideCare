@@ -32,7 +32,10 @@ class _ExplorePageState extends State<ExplorePage> {
           LocationSearchBar(),
           if (_mapController != null)
             LocationFloatingButton(mapController: _mapController!),
-          ServiceProviderList(),
+          Padding(
+            padding: const EdgeInsets.only(left: 10, right: 10),
+            child: ServiceProviderList(),
+          ),
           BottomNavigationBarSection(),
         ],
       ),
