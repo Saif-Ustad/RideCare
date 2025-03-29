@@ -3,6 +3,7 @@ import 'package:go_router/go_router.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:ridecare/presentation/auth/pages/signin.dart';
 import 'package:ridecare/presentation/bookmark/pages/bookmark.dart';
+import 'package:ridecare/presentation/chooseService/pages/chooseServices.dart';
 import 'package:ridecare/presentation/home/pages/home.dart';
 import 'package:ridecare/presentation/explore/pages/explore.dart';
 import 'package:ridecare/presentation/profile/pages/profile.dart';
@@ -13,7 +14,7 @@ import '../../../presentation/auth/pages/form.dart';
 import '../../../presentation/onboarding/pages/onboarding.dart';
 
 final GoRouter router = GoRouter(
-  initialLocation: '/splash',
+  initialLocation: '/choose-service',
   refreshListenable: AuthNotifier(),
   routes: [
     GoRoute(path: '/splash', builder: (context, state) => const SplashPage()),
@@ -41,6 +42,7 @@ final GoRouter router = GoRouter(
       },
     ),
 
+    GoRoute(path: '/choose-service', builder: (context, state) => const ChooseServicesPage()),
   ],
 
   redirect: (context, state) async {
