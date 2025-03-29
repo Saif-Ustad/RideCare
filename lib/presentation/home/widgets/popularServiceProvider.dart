@@ -151,6 +151,7 @@
 
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import '../../../core/configs/assets/app_images.dart';
 import '../../../core/configs/theme/app_colors.dart';
 
@@ -159,6 +160,7 @@ class PopularServiceProviderSection extends StatelessWidget {
 
   final List<ServiceProvider> serviceProviders = [
     ServiceProvider(
+      "1",
       "Bajaj Service Center",
       "0.5 km",
       "2 Mins",
@@ -166,6 +168,7 @@ class PopularServiceProviderSection extends StatelessWidget {
       AppImages.popularServiceProvider1,
     ),
     ServiceProvider(
+      "1",
       "Honda Service Center",
       "1.5 km",
       "8 Mins",
@@ -173,6 +176,7 @@ class PopularServiceProviderSection extends StatelessWidget {
       AppImages.popularServiceProvider2,
     ),
     ServiceProvider(
+      "1",
       "Toyota Service Center",
       "0.5 km",
       "2 Mins",
@@ -243,38 +247,43 @@ class _ServiceProviderCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      // width: 210,
-      margin: const EdgeInsets.all(8),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(10),
-        boxShadow: [
-          BoxShadow(color: Colors.black12, blurRadius: 5, spreadRadius: 2),
-        ],
-      ),
-      child: Padding(
-        padding: const EdgeInsets.all(10),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            _buildImage(),
-            const SizedBox(height: 8),
-            Text(
-              provider.name,
-              style: _textStyle(14, FontWeight.w500, AppColors.black),
-            ),
-            const SizedBox(height: 5),
-            Row(
-              children: [
-                _buildInfoRow(Icons.location_on, provider.distance),
-                const SizedBox(width: 10),
-                _buildInfoRow(Icons.access_time_filled, provider.time),
-              ],
-            ),
-            const SizedBox(height: 5),
-            _buildPrice(),
+    return GestureDetector(
+      onTap: () {
+        context.push('/service-provider/${provider.id}');
+      },
+      child: Container(
+        // width: 210,
+        margin: const EdgeInsets.all(8),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(10),
+          boxShadow: [
+            BoxShadow(color: Colors.black12, blurRadius: 5, spreadRadius: 2),
           ],
+        ),
+        child: Padding(
+          padding: const EdgeInsets.all(10),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              _buildImage(),
+              const SizedBox(height: 8),
+              Text(
+                provider.name,
+                style: _textStyle(14, FontWeight.w500, AppColors.black),
+              ),
+              const SizedBox(height: 5),
+              Row(
+                children: [
+                  _buildInfoRow(Icons.location_on, provider.distance),
+                  const SizedBox(width: 10),
+                  _buildInfoRow(Icons.access_time_filled, provider.time),
+                ],
+              ),
+              const SizedBox(height: 5),
+              _buildPrice(),
+            ],
+          ),
         ),
       ),
     );
@@ -361,7 +370,7 @@ class _ServiceProviderCard extends StatelessWidget {
 }
 
 class ServiceProvider {
-  final String name, distance, time, price, image;
+  final String id, name, distance, time, price, image;
 
-  ServiceProvider(this.name, this.distance, this.time, this.price, this.image);
+  ServiceProvider(this.id, this.name, this.distance, this.time, this.price, this.image);
 }

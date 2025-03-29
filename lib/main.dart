@@ -1,6 +1,7 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 import 'package:ridecare/core/configs/routes/router.dart';
 import 'package:ridecare/presentation/auth/bloc/auth_bloc.dart';
 import 'package:ridecare/presentation/auth/bloc/password_toggle_bloc.dart';
@@ -17,8 +18,6 @@ void main() async {
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
-
-  // FirebaseAuth.instance.setSettings(appVerificationDisabledForTesting: true); // ✅ Disable reCAPTCHA for testing
 
   setupServiceLocator();
   runApp(const MyApp());
@@ -44,12 +43,19 @@ class MyApp extends StatelessWidget {
           create: (context) => sl<AuthBloc>(),
         ),
       ],
-      child: MaterialApp.router(
-        theme: AppTheme.lightTheme,
-        debugShowCheckedModeBanner: false,
-        title: 'RideCare',
-        // home:  HomePage(),
-        routerConfig: router,
+      child: PopScope(
+        canPop: true,
+        onPopInvokedWithResult: (didPop, result) {
+          if (!didPop && GoRouter.of(context).canPop()) {
+            GoRouter.of(context).pop();
+          }
+        },
+        child: MaterialApp.router(
+          theme: AppTheme.lightTheme,
+          debugShowCheckedModeBanner: false,
+          title: 'RideCare',
+          routerConfig: router,
+        ),
       ),
     );
   }

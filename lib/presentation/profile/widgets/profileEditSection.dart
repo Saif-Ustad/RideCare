@@ -15,7 +15,7 @@ class ProfileSection extends StatelessWidget {
           children: [
             const CircleAvatar(
               radius: 50,
-              backgroundImage: AssetImage(AppImages.profilePhoto),
+              backgroundImage: AssetImage(AppImages.profilePhoto1),
             ),
             Container(
               padding: const EdgeInsets.all(5),

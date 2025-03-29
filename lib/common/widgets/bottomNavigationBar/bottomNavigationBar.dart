@@ -35,7 +35,7 @@ class _BottomNavigationBarSectionState extends State<BottomNavigationBarSection>
 
   void _onItemTapped(int index) {
     if (index != _getSelectedIndex(context)) {
-      context.go(_routes[index]);
+      context.push(_routes[index]);
     }
   }
 

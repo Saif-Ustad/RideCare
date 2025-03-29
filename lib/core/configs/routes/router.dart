@@ -6,6 +6,7 @@ import 'package:ridecare/presentation/bookmark/pages/bookmark.dart';
 import 'package:ridecare/presentation/home/pages/home.dart';
 import 'package:ridecare/presentation/explore/pages/explore.dart';
 import 'package:ridecare/presentation/profile/pages/profile.dart';
+import 'package:ridecare/presentation/serviceProvider/pages/serviceProviderDetails.dart';
 import 'package:ridecare/presentation/splash/pages/splash.dart';
 import '../../../common/helper/prefService.dart';
 import '../../../presentation/auth/pages/form.dart';
@@ -25,6 +26,21 @@ final GoRouter router = GoRouter(
     GoRoute(path: '/explore', builder: (context, state) => const ExplorePage()),
     GoRoute(path: '/bookmark', builder: (context, state) =>  BookmarkPage()),
     GoRoute(path: '/profile', builder: (context, state) => const ProfilePage()),
+
+    // GoRoute(path: '/service-provider/:id', builder: (context, state) =>  ServiceProviderDetailPage()),
+    // Use a prebuilt transition
+    GoRoute(
+      path: '/service-provider/:id',
+      pageBuilder: (context, state) {
+        final String id = state.pathParameters['id']!;
+        return MaterialPage(
+          key: state.pageKey,
+          child: ServiceProviderDetailPage(),
+          fullscreenDialog: true, // Enables the default slide-up transition
+        );
+      },
+    ),
+
   ],
 
   redirect: (context, state) async {
