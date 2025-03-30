@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:ridecare/core/configs/assets/app_images.dart';
 import '../../../common/widgets/bottomBar/bottomBar.dart';
 import '../../../core/configs/theme/app_colors.dart';
@@ -81,14 +82,14 @@ class _AppointmentBookingPageState extends State<AppointmentBookingPage> {
                 ),
               ),
             ),
-            CustomBottomBar(
-              text: "Continue",
-              onPressed: () {
-                // Handle submission
-              },
-            ),
           ],
         ),
+      ),
+      bottomNavigationBar: CustomBottomBar(
+        text: "Continue",
+        onPressed: () {
+          context.push("/select-vehicle");
+        },
       ),
     );
   }

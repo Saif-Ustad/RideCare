@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import '../../../core/configs/theme/app_colors.dart';
+import '../widgets/serviceOption.dart';
 
 class ChooseServicesPage extends StatefulWidget {
   const ChooseServicesPage({super.key});
@@ -254,14 +255,4 @@ class _ChooseServicesPageState extends State<ChooseServicesPage> {
   );
 }
 
-class ServiceOption {
-  final String name;
-  final double price;
-  bool isSelected;
 
-  ServiceOption({
-    required this.name,
-    required this.price,
-    required this.isSelected,
-  });
-}

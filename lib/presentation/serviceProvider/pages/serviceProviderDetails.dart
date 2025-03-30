@@ -71,14 +71,14 @@ class _ServiceProviderDetailPageState extends State<ServiceProviderDetailPage>
                 ],
               ),
             ),
-            CustomBottomBar(
-              text: "Book Service Now",
-              onPressed: () {
-                context.push("/choose-service");
-              },
-            ),
           ],
         ),
+      ),
+      bottomNavigationBar: CustomBottomBar(
+        text: "Book Service Now",
+        onPressed: () {
+          context.push("/choose-service");
+        },
       ),
     );
   }

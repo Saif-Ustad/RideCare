@@ -6,6 +6,8 @@ import 'package:ridecare/presentation/bookmark/pages/bookmark.dart';
 import 'package:ridecare/presentation/chooseService/pages/chooseServices.dart';
 import 'package:ridecare/presentation/home/pages/home.dart';
 import 'package:ridecare/presentation/explore/pages/explore.dart';
+import 'package:ridecare/presentation/location/pages/addLocation.dart';
+import 'package:ridecare/presentation/location/pages/selectLocation.dart';
 import 'package:ridecare/presentation/profile/pages/profile.dart';
 import 'package:ridecare/presentation/serviceProvider/pages/appointmentBooking.dart';
 import 'package:ridecare/presentation/serviceProvider/pages/serviceProviderDetails.dart';
@@ -13,6 +15,8 @@ import 'package:ridecare/presentation/splash/pages/splash.dart';
 import '../../../common/helper/prefService.dart';
 import '../../../presentation/auth/pages/form.dart';
 import '../../../presentation/onboarding/pages/onboarding.dart';
+import '../../../presentation/vehicles/pages/addVehicle.dart';
+import '../../../presentation/vehicles/pages/selectVehicle.dart';
 
 final GoRouter router = GoRouter(
   initialLocation: '/splash',
@@ -45,6 +49,10 @@ final GoRouter router = GoRouter(
 
     GoRoute(path: '/choose-service', builder: (context, state) => const ChooseServicesPage()),
     GoRoute(path: '/appointment-booking', builder: (context, state) =>  AppointmentBookingPage()),
+    GoRoute(path: '/select-vehicle', builder: (context, state) => const SelectVehiclePage()),
+    GoRoute(path: '/add-vehicle', builder: (context, state) => const AddVehiclePage()),
+    GoRoute(path: '/select-location', builder: (context, state) => const SelectLocationPage()),
+    GoRoute(path: '/add-location', builder: (context, state) => const AddLocationPage()),
   ],
 
   redirect: (context, state) async {

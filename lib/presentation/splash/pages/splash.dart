@@ -28,6 +28,7 @@ class _SplashPageState extends State<SplashPage> {
   Widget build(BuildContext context) {
     final Size screenSize = MediaQuery.of(context).size;
     return Scaffold(
+      backgroundColor: Colors.white,
       body: Center(
         child: SvgPicture.asset(
           AppVectors.logo,
