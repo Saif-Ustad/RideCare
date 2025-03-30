@@ -7,6 +7,7 @@ import 'package:ridecare/presentation/chooseService/pages/chooseServices.dart';
 import 'package:ridecare/presentation/home/pages/home.dart';
 import 'package:ridecare/presentation/explore/pages/explore.dart';
 import 'package:ridecare/presentation/profile/pages/profile.dart';
+import 'package:ridecare/presentation/serviceProvider/pages/appointmentBooking.dart';
 import 'package:ridecare/presentation/serviceProvider/pages/serviceProviderDetails.dart';
 import 'package:ridecare/presentation/splash/pages/splash.dart';
 import '../../../common/helper/prefService.dart';
@@ -14,7 +15,7 @@ import '../../../presentation/auth/pages/form.dart';
 import '../../../presentation/onboarding/pages/onboarding.dart';
 
 final GoRouter router = GoRouter(
-  initialLocation: '/choose-service',
+  initialLocation: '/splash',
   refreshListenable: AuthNotifier(),
   routes: [
     GoRoute(path: '/splash', builder: (context, state) => const SplashPage()),
@@ -43,6 +44,7 @@ final GoRouter router = GoRouter(
     ),
 
     GoRoute(path: '/choose-service', builder: (context, state) => const ChooseServicesPage()),
+    GoRoute(path: '/appointment-booking', builder: (context, state) =>  AppointmentBookingPage()),
   ],
 
   redirect: (context, state) async {

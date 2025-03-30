@@ -131,7 +131,7 @@ class _ChooseServicesPageState extends State<ChooseServicesPage> {
                   borderRadius: BorderRadius.circular(10),
                 ),
               ),
-              onPressed: () {},
+              onPressed: () { context.push("/appointment-booking");},
               child: const Text(
                 "Next",
                 style: TextStyle(color: Colors.white, fontSize: 16),

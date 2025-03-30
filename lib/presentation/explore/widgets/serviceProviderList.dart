@@ -3,7 +3,34 @@ import 'package:ridecare/presentation/explore/widgets/serviceProviderCard.dart';
 import '../../../core/configs/assets/app_images.dart';
 
 class ServiceProviderList extends StatelessWidget {
-  const ServiceProviderList({super.key});
+  ServiceProviderList({super.key});
+
+  final List<ServiceProvider> serviceProviders = [
+    ServiceProvider(
+      "1",
+      "Bajaj Service Center",
+      "0.5 km",
+      "2 Mins",
+      "100-1200",
+      AppImages.popularServiceProvider1,
+    ),
+    ServiceProvider(
+      "1",
+      "Honda Service Center",
+      "1.5 km",
+      "8 Mins",
+      "200-1500",
+      AppImages.popularServiceProvider2,
+    ),
+    ServiceProvider(
+      "1",
+      "Toyota Service Center",
+      "0.5 km",
+      "2 Mins",
+      "500-2300",
+      AppImages.popularServiceProvider3,
+    ),
+  ];
 
   @override
   Widget build(BuildContext context) {
@@ -15,29 +42,10 @@ class ServiceProviderList extends StatelessWidget {
         child: ListView(
           scrollDirection: Axis.horizontal,
           padding: EdgeInsets.symmetric(horizontal: 15),
-          children: [
-            ServiceProviderCard(
-              name: "Bajaj Service Center",
-              distance: "0.5 km",
-              time: "2 Mins",
-              price: "100-1200",
-              image: AppImages.popularServiceProvider1,
-            ),
-            ServiceProviderCard(
-              name: "Honda Service Center",
-              distance: "1.5 km",
-              time: "8 Mins",
-              price: "200-1500",
-              image: AppImages.popularServiceProvider2,
-            ),
-            ServiceProviderCard(
-              name: "Toyota Service Center",
-              distance: "0.5 km",
-              time: "2 Mins",
-              price: "500-2300",
-              image: AppImages.popularServiceProvider3,
-            ),
-          ],
+          children:
+            serviceProviders
+                .map((provider) => ServiceProviderCard(provider: provider))
+                .toList(),
         ),
       ),
     );
