@@ -4,8 +4,8 @@ import 'package:ridecare/core/configs/assets/app_images.dart';
 import '../../../common/widgets/bottomBar/bottomBar.dart';
 import '../../../core/configs/theme/app_colors.dart';
 
-class BillSummary extends StatelessWidget {
-  const BillSummary({super.key});
+class BillSummaryPage extends StatelessWidget {
+  const BillSummaryPage({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -71,7 +71,12 @@ class BillSummary extends StatelessWidget {
           ),
         ),
       ),
-      bottomNavigationBar: CustomBottomBar(text: "Continue", onPressed: () {}),
+      bottomNavigationBar: CustomBottomBar(
+        text: "Continue",
+        onPressed: () {
+          context.push("/payment-gateway");
+        },
+      ),
     );
   }
 

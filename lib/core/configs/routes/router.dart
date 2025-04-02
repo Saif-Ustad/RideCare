@@ -3,6 +3,7 @@ import 'package:go_router/go_router.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:ridecare/presentation/auth/pages/signin.dart';
 import 'package:ridecare/presentation/billing/pages/billSummary.dart';
+import 'package:ridecare/presentation/billing/pages/paymentGetway.dart';
 import 'package:ridecare/presentation/bookmark/pages/bookmark.dart';
 import 'package:ridecare/presentation/chooseService/pages/chooseServices.dart';
 import 'package:ridecare/presentation/home/pages/home.dart';
@@ -54,7 +55,8 @@ final GoRouter router = GoRouter(
     GoRoute(path: '/add-vehicle', builder: (context, state) => const AddVehiclePage()),
     GoRoute(path: '/select-location', builder: (context, state) => const SelectLocationPage()),
     GoRoute(path: '/add-location', builder: (context, state) => const AddLocationPage()),
-    GoRoute(path: '/bill-summary/:id', builder: (context, state) => const BillSummary()),
+    GoRoute(path: '/bill-summary/:id', builder: (context, state) => const BillSummaryPage()),
+    GoRoute(path: '/payment-gateway', builder: (context, state) => const PaymentGatewayPage()),
   ],
 
   redirect: (context, state) async {
