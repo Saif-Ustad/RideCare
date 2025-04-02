@@ -68,7 +68,7 @@ class _SelectLocationPageState extends State<SelectLocationPage> {
       bottomNavigationBar: CustomBottomBar(
         text: "Continue",
         onPressed: () {
-          // Handle navigation to the next page
+          context.push("/bill-summary/1");
         },
       ),
     );
