@@ -230,7 +230,7 @@ class _ServiceProviderList extends StatelessWidget {
         autoPlay: false,
         enlargeCenterPage: false,
         viewportFraction: 0.7,
-        enableInfiniteScroll: false,
+        enableInfiniteScroll: true,
       ),
       items:
           serviceProviders

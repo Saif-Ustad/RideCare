@@ -45,16 +45,15 @@ class _SelectVehiclePageState extends State<SelectVehiclePage> {
 
       body: Padding(
         padding: const EdgeInsets.all(15),
-        child: Expanded(
-          child: ListView.builder(
-            itemCount: vehicles.length,
-            itemBuilder: (context, index) {
-              final vehicle = vehicles[index];
-              return _buildVehicleCard(vehicle);
-            },
-          ),
+        child: ListView.builder(
+          itemCount: vehicles.length,
+          itemBuilder: (context, index) {
+            final vehicle = vehicles[index];
+            return _buildVehicleCard(vehicle);
+          },
         ),
       ),
+
       bottomNavigationBar: CustomBottomBar(
         text: "Continue",
         onPressed: () {

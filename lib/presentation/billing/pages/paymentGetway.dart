@@ -84,7 +84,7 @@ class _PaymentGatewayPageState extends State<PaymentGatewayPage> {
       bottomNavigationBar: CustomBottomBar(
         text: "Continue",
         onPressed: () {
-          context.push("/payment-gateway");
+          context.push("/payment-done");
         },
       ),
     );
