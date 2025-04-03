@@ -5,14 +5,14 @@ class ProfileMenuList extends StatelessWidget {
   const ProfileMenuList({super.key});
 
   final List<Map<String, dynamic>> _menuItems = const [
-    {'icon': Icons.person, 'title': "Your Profile"},
-    {'icon': Icons.location_on, 'title': "Manage Address"},
-    {'icon': Icons.credit_card, 'title': "Payment Methods"},
-    {'icon': Icons.calendar_today, 'title': "My Bookings"},
-    {'icon': Icons.account_balance_wallet, 'title': "Wallet"},
-    {'icon': Icons.settings, 'title': "Settings"},
-    {'icon': Icons.headset_mic, 'title': "Help Center"},
-    {'icon': Icons.privacy_tip, 'title': "Privacy Policy"},
+    {'icon': Icons.person, 'title': "Your Profile", 'route' : ""},
+    {'icon': Icons.location_on, 'title': "Manage Address", 'route' : "/select-location"},
+    {'icon': Icons.credit_card, 'title': "Payment Methods", 'route' : "/payment-gateway"},
+    {'icon': Icons.calendar_today, 'title': "My Bookings", 'route' : "/my-bookings"},
+    {'icon': Icons.account_balance_wallet, 'title': "Wallet", 'route' : ""},
+    {'icon': Icons.settings, 'title': "Settings", 'route' : ""},
+    {'icon': Icons.headset_mic, 'title': "Help Center", 'route' : ""},
+    {'icon': Icons.privacy_tip, 'title': "Privacy Policy", 'route' : ""},
   ];
 
   @override
@@ -23,6 +23,7 @@ class ProfileMenuList extends StatelessWidget {
         return ProfileMenuItem(
           icon: _menuItems[index]['icon'],
           title: _menuItems[index]['title'],
+          route: _menuItems[index]['route'],
         );
       },
     );

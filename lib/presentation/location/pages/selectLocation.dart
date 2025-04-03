@@ -115,7 +115,7 @@ class _SelectLocationPageState extends State<SelectLocationPage> {
   Widget _buildAddAddressButton() {
     return GestureDetector(
       onTap: () {
-       context.push("add-location");
+       context.push("/add-location");
       },
       child: Padding(
         padding: const EdgeInsets.symmetric(vertical: 15),

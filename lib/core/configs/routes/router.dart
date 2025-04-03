@@ -6,6 +6,7 @@ import 'package:ridecare/presentation/billing/pages/billSummary.dart';
 import 'package:ridecare/presentation/billing/pages/eReceipt.dart';
 import 'package:ridecare/presentation/billing/pages/paymentDone.dart';
 import 'package:ridecare/presentation/billing/pages/paymentGetway.dart';
+import 'package:ridecare/presentation/booking/pages/myBookings.dart';
 import 'package:ridecare/presentation/bookmark/pages/bookmark.dart';
 import 'package:ridecare/presentation/chooseService/pages/chooseServices.dart';
 import 'package:ridecare/presentation/home/pages/home.dart';
@@ -61,6 +62,8 @@ final GoRouter router = GoRouter(
     GoRoute(path: '/payment-gateway', builder: (context, state) => const PaymentGatewayPage()),
     GoRoute(path: '/payment-done', builder: (context, state) => const PaymentDonePage()),
     GoRoute(path: '/e-receipt', builder: (context, state) => const EReceiptPage()),
+
+    GoRoute(path: '/my-bookings', builder: (context, state) => const MyBookingsPage()),
   ],
 
   redirect: (context, state) async {

@@ -5,7 +5,6 @@ import 'package:ridecare/domain/usecases/sign_out.dart';
 
 import '../../../core/configs/theme/app_colors.dart';
 
-
 class HomeAppBar extends StatelessWidget {
   const HomeAppBar({super.key});
 
@@ -28,7 +27,7 @@ class HomeAppBar extends StatelessWidget {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             crossAxisAlignment: CrossAxisAlignment.start,
-            children: [_buildLocationInfo(), _buildNotificationIcon(context)],
+            children: [_buildLocationInfo(context), _buildNotificationIcon(context)],
           ),
         ),
       ),
@@ -48,7 +47,7 @@ class HomeAppBar extends StatelessWidget {
     );
   }
 
-  Widget _buildLocationInfo() {
+  Widget _buildLocationInfo(BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -60,26 +59,34 @@ class HomeAppBar extends StatelessWidget {
             color: Colors.white,
           ),
         ),
-        Row(
-          children: [
-            Icon(Icons.location_on, color: AppColors.orange, size: 22),
-            SizedBox(width: 2),
-            Text(
-              "Kondhwa, Pune",
-              style: TextStyle(
-                color: Colors.white,
-                fontSize: 14,
-                fontWeight: FontWeight.w500,
+        GestureDetector(
+          onTap: () {
+            context.push("/select-location");
+          },
+          child: Row(
+            children: [
+              Icon(Icons.location_on, color: AppColors.orange, size: 22),
+              SizedBox(width: 2),
+              Text(
+                "Kondhwa, Pune",
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 14,
+                  fontWeight: FontWeight.w500,
+                ),
               ),
-            ),
-            Icon(Icons.arrow_drop_down, color: Colors.white, size: 26),
-          ],
+              Icon(Icons.arrow_drop_down, color: Colors.white, size: 26),
+            ],
+          ),
         ),
       ],
     );
   }
 
-  Widget _buildNotificationIcon(BuildContext context, {bool hasNotification = true}) {
+  Widget _buildNotificationIcon(
+    BuildContext context, {
+    bool hasNotification = true,
+  }) {
     return Stack(
       children: [
         Container(
@@ -95,7 +102,8 @@ class HomeAppBar extends StatelessWidget {
               final signOutUseCase = GetIt.instance<SignOut>();
               await signOutUseCase();
 
-              if (context.mounted) {  // Ensure context is valid
+              if (context.mounted) {
+                // Ensure context is valid
                 GoRouter.of(context).go('/signin'); // Redirect to Sign-In Page
               }
             },

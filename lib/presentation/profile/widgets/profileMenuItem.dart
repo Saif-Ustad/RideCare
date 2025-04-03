@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
 import '../../../core/configs/theme/app_colors.dart';
 
 class ProfileMenuItem extends StatelessWidget {
   final IconData icon;
   final String title;
+  final String route;
 
-  const ProfileMenuItem({super.key, required this.icon, required this.title});
+  const ProfileMenuItem({super.key, required this.icon, required this.title, required this.route});
 
   @override
   Widget build(BuildContext context) {
@@ -19,7 +21,7 @@ class ProfileMenuItem extends StatelessWidget {
         color: Colors.grey,
       ),
       onTap: () {
-        // Handle navigation
+        context.push(route);
       },
     );
   }
