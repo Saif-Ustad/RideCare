@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
-import '../../../core/configs/assets/app_images.dart';
 import '../../../core/configs/theme/app_colors.dart';
+import '../widgets/booking.dart';
 
 class MyBookingsPage extends StatefulWidget {
   const MyBookingsPage({super.key});
@@ -254,7 +254,7 @@ class _MyBookingsPageState extends State<MyBookingsPage>
             // Action Buttons
             Row(
               children: [
-                if (!isCancelled) ...[
+                if (!isCancelled && booking.btn1OnPressed != null) ...[
                   Expanded(
                     child: TextButton(
                       style: TextButton.styleFrom(
@@ -263,15 +263,16 @@ class _MyBookingsPageState extends State<MyBookingsPage>
                           borderRadius: BorderRadius.circular(8),
                         ),
                       ),
-                      onPressed: booking.btn1OnPressed,
+                      onPressed: () => booking.btn1OnPressed!(context),
                       child: Text(
                         booking.btn1,
                         style: TextStyle(fontSize: 14, color: AppColors.black),
                       ),
                     ),
                   ),
-
                   const SizedBox(width: 10),
+                ],
+                if (!isCancelled && booking.btn2OnPressed != null) ...[
                   Expanded(
                     child: ElevatedButton(
                       style: ElevatedButton.styleFrom(
@@ -280,7 +281,7 @@ class _MyBookingsPageState extends State<MyBookingsPage>
                           borderRadius: BorderRadius.circular(8),
                         ),
                       ),
-                      onPressed: booking.btn2OnPressed,
+                      onPressed: () => booking.btn2OnPressed!(context),
                       child: Text(
                         booking.btn2,
                         style: const TextStyle(
@@ -328,109 +329,3 @@ class _MyBookingsPageState extends State<MyBookingsPage>
 
 TextStyle get _infoTextStyle =>
     const TextStyle(fontSize: 12, color: AppColors.darkGrey);
-
-class Booking {
-  final String serviceCenter, orderId, orderDate, imageUrl, status, btn1, btn2;
-  final double distance, time, payment;
-  final Color statusColor;
-  final VoidCallback btn1OnPressed, btn2OnPressed;
-
-  Booking({
-    required this.serviceCenter,
-    required this.orderId,
-    required this.orderDate,
-    required this.imageUrl,
-    required this.status,
-    required this.statusColor,
-    required this.distance,
-    required this.time,
-    required this.payment,
-    required this.btn1,
-    required this.btn2,
-    required this.btn1OnPressed,
-    required this.btn2OnPressed,
-  });
-}
-
-List<Booking> activeBookings = [
-  Booking(
-    serviceCenter: "Bajaj Service Center",
-    orderId: "CRR0265A53",
-    orderDate: "4 Mar",
-    imageUrl: AppImages.popularServiceProvider1,
-    status: "Order Pending",
-    statusColor: AppColors.orange,
-    distance: 0.5,
-    time: 2,
-    payment: 1035,
-    btn1: "Cancle",
-    btn2: "Track Order",
-    btn1OnPressed: () => {},
-    btn2OnPressed: () => {},
-  ),
-  Booking(
-    serviceCenter: "Honda Service Center",
-    orderId: "CRD3275A56",
-    orderDate: "2 Mar",
-    imageUrl: AppImages.popularServiceProvider2,
-    status: "Order Confirmed",
-    statusColor: Colors.green,
-    distance: 1.5,
-    time: 8,
-    payment: 2835,
-    btn1: "Cancle",
-    btn2: "Track Order",
-    btn1OnPressed: () => {},
-    btn2OnPressed: () => {},
-  ),
-];
-
-List<Booking> completedBookings = [
-  Booking(
-    serviceCenter: "Toyota Service Center",
-    orderId: "CRD3275A56",
-    orderDate: "2 Mar",
-    imageUrl: AppImages.popularServiceProvider2,
-    status: "Order Confirmed",
-    statusColor: Colors.green,
-    distance: 1.5,
-    time: 8,
-    payment: 2835,
-    btn1: "Leave Review",
-    btn2: "E-Reciept",
-    btn1OnPressed: () => {},
-    btn2OnPressed: () => {},
-  ),
-];
-List<Booking> cancelledBookings = [
-  Booking(
-    serviceCenter: "Mazda Service Center",
-    orderId: "CRD3275A56",
-    orderDate: "2 Mar",
-    imageUrl: AppImages.popularServiceProvider2,
-    status: "Cancelled",
-    statusColor: AppColors.orange,
-    distance: 1.5,
-    time: 8,
-    payment: 2835,
-    btn1: "Leave Review",
-    btn2: "E-Reciept",
-    btn1OnPressed: () => {},
-    btn2OnPressed: () => {},
-  ),
-  Booking(
-    serviceCenter: "Ferrari Service Center",
-    orderId: "CRD3275A56",
-    orderDate: "2 Mar",
-    imageUrl: AppImages.popularServiceProvider2,
-    status: "Cancelled",
-    statusColor: AppColors.orange,
-    distance: 1.5,
-    time: 8,
-    payment: 2835,
-    btn1: "Leave Review",
-    btn2: "E-Reciept",
-    btn1OnPressed: () => {},
-    btn2OnPressed: () => {},
-  ),
-];
