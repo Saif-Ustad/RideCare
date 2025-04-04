@@ -8,7 +8,7 @@ class Booking {
   final String serviceCenter, orderId, orderDate, imageUrl, status, btn1, btn2;
   final double distance, time, payment;
   final Color statusColor;
-  final Function(BuildContext)? btn1OnPressed, btn2OnPressed; // Accept context
+  final Function(BuildContext)? btn1OnPressed, btn2OnPressed;
 
   Booking({
     required this.serviceCenter,
@@ -40,7 +40,9 @@ List<Booking> activeBookings = [
     payment: 1035,
     btn1: "Cancel",
     btn2: "Track Order",
-    btn1OnPressed: (context) {},
+    btn1OnPressed: (context) {
+      context.push("/cancel-booking");
+    },
     btn2OnPressed: (context) {
       context.push("/track-order/1");
     },
@@ -57,7 +59,9 @@ List<Booking> activeBookings = [
     payment: 2835,
     btn1: "Cancel",
     btn2: "Track Order",
-    btn1OnPressed: (context) {},
+    btn1OnPressed: (context) {
+      context.push("/cancel-booking");
+    },
     btn2OnPressed: (context) {
       context.push("/track-order/1");
     },
@@ -95,12 +99,8 @@ List<Booking> cancelledBookings = [
     distance: 1.5,
     time: 8,
     payment: 2835,
-    btn1: "Leave Review",
-    btn2: "E-Receipt",
-    btn1OnPressed: (context) {},
-    btn2OnPressed: (context) {
-      context.push("/e-receipt");
-    },
+    btn1: "",
+    btn2: "",
   ),
   Booking(
     serviceCenter: "Ferrari Service Center",
@@ -114,7 +114,5 @@ List<Booking> cancelledBookings = [
     payment: 2835,
     btn1: "",
     btn2: "",
-    btn1OnPressed: (context) {},
-    btn2OnPressed: (context) {},
   ),
 ];
