@@ -15,6 +15,12 @@ import 'package:ridecare/presentation/home/pages/home.dart';
 import 'package:ridecare/presentation/onboarding/bloc/onboarding_bloc.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
+import '../../data/datasources/special_offer_remote_datasource.dart';
+import '../../data/repositories/special_offer_repository_impl.dart';
+import '../../domain/repositories/special_offer_repository.dart';
+import '../../domain/usecases/get_special_offers.dart';
+import '../../presentation/home/bloc/specialOffers/special_offer_bloc.dart';
+
 final GetIt sl = GetIt.instance;
 
 void setupServiceLocator() {
@@ -26,21 +32,28 @@ void setupServiceLocator() {
 
   // ✅ Register Remote Data Source
   sl.registerLazySingleton<AuthRemoteDataSource>(
-    () => AuthRemoteDataSourceImpl(
-      sl<FirebaseAuth>(),
-      sl<FirebaseFirestore>(),
-    ),
+    () => AuthRemoteDataSourceImpl(sl<FirebaseAuth>(), sl<FirebaseFirestore>()),
   );
 
-  // ✅ Register Auth Repository
+  sl.registerLazySingleton<SpecialOfferRemoteDataSource>(
+    () => SpecialOfferRemoteDataSourceImpl(firestore: sl()),
+  );
+
+  // ✅ Register Repository
   sl.registerLazySingleton<AuthRepository>(
     () => AuthRepositoryImpl(sl<AuthRemoteDataSource>()),
+  );
+
+  sl.registerLazySingleton<SpecialOfferRepository>(
+    () => SpecialOfferRepositoryImpl(remoteDataSource: sl()),
   );
 
   // ✅ Register Use Cases
   sl.registerLazySingleton(() => RegisterWithEmail(sl<AuthRepository>()));
   sl.registerLazySingleton(() => SignInWithEmail(sl<AuthRepository>()));
   sl.registerLazySingleton(() => SignOut(sl<AuthRepository>()));
+
+  sl.registerLazySingleton(() => GetSpecialOffers(repository: sl()));
 
   // ✅ Register BLoCs
   sl.registerLazySingleton<OnboardingBloc>(() => OnboardingBloc());
@@ -55,12 +68,16 @@ void setupServiceLocator() {
     ),
   );
 
+  sl.registerLazySingleton<SpecialOfferBloc>(
+    () => SpecialOfferBloc(getSpecialOffers: sl()),
+  );
 
-  sl.registerLazySingleton<GoRouter>(() => GoRouter(
-    routes: [
-      GoRoute(path: '/home', builder: (context, state) => HomePage()),
-      GoRoute(path: '/signin', builder: (context, state) => SignInPage()),
-    ],
-  ));
-
+  sl.registerLazySingleton<GoRouter>(
+    () => GoRouter(
+      routes: [
+        GoRoute(path: '/home', builder: (context, state) => HomePage()),
+        GoRoute(path: '/signin', builder: (context, state) => SignInPage()),
+      ],
+    ),
+  );
 }

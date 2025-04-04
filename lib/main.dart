@@ -8,6 +8,7 @@ import 'package:ridecare/presentation/auth/bloc/password_toggle_bloc.dart';
 import 'package:ridecare/presentation/auth/bloc/otp_bloc.dart';
 import 'package:ridecare/core/configs/theme/app_theme.dart';
 import 'package:ridecare/core/dependency_injection/service_locator.dart';
+import 'package:ridecare/presentation/home/bloc/specialOffers/special_offer_bloc.dart';
 import 'package:ridecare/presentation/onboarding/bloc/onboarding_bloc.dart';
 
 import 'firebase_options.dart';
@@ -41,6 +42,9 @@ class MyApp extends StatelessWidget {
         ),
         BlocProvider<AuthBloc>(
           create: (context) => sl<AuthBloc>(),
+        ),
+        BlocProvider<SpecialOfferBloc>(
+          create: (context) => sl<SpecialOfferBloc>(),
         ),
       ],
       child: PopScope(

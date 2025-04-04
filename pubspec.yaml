@@ -41,7 +41,6 @@ dependencies:
   vector_graphics: ^1.1.18
   firebase_core: ^3.12.1
   firebase_auth: ^5.5.1
-  google_fonts: ^6.1.0
   carousel_slider:
   google_maps_flutter: ^2.5.0
   geolocator: ^13.0.3
@@ -55,6 +54,7 @@ dependencies:
 
   flutter_map: ^6.1.0
   http: ^1.3.0
+  dartz:
 
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
