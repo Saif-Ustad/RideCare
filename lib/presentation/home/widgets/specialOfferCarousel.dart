@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -39,13 +40,21 @@ class SpecialOfferSection extends StatelessWidget {
                       return Stack(
                         children: [
                           Container(
-                            margin: EdgeInsets.all(5),
+                            margin: const EdgeInsets.all(5),
                             decoration: BoxDecoration(
                               borderRadius: BorderRadius.circular(15),
-                              image: DecorationImage(
-                                image: NetworkImage(item.imageUrl),
-                                fit: BoxFit.cover,
-                              ),
+                            ),
+                            clipBehavior: Clip.antiAlias,
+                            child: CachedNetworkImage(
+                              imageUrl: item.imageUrl,
+                              fit: BoxFit.cover,
+                              placeholder:
+                                  (context, url) =>
+                                      Container(color: Colors.grey[300]),
+                              fadeInDuration: const Duration(milliseconds: 500),
+                              errorWidget:
+                                  (context, url, error) =>
+                                      const Icon(Icons.error),
                             ),
                           ),
 

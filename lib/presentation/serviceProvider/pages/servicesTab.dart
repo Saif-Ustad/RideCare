@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:ridecare/domain/entities/service_entity.dart';
@@ -87,7 +88,27 @@ class ServicesTab extends StatelessWidget {
               color: AppColors.primary.withOpacity(0.15),
             ),
             // child: Icon(service.iconUrl, size: 24, color: AppColors.primary),
-            child: Image.network(service.iconUrl, width: 24, height: 24),
+            child: CachedNetworkImage(
+              imageUrl: service.iconUrl,
+              width: 24,
+              height: 24,
+              fit: BoxFit.cover,
+              placeholder:
+                  (context, url) => Container(
+                    width: 24,
+                    height: 24,
+                    decoration: BoxDecoration(
+                      color: Colors.grey[300],
+                      borderRadius: BorderRadius.circular(4),
+                    ),
+                  ),
+              errorWidget:
+                  (context, url, error) => const Icon(
+                    Icons.broken_image,
+                    size: 24,
+                    color: Colors.redAccent,
+                  ),
+            ),
           ),
           const SizedBox(width: 12),
 

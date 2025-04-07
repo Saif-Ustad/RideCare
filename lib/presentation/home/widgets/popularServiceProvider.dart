@@ -149,6 +149,7 @@
 //   }
 // }
 
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -307,11 +308,25 @@ class _ServiceProviderCard extends StatelessWidget {
       borderRadius: BorderRadius.circular(10),
       child: Stack(
         children: [
-          Image.network(
-            provider.workImageUrl,
+          CachedNetworkImage(
+            imageUrl: provider.workImageUrl,
             height: 100,
             width: double.infinity,
             fit: BoxFit.cover,
+            placeholder:
+                (context, url) => Container(
+                  height: 100,
+                  width: double.infinity,
+                  color: Colors.grey[300],
+                ),
+            errorWidget:
+                (context, url, error) => Container(
+                  height: 100,
+                  width: double.infinity,
+                  color: Colors.grey[200],
+                  child: const Icon(Icons.broken_image, color: Colors.red),
+                ),
+            fadeInDuration: const Duration(milliseconds: 500),
           ),
           _buildBadge(
             Icons.star_rounded,

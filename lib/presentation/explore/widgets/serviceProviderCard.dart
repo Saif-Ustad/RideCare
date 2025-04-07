@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:ridecare/domain/entities/service_provider_entity.dart';
@@ -41,13 +42,26 @@ class ServiceProviderCard extends StatelessWidget {
       borderRadius: BorderRadius.circular(10),
       child: Stack(
         children: [
-          Image.network(
-            provider.workImageUrl,
+          CachedNetworkImage(
+            imageUrl: provider.workImageUrl,
             height: 100,
             width: double.infinity,
             fit: BoxFit.cover,
+            placeholder:
+                (context, url) => Container(
+                  height: 100,
+                  width: double.infinity,
+                  color: Colors.grey[300],
+                ),
+            errorWidget:
+                (context, url, error) => Container(
+                  height: 100,
+                  width: double.infinity,
+                  color: Colors.grey[200],
+                  child: const Icon(Icons.broken_image, color: Colors.red),
+                ),
+            fadeInDuration: const Duration(milliseconds: 500),
           ),
-
           // ratings Badge
           Positioned(
             top: 8,
@@ -157,4 +171,3 @@ class ServiceProviderCard extends StatelessWidget {
     );
   }
 }
-

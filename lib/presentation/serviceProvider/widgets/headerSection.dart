@@ -1,4 +1,4 @@
-
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:ridecare/domain/entities/service_provider_entity.dart';
@@ -10,17 +10,35 @@ class HeaderSection extends StatelessWidget {
   final List<String> images;
   final ServiceProviderEntity provider;
 
-  const HeaderSection({super.key, required this.images, required this.provider});
+  const HeaderSection({
+    super.key,
+    required this.images,
+    required this.provider,
+  });
 
   @override
   Widget build(BuildContext context) {
     return Stack(
       children: [
-        Image.network(
-          provider.workImageUrl,
-          width: double.infinity,
+        CachedNetworkImage(
+          imageUrl: provider.workImageUrl,
           height: MediaQuery.of(context).size.height * 0.3,
+          width: double.infinity,
           fit: BoxFit.cover,
+          placeholder:
+              (context, url) => Container(
+                height: 100,
+                width: double.infinity,
+                color: Colors.grey[300],
+              ),
+          errorWidget:
+              (context, url, error) => Container(
+                height: 100,
+                width: double.infinity,
+                color: Colors.grey[200],
+                child: const Icon(Icons.broken_image, color: Colors.red),
+              ),
+          fadeInDuration: const Duration(milliseconds: 500),
         ),
         Positioned(
           top: 10,
