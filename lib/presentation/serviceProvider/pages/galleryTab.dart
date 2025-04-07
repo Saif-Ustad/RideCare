@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:ridecare/core/configs/theme/app_colors.dart';
 
@@ -74,7 +75,17 @@ class GalleryTab extends StatelessWidget {
   Widget _galleryItem(String imageUrl) {
     return ClipRRect(
       borderRadius: BorderRadius.circular(10),
-      child: Image.network(imageUrl, fit: BoxFit.cover),
+      child: CachedNetworkImage(
+        imageUrl: imageUrl,
+        fit: BoxFit.cover,
+        placeholder: (context, url) => Container(
+          color: Colors.grey[300],
+        ),
+        errorWidget: (context, url, error) => const Icon(
+          Icons.broken_image,
+          color: Colors.grey,
+        ),
+      ),
     );
   }
 }

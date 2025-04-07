@@ -92,7 +92,6 @@ class ServicesTab extends StatelessWidget {
               imageUrl: service.iconUrl,
               width: 24,
               height: 24,
-              fit: BoxFit.cover,
               placeholder:
                   (context, url) => Container(
                     width: 24,

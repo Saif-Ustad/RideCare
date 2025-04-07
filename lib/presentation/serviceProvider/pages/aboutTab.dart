@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:ridecare/core/configs/theme/app_colors.dart';
@@ -113,7 +114,25 @@ class _AboutTabState extends State<AboutTab> {
             children: [
               CircleAvatar(
                 radius: 30,
-                backgroundImage: NetworkImage(widget.userImage),
+                backgroundColor: Colors.grey[300],
+                child: ClipOval(
+                  child: CachedNetworkImage(
+                    imageUrl: widget.userImage,
+                    width: 60,
+                    height: 60,
+                    fit: BoxFit.cover,
+                    placeholder: (context, url) => Container(
+                      width: 60,
+                      height: 60,
+                      color: Colors.grey[300],
+                    ),
+                    errorWidget: (context, url, error) => const Icon(
+                      Icons.person,
+                      size: 30,
+                      color: Colors.grey,
+                    ),
+                  ),
+                ),
               ),
               const SizedBox(width: 15),
               Expanded(
