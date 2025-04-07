@@ -3,6 +3,8 @@ import 'dart:convert';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:ridecare/core/configs/theme/app_colors.dart';
+import 'package:ridecare/domain/entities/service_provider_entity.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class AboutTab extends StatefulWidget {
   final String aboutText;
@@ -11,8 +13,9 @@ class AboutTab extends StatefulWidget {
   final String userImage;
   final double rating;
   final String experience;
-  final String location;
-  final String availability;
+  final LocationEntity location;
+  final AvailabilityEntity availability;
+  final String phoneNumber;
 
   const AboutTab({
     super.key,
@@ -24,6 +27,7 @@ class AboutTab extends StatefulWidget {
     required this.experience,
     required this.location,
     required this.availability,
+    required this.phoneNumber,
   });
 
   @override
@@ -32,6 +36,27 @@ class AboutTab extends StatefulWidget {
 
 class _AboutTabState extends State<AboutTab> {
   bool isExpanded = false;
+
+
+  Future<void> _launchPhoneDialer(String phoneNumber) async {
+    final Uri phoneUri = Uri(scheme: 'tel', path: phoneNumber);
+    if (await canLaunchUrl(phoneUri)) {
+      await launchUrl(phoneUri, mode: LaunchMode.externalApplication);
+    } else {
+      print("Could not launch $phoneUri");
+    }
+  }
+
+  Future<void> _launchWhatsApp(String phoneNumber) async {
+    final sanitizedNumber = phoneNumber.replaceAll(RegExp(r'[^\d]'), '');
+    final Uri whatsappUri = Uri.parse("https://wa.me/$sanitizedNumber");
+    if (await canLaunchUrl(whatsappUri)) {
+      await launchUrl(whatsappUri, mode: LaunchMode.externalApplication);
+    } else {
+      print("Could not launch $whatsappUri");
+    }
+  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -88,7 +113,7 @@ class _AboutTabState extends State<AboutTab> {
             children: [
               CircleAvatar(
                 radius: 30,
-                backgroundImage: AssetImage(widget.userImage),
+                backgroundImage: NetworkImage(widget.userImage),
               ),
               const SizedBox(width: 15),
               Expanded(
@@ -98,15 +123,15 @@ class _AboutTabState extends State<AboutTab> {
                     Text(
                       widget.userName,
                       style: const TextStyle(
-                        fontSize: 16,
+                        fontSize: 14,
                         fontWeight: FontWeight.w500,
-                        color: AppColors.black
+                        color: AppColors.black,
                       ),
                     ),
                     Text(
                       widget.userRole,
                       style: const TextStyle(
-                        fontSize: 14,
+                        fontSize: 12,
                         color: AppColors.darkGrey,
                       ),
                     ),
@@ -117,19 +142,22 @@ class _AboutTabState extends State<AboutTab> {
               ),
               Row(
                 children: [
-                  _iconButton(Icons.phone, () {}),
+                  _iconButton(Icons.phone, () => _launchPhoneDialer(widget.phoneNumber)),
                   const SizedBox(width: 10),
-                  _iconButton(Icons.chat, () {}),
+                  _iconButton(Icons.chat, () => _launchWhatsApp(widget.phoneNumber)),
                 ],
-              ),
+              )
             ],
           ),
           const SizedBox(height: 25),
 
           // Additional Details
-          _infoRow(Icons.work, "Experience: ${widget.experience}"),
-          _infoRow(Icons.location_on, "Location: ${widget.location}"),
-          _infoRow(Icons.schedule, "Availability: ${widget.availability}"),
+          _infoRow(Icons.work, "Experience: ${widget.experience} Years"),
+          _infoRow(Icons.location_on, "Location: ${widget.location.address}"),
+          _infoRow(
+            Icons.schedule,
+            "Availability: ${widget.availability.from} - ${widget.availability.to}",
+          ),
 
           const SizedBox(height: 20),
 
@@ -219,11 +247,13 @@ class _AboutTabState extends State<AboutTab> {
   Widget _buildStarRating(double rating) {
     return Row(
       children: List.generate(5, (index) {
-        return Icon(
-          index < rating ? Icons.star : Icons.star_border,
-          size: 18,
-          color: Colors.amber,
-        );
+        if (index < rating.floor()) {
+          return Icon(Icons.star, size: 16, color: Colors.amber);
+        } else if (index < rating && rating - index >= 0.5) {
+          return Icon(Icons.star_half, size: 16, color: Colors.amber);
+        } else {
+          return Icon(Icons.star_border, size: 16, color: Colors.amber);
+        }
       }),
     );
   }

@@ -33,41 +33,80 @@ final GoRouter router = GoRouter(
     GoRoute(path: '/onboarding', builder: (context, state) => OnboardingPage()),
 
     GoRoute(path: '/signin', builder: (context, state) => const SignInPage()),
-    GoRoute(path: '/userform', builder: (context, state) => const UserFormPage(),),
+    GoRoute(
+      path: '/userform',
+      builder: (context, state) => const UserFormPage(),
+    ),
 
     GoRoute(path: '/home', builder: (context, state) => const HomePage()),
     GoRoute(path: '/explore', builder: (context, state) => const ExplorePage()),
-    GoRoute(path: '/bookmark', builder: (context, state) =>  BookmarkPage()),
+    GoRoute(path: '/bookmark', builder: (context, state) => BookmarkPage()),
     GoRoute(path: '/profile', builder: (context, state) => const ProfilePage()),
 
-    // GoRoute(path: '/service-provider/:id', builder: (context, state) =>  ServiceProviderDetailPage()),
-    // Use a prebuilt transition
     GoRoute(
       path: '/service-provider/:id',
-      pageBuilder: (context, state) {
-        final String id = state.pathParameters['id']!;
-        return MaterialPage(
-          key: state.pageKey,
-          child: ServiceProviderDetailPage(),
-          fullscreenDialog: true, // Enables the default slide-up transition
-        );
+      builder: (context, state) {
+        final id = state.pathParameters['id']!;
+        return ServiceProviderDetailPage(id: id);
       },
     ),
 
-    GoRoute(path: '/choose-service', builder: (context, state) => const ChooseServicesPage()),
-    GoRoute(path: '/appointment-booking', builder: (context, state) =>  AppointmentBookingPage()),
-    GoRoute(path: '/select-vehicle', builder: (context, state) => const SelectVehiclePage()),
-    GoRoute(path: '/add-vehicle', builder: (context, state) => const AddVehiclePage()),
-    GoRoute(path: '/select-location', builder: (context, state) => const SelectLocationPage()),
-    GoRoute(path: '/add-location', builder: (context, state) => const AddLocationPage()),
-    GoRoute(path: '/bill-summary/:id', builder: (context, state) => const BillSummaryPage()),
-    GoRoute(path: '/payment-gateway', builder: (context, state) => const PaymentGatewayPage()),
-    GoRoute(path: '/payment-done', builder: (context, state) => const PaymentDonePage()),
-    GoRoute(path: '/e-receipt', builder: (context, state) => const EReceiptPage()),
+    GoRoute(
+      path: '/choose-service',
+      builder: (context, state) => const ChooseServicesPage(),
+    ),
+    GoRoute(
+      path: '/appointment-booking',
+      builder: (context, state) {
+        final id = state.pathParameters['id']!;
+        return AppointmentBookingPage(id: id);
+      },
+    ),
+    GoRoute(
+      path: '/select-vehicle',
+      builder: (context, state) => const SelectVehiclePage(),
+    ),
+    GoRoute(
+      path: '/add-vehicle',
+      builder: (context, state) => const AddVehiclePage(),
+    ),
+    GoRoute(
+      path: '/select-location',
+      builder: (context, state) => const SelectLocationPage(),
+    ),
+    GoRoute(
+      path: '/add-location',
+      builder: (context, state) => const AddLocationPage(),
+    ),
+    GoRoute(
+      path: '/bill-summary/:id',
+      builder: (context, state) => const BillSummaryPage(),
+    ),
+    GoRoute(
+      path: '/payment-gateway',
+      builder: (context, state) => const PaymentGatewayPage(),
+    ),
+    GoRoute(
+      path: '/payment-done',
+      builder: (context, state) => const PaymentDonePage(),
+    ),
+    GoRoute(
+      path: '/e-receipt',
+      builder: (context, state) => const EReceiptPage(),
+    ),
 
-    GoRoute(path: '/my-bookings', builder: (context, state) => const MyBookingsPage()),
-    GoRoute(path: '/cancel-booking', builder: (context, state) => const CancelBookingPage()),
-    GoRoute(path: '/track-order/:id', builder: (context, state) => const TrackOrderPage()),
+    GoRoute(
+      path: '/my-bookings',
+      builder: (context, state) => const MyBookingsPage(),
+    ),
+    GoRoute(
+      path: '/cancel-booking',
+      builder: (context, state) => const CancelBookingPage(),
+    ),
+    GoRoute(
+      path: '/track-order/:id',
+      builder: (context, state) => const TrackOrderPage(),
+    ),
   ],
 
   redirect: (context, state) async {

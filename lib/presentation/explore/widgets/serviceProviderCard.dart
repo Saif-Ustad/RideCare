@@ -1,14 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:ridecare/domain/entities/service_provider_entity.dart';
 
 import '../../../core/configs/theme/app_colors.dart';
 
 class ServiceProviderCard extends StatelessWidget {
-  final ServiceProvider provider;
-  const ServiceProviderCard({
-    super.key,
-    required this.provider
-  });
+  final ServiceProviderEntity provider;
+
+  const ServiceProviderCard({super.key, required this.provider});
 
   @override
   Widget build(BuildContext context) {
@@ -42,8 +41,8 @@ class ServiceProviderCard extends StatelessWidget {
       borderRadius: BorderRadius.circular(10),
       child: Stack(
         children: [
-          Image.asset(
-            provider.image,
+          Image.network(
+            provider.workImageUrl,
             height: 100,
             width: double.infinity,
             fit: BoxFit.cover,
@@ -64,7 +63,7 @@ class ServiceProviderCard extends StatelessWidget {
                   Icon(Icons.star_rounded, color: AppColors.golden, size: 14),
                   SizedBox(width: 3),
                   Text(
-                    "4.8",
+                    provider.rating.toString(),
                     style: TextStyle(
                       fontSize: 10,
                       fontWeight: FontWeight.w600,
@@ -113,7 +112,7 @@ class ServiceProviderCard extends StatelessWidget {
                 size: 14,
               ),
               SizedBox(width: 5),
-              Text(provider.distance, style: TextStyle(color: AppColors.darkGrey)),
+              Text("1.5 Km", style: TextStyle(color: AppColors.darkGrey)),
               SizedBox(width: 15),
               Icon(
                 Icons.access_time_filled,
@@ -121,7 +120,7 @@ class ServiceProviderCard extends StatelessWidget {
                 size: 14,
               ),
               SizedBox(width: 5),
-              Text(provider.time, style: TextStyle(color: AppColors.darkGrey)),
+              Text("10 Min", style: TextStyle(color: AppColors.darkGrey)),
             ],
           ),
           SizedBox(height: 5),
@@ -136,7 +135,7 @@ class ServiceProviderCard extends StatelessWidget {
                 ),
               ),
               Text(
-                provider.price,
+                "${provider.serviceCharges.min} - ${provider.serviceCharges.max}",
                 style: TextStyle(
                   color: AppColors.primary,
                   fontSize: 14,
@@ -159,9 +158,3 @@ class ServiceProviderCard extends StatelessWidget {
   }
 }
 
-
-class ServiceProvider {
-  final String id, name, distance, time, price, image;
-
-  ServiceProvider(this.id, this.name, this.distance, this.time, this.price, this.image);
-}

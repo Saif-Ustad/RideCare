@@ -10,6 +10,7 @@ class ServiceProviderModel extends ServiceProviderEntity {
     required super.experienceYears,
     required super.profileImageUrl,
     required super.workImageUrl,
+    required super.galleryImageUrls,
     required super.rating,
     required super.reviewsCount,
     required super.availability,
@@ -32,6 +33,7 @@ class ServiceProviderModel extends ServiceProviderEntity {
       experienceYears: json['experienceYears'] ?? '',
       profileImageUrl: json['profileImageUrl'] ?? '',
       workImageUrl: json['workImageUrl'] ?? '',
+      galleryImageUrls: List<String>.from(json['galleryImageUrls'] ?? []),
       rating: (json['rating'] ?? 0).toDouble(),
       reviewsCount: (json['reviewsCount'] ?? 0).toInt(),
       availability: AvailabilityEntity(
@@ -61,6 +63,7 @@ class ServiceProviderModel extends ServiceProviderEntity {
       'experienceYears': experienceYears,
       'profileImageUrl': profileImageUrl,
       'workImageUrl': workImageUrl,
+      'galleryImageUrls': galleryImageUrls,
       'rating': rating,
       'reviewsCount': reviewsCount,
       'availability': {'from': availability.from, 'to': availability.to},

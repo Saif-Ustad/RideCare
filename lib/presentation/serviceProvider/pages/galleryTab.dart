@@ -1,18 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:ridecare/core/configs/assets/app_images.dart';
 import 'package:ridecare/core/configs/theme/app_colors.dart';
 
 class GalleryTab extends StatelessWidget {
-  final List<String> galleryImages = [
-    AppImages.galleryImage1,
-    AppImages.galleryImage2,
-    AppImages.galleryImage1,
-    AppImages.galleryImage2,
-    AppImages.galleryImage1,
-    AppImages.galleryImage2,
-  ];
 
-  GalleryTab({super.key});
+  final List<String> galleryImages;
+
+  const GalleryTab({super.key, required this.galleryImages});
 
   @override
   Widget build(BuildContext context) {
@@ -81,7 +74,7 @@ class GalleryTab extends StatelessWidget {
   Widget _galleryItem(String imageUrl) {
     return ClipRRect(
       borderRadius: BorderRadius.circular(10),
-      child: Image.asset(imageUrl, fit: BoxFit.cover),
+      child: Image.network(imageUrl, fit: BoxFit.cover),
     );
   }
 }

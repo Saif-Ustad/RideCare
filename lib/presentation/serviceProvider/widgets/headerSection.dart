@@ -1,21 +1,23 @@
 
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:ridecare/domain/entities/service_provider_entity.dart';
 
 import '../../../core/configs/assets/app_images.dart';
 import '../../../core/configs/theme/app_colors.dart';
 
 class HeaderSection extends StatelessWidget {
   final List<String> images;
+  final ServiceProviderEntity provider;
 
-  const HeaderSection({super.key, required this.images});
+  const HeaderSection({super.key, required this.images, required this.provider});
 
   @override
   Widget build(BuildContext context) {
     return Stack(
       children: [
-        Image.asset(
-          AppImages.serviceProvider1,
+        Image.network(
+          provider.workImageUrl,
           width: double.infinity,
           height: MediaQuery.of(context).size.height * 0.3,
           fit: BoxFit.cover,

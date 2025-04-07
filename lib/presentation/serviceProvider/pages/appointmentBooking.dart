@@ -1,13 +1,17 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:ridecare/core/configs/assets/app_images.dart';
 import '../../../common/widgets/bottomBar/bottomBar.dart';
 import '../../../core/configs/theme/app_colors.dart';
+import '../../home/bloc/serviceProvider/service_provider_bloc.dart';
+import '../../home/bloc/serviceProvider/service_provider_state.dart';
 import '../widgets/headerSection.dart';
 import '../widgets/serviceInfoSection.dart';
 
 class AppointmentBookingPage extends StatefulWidget {
-  const AppointmentBookingPage({super.key});
+  final String id;
+  const AppointmentBookingPage({super.key, required this.id});
 
   @override
   _AppointmentBookingPageState createState() => _AppointmentBookingPageState();
@@ -42,62 +46,86 @@ class _AppointmentBookingPageState extends State<AppointmentBookingPage> {
     }
   }
 
-
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.white,
-      resizeToAvoidBottomInset: true,
-      body: SafeArea(
-        child: Column(
-          children: [
-            HeaderSection(images: images),
-            Expanded(
-              child: SingleChildScrollView(
-                physics: const BouncingScrollPhysics(),
-                child: Column(
-                  children: [
-                    const SizedBox(height: 12),
-                    const ServiceInfoSection(),
-                    Divider(color: AppColors.lightGray, thickness: 1, height: 25),
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 16),
+    return BlocBuilder<ServiceProviderBloc, ServiceProviderState>(
+      builder: (context, state) {
+        if (state is ServiceProviderLoaded) {
+          final provider = state.providers.firstWhere(
+            (element) => element.id == widget.id,
+            orElse: () => throw Exception('Provider not found'),
+          );
+
+          return Scaffold(
+            backgroundColor: Colors.white,
+            resizeToAvoidBottomInset: true,
+            body: SafeArea(
+              child: Column(
+                children: [
+                  HeaderSection(images: images, provider: provider,),
+                  Expanded(
+                    child: SingleChildScrollView(
+                      physics: const BouncingScrollPhysics(),
                       child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          _sectionTitle("BOOK A SLOT"),
-                          const SizedBox(height: 10),
-                          _serviceTypeSelection(),
-                          const SizedBox(height: 16),
-                          _dateTimeSelection(context),
-                          const SizedBox(height: 8),
-                          _estimatedDuration(),
-                          const SizedBox(height: 16),
-                          _noteInputField(),
-                          const SizedBox(height: 10),
+                          const SizedBox(height: 12),
+                          ServiceInfoSection(provider: provider),
+                          Divider(
+                            color: AppColors.lightGray,
+                            thickness: 1,
+                            height: 25,
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 16),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                _sectionTitle("BOOK A SLOT"),
+                                const SizedBox(height: 10),
+                                _serviceTypeSelection(),
+                                const SizedBox(height: 16),
+                                _dateTimeSelection(context),
+                                const SizedBox(height: 8),
+                                _estimatedDuration(),
+                                const SizedBox(height: 16),
+                                _noteInputField(),
+                                const SizedBox(height: 10),
+                              ],
+                            ),
+                          ),
                         ],
                       ),
                     ),
-                  ],
-                ),
+                  ),
+                ],
               ),
             ),
-          ],
-        ),
-      ),
-      bottomNavigationBar: CustomBottomBar(
-        text: "Continue",
-        onPressed: () {
-          context.push("/select-vehicle");
-        },
-      ),
+            bottomNavigationBar: CustomBottomBar(
+              text: "Continue",
+              onPressed: () {
+                context.push("/select-vehicle");
+              },
+            ),
+          );
+        } else if (state is ServiceProviderLoading) {
+          return const Center(child: CircularProgressIndicator());
+        } else if (state is ServiceProviderError) {
+          return Center(child: Text(state.message));
+        } else {
+          return const SizedBox();
+        }
+      },
     );
   }
 
   Widget _sectionTitle(String title) {
     return Text(
       title,
-      style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500, color: AppColors.black),
+      style: TextStyle(
+        fontSize: 14,
+        fontWeight: FontWeight.w500,
+        color: AppColors.black,
+      ),
     );
   }
 
@@ -124,13 +152,20 @@ class _AppointmentBookingPageState extends State<AppointmentBookingPage> {
       child: ElevatedButton(
         style: ElevatedButton.styleFrom(
           elevation: 1,
-          backgroundColor: selectedServiceType == type ? AppColors.primary : AppColors.lightGray,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+          backgroundColor:
+              selectedServiceType == type
+                  ? AppColors.primary
+                  : AppColors.lightGray,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20),
+          ),
         ),
         onPressed: () => setState(() => selectedServiceType = type),
         child: Text(
           type,
-          style: TextStyle(color: selectedServiceType == type ? Colors.white : Colors.black),
+          style: TextStyle(
+            color: selectedServiceType == type ? Colors.white : Colors.black,
+          ),
         ),
       ),
     );
@@ -169,7 +204,11 @@ class _AppointmentBookingPageState extends State<AppointmentBookingPage> {
     );
   }
 
-  Widget _inputBox({required String text, required IconData icon, required VoidCallback onTap}) {
+  Widget _inputBox({
+    required String text,
+    required IconData icon,
+    required VoidCallback onTap,
+  }) {
     return GestureDetector(
       onTap: onTap,
       child: Container(
@@ -193,12 +232,22 @@ class _AppointmentBookingPageState extends State<AppointmentBookingPage> {
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-      decoration: BoxDecoration(color: AppColors.lightGray, borderRadius: BorderRadius.circular(8)),
+      decoration: BoxDecoration(
+        color: AppColors.lightGray,
+        borderRadius: BorderRadius.circular(8),
+      ),
       child: Row(
         children: [
           Container(width: 3, height: 16, color: AppColors.primary),
           const SizedBox(width: 8),
-          Text("Estimated Service Duration: 1.5 hours", style: TextStyle(fontSize: 12, fontWeight: FontWeight.w500, color: AppColors.darkGrey)),
+          Text(
+            "Estimated Service Duration: 1.5 hours",
+            style: TextStyle(
+              fontSize: 12,
+              fontWeight: FontWeight.w500,
+              color: AppColors.darkGrey,
+            ),
+          ),
         ],
       ),
     );
@@ -211,11 +260,21 @@ class _AppointmentBookingPageState extends State<AppointmentBookingPage> {
         _sectionTitle("Note to Service Provider"),
         const SizedBox(height: 5),
         Container(
-          decoration: BoxDecoration(color: AppColors.lightGray, borderRadius: BorderRadius.circular(8)),
+          decoration: BoxDecoration(
+            color: AppColors.lightGray,
+            borderRadius: BorderRadius.circular(8),
+          ),
           child: TextField(
             controller: noteController,
             style: TextStyle(fontSize: 14, color: AppColors.darkGrey),
-            decoration: InputDecoration(hintText: "Enter Here", border: InputBorder.none, contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 14)),
+            decoration: InputDecoration(
+              hintText: "Enter Here",
+              border: InputBorder.none,
+              contentPadding: const EdgeInsets.symmetric(
+                horizontal: 12,
+                vertical: 14,
+              ),
+            ),
           ),
         ),
       ],

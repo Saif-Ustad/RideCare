@@ -7,6 +7,7 @@ class ServiceProviderEntity {
   final String experienceYears;
   final String profileImageUrl;
   final String workImageUrl;
+  final List<String> galleryImageUrls;
   final double rating;
   final int reviewsCount;
   final AvailabilityEntity availability;
@@ -24,6 +25,7 @@ class ServiceProviderEntity {
     required this.experienceYears,
     required this.profileImageUrl,
     required this.workImageUrl,
+    required this.galleryImageUrls,
     required this.rating,
     required this.reviewsCount,
     required this.availability,
