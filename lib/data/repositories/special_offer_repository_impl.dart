@@ -10,7 +10,7 @@ class SpecialOfferRepositoryImpl implements SpecialOfferRepository {
   SpecialOfferRepositoryImpl({required this.remoteDataSource});
 
   @override
-  Future<Either<Exception, List<SpecialOffer>>> getSpecialOffers() async {
+  Future<Either<Exception, List<SpecialOfferEntity>>> getSpecialOffers() async {
     try {
       final specialOffers = await remoteDataSource.getSpecialOffers();
       return Right(specialOffers);

@@ -7,7 +7,7 @@ import '../datasources/auth_remote_datasource.dart';
 class AuthRepositoryImpl implements AuthRepository {
   final AuthRemoteDataSource remoteDataSource;
 
-  AuthRepositoryImpl(this.remoteDataSource);
+  AuthRepositoryImpl({required this.remoteDataSource});
 
   @override
   Future<void> registerWithEmailAndPassword(String firstName, String lastName, String email, String password) {

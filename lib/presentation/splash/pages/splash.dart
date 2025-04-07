@@ -1,7 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
 import 'package:ridecare/core/configs/assets/app_vectors.dart';
+import 'package:ridecare/presentation/home/bloc/serviceProvider/service_provider_bloc.dart';
+import 'package:ridecare/presentation/home/bloc/serviceProvider/service_provider_event.dart';
+
+import '../../home/bloc/specialOffers/special_offer_bloc.dart';
+import '../../home/bloc/specialOffers/special_offer_event.dart';
 
 class SplashPage extends StatefulWidget {
   const SplashPage({super.key});
@@ -14,7 +20,13 @@ class _SplashPageState extends State<SplashPage> {
   @override
   void initState() {
     super.initState();
+    _loadData();
     _navigateToNext();
+  }
+
+  Future<void> _loadData() async {
+    context.read<SpecialOfferBloc>().add(FetchSpecialOffers());
+    context.read<ServiceProviderBloc>().add(FetchAllServiceProviders());
   }
 
   Future<void> _navigateToNext() async {

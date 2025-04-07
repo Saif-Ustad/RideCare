@@ -1,7 +1,7 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
-import '../../../domain/usecases/register_with_email.dart';
-import '../../../domain/usecases/sign_in_with_email.dart';
-import '../../../domain/usecases/sign_out.dart';
+import '../../../domain/usecases/auth/register_with_email.dart';
+import '../../../domain/usecases/auth/sign_in_with_email.dart';
+import '../../../domain/usecases/auth/sign_out.dart';
 import 'auth_event.dart';
 import 'auth_state.dart';
 

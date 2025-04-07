@@ -1,5 +1,5 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
-import '../../../../domain/usecases/get_special_offers.dart';
+import '../../../../domain/usecases/specialOffers/get_special_offers.dart';
 import 'special_offer_event.dart';
 import 'special_offer_state.dart';
 

@@ -1,6 +1,6 @@
 import '../../domain/entities/special_offer_entity.dart';
 
-class SpecialOfferModel extends SpecialOffer {
+class SpecialOfferModel extends SpecialOfferEntity {
   SpecialOfferModel({
     required super.title,
     required super.description,

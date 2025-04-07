@@ -8,23 +8,23 @@ abstract class AuthRemoteDataSource {
 }
 
 class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
-  final FirebaseAuth _auth;
-  final FirebaseFirestore _fireStore;
+  final FirebaseAuth auth;
+  final FirebaseFirestore fireStore;
 
-  AuthRemoteDataSourceImpl(this._auth, this._fireStore);
+  AuthRemoteDataSourceImpl({required this.auth, required this.fireStore});
 
   @override
   Future<void> registerWithEmailAndPassword(
       String firstName, String lastName, String email, String password) async {
     try {
       // Create user with email and password
-      UserCredential userCredential = await _auth.createUserWithEmailAndPassword(
+      UserCredential userCredential = await auth.createUserWithEmailAndPassword(
         email: email,
         password: password,
       );
 
       // Store user data in FireStore
-      await _fireStore.collection('users').doc(userCredential.user!.uid).set({
+      await fireStore.collection('users').doc(userCredential.user!.uid).set({
         'firstName': firstName,
         'lastName': lastName,
         'email': email,
@@ -38,12 +38,12 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
 
   @override
   Future<User?> signInWithEmailAndPassword(String email, String password) async {
-    final credential = await _auth.signInWithEmailAndPassword(email: email, password: password);
+    final credential = await auth.signInWithEmailAndPassword(email: email, password: password);
     return credential.user;
   }
 
   @override
   Future<void> signOut() async {
-    await _auth.signOut();
+    await auth.signOut();
   }
 }

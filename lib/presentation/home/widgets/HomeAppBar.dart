@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 import 'package:go_router/go_router.dart';
-import 'package:ridecare/domain/usecases/sign_out.dart';
+import 'package:ridecare/domain/usecases/auth/sign_out.dart';
 
 import '../../../core/configs/theme/app_colors.dart';
 

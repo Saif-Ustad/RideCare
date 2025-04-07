@@ -2,32 +2,11 @@ import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:ridecare/core/configs/theme/app_colors.dart';
-
-import '../../../core/configs/assets/app_images.dart';
 import '../bloc/specialOffers/special_offer_bloc.dart';
-import '../bloc/specialOffers/special_offer_event.dart';
 import '../bloc/specialOffers/special_offer_state.dart';
 
-class SpecialOfferSection extends StatefulWidget {
+class SpecialOfferSection extends StatelessWidget {
   const SpecialOfferSection({super.key});
-
-  @override
-  State<SpecialOfferSection> createState() => _SpecialOfferSectionState();
-}
-
-class _SpecialOfferSectionState extends State<SpecialOfferSection> {
-  final List<String> carouselImages = [
-    AppImages.specialOffer1,
-    AppImages.specialOffer2,
-    AppImages.specialOffer3,
-  ];
-
-  @override
-  void initState() {
-    super.initState();
-
-    context.read<SpecialOfferBloc>().add(FetchSpecialOffers());
-  }
 
   @override
   Widget build(BuildContext context) {

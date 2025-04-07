@@ -151,39 +151,42 @@
 
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
-import '../../../core/configs/assets/app_images.dart';
+import 'package:ridecare/domain/entities/service_provider_entity.dart';
+import 'package:ridecare/presentation/home/bloc/serviceProvider/service_provider_bloc.dart';
+import 'package:ridecare/presentation/home/bloc/serviceProvider/service_provider_state.dart';
 import '../../../core/configs/theme/app_colors.dart';
 
 class PopularServiceProviderSection extends StatelessWidget {
-  PopularServiceProviderSection({super.key});
+  const PopularServiceProviderSection({super.key});
 
-  final List<ServiceProvider> serviceProviders = [
-    ServiceProvider(
-      "1",
-      "Bajaj Service Center",
-      "0.5 km",
-      "2 Mins",
-      "100-1200",
-      AppImages.popularServiceProvider1,
-    ),
-    ServiceProvider(
-      "1",
-      "Honda Service Center",
-      "1.5 km",
-      "8 Mins",
-      "200-1500",
-      AppImages.popularServiceProvider2,
-    ),
-    ServiceProvider(
-      "1",
-      "Toyota Service Center",
-      "0.5 km",
-      "2 Mins",
-      "500-2300",
-      AppImages.popularServiceProvider3,
-    ),
-  ];
+  // final List<ServiceProvider> serviceProviders = [
+  //   ServiceProvider(
+  //     "1",
+  //     "Bajaj Service Center",
+  //     "0.5 km",
+  //     "2 Mins",
+  //     "100-1200",
+  //     AppImages.popularServiceProvider1,
+  //   ),
+  //   ServiceProvider(
+  //     "1",
+  //     "Honda Service Center",
+  //     "1.5 km",
+  //     "8 Mins",
+  //     "200-1500",
+  //     AppImages.popularServiceProvider2,
+  //   ),
+  //   ServiceProvider(
+  //     "1",
+  //     "Toyota Service Center",
+  //     "0.5 km",
+  //     "2 Mins",
+  //     "500-2300",
+  //     AppImages.popularServiceProvider3,
+  //   ),
+  // ];
 
   @override
   Widget build(BuildContext context) {
@@ -191,7 +194,7 @@ class PopularServiceProviderSection extends StatelessWidget {
       children: [
         _buildSectionHeader("Popular Services Provider"),
         const SizedBox(height: 10),
-        _ServiceProviderList(serviceProviders: serviceProviders),
+        _ServiceProviderList(),
       ],
     );
   }
@@ -218,30 +221,40 @@ class PopularServiceProviderSection extends StatelessWidget {
 }
 
 class _ServiceProviderList extends StatelessWidget {
-  final List<ServiceProvider> serviceProviders;
-
-  const _ServiceProviderList({required this.serviceProviders, super.key});
+  const _ServiceProviderList({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return CarouselSlider(
-      options: CarouselOptions(
-        height: 220,
-        autoPlay: false,
-        enlargeCenterPage: false,
-        viewportFraction: 0.7,
-        enableInfiniteScroll: true,
-      ),
-      items:
-          serviceProviders
-              .map((provider) => _ServiceProviderCard(provider: provider))
-              .toList(),
+    return BlocBuilder<ServiceProviderBloc, ServiceProviderState>(
+      builder: (context, state) {
+        if (state is ServiceProviderLoaded) {
+          return CarouselSlider(
+            options: CarouselOptions(
+              height: 220,
+              autoPlay: false,
+              enlargeCenterPage: false,
+              viewportFraction: 0.7,
+              enableInfiniteScroll: true,
+            ),
+            items:
+                state.providers
+                    .map((provider) => _ServiceProviderCard(provider: provider))
+                    .toList(),
+          );
+        } else if (state is ServiceProviderLoading) {
+          return const Center(child: CircularProgressIndicator());
+        } else if (state is ServiceProviderError) {
+          return Center(child: Text(state.message));
+        } else {
+          return const SizedBox(); // or fallback UI
+        }
+      },
     );
   }
 }
 
 class _ServiceProviderCard extends StatelessWidget {
-  final ServiceProvider provider;
+  final ServiceProviderEntity provider;
 
   const _ServiceProviderCard({required this.provider, super.key});
 
@@ -275,9 +288,9 @@ class _ServiceProviderCard extends StatelessWidget {
               const SizedBox(height: 5),
               Row(
                 children: [
-                  _buildInfoRow(Icons.location_on, provider.distance),
+                  _buildInfoRow(Icons.location_on, "0.5 Km"),
                   const SizedBox(width: 10),
-                  _buildInfoRow(Icons.access_time_filled, provider.time),
+                  _buildInfoRow(Icons.access_time_filled, "2 Mins"),
                 ],
               ),
               const SizedBox(height: 5),
@@ -294,13 +307,17 @@ class _ServiceProviderCard extends StatelessWidget {
       borderRadius: BorderRadius.circular(10),
       child: Stack(
         children: [
-          Image.asset(
-            provider.image,
+          Image.network(
+            provider.workImageUrl,
             height: 100,
             width: double.infinity,
             fit: BoxFit.cover,
           ),
-          _buildBadge(Icons.star_rounded, "4.8", AppColors.golden),
+          _buildBadge(
+            Icons.star_rounded,
+            provider.rating.toString(),
+            AppColors.golden,
+          ),
           _buildBadge(Icons.bookmark, "", AppColors.primary, right: true),
         ],
       ),
@@ -353,7 +370,7 @@ class _ServiceProviderCard extends StatelessWidget {
       children: [
         Text("Rs. ", style: _textStyle(14, FontWeight.w600, AppColors.primary)),
         Text(
-          provider.price,
+          "${provider.serviceCharges.min} - ${provider.serviceCharges.max}",
           style: _textStyle(14, FontWeight.w600, AppColors.primary),
         ),
         Text(
@@ -367,10 +384,4 @@ class _ServiceProviderCard extends StatelessWidget {
   TextStyle _textStyle(double size, FontWeight weight, Color color) {
     return TextStyle(fontSize: size, fontWeight: weight, color: color);
   }
-}
-
-class ServiceProvider {
-  final String id, name, distance, time, price, image;
-
-  ServiceProvider(this.id, this.name, this.distance, this.time, this.price, this.image);
 }

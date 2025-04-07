@@ -12,7 +12,7 @@ class SpecialOfferInitial extends SpecialOfferState {}
 class SpecialOfferLoading extends SpecialOfferState {}
 
 class SpecialOfferLoaded extends SpecialOfferState {
-  final List<SpecialOffer> offers;
+  final List<SpecialOfferEntity> offers;
 
   SpecialOfferLoaded(this.offers);
 
