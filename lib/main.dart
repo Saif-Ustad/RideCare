@@ -11,6 +11,7 @@ import 'package:ridecare/core/dependency_injection/service_locator.dart';
 import 'package:ridecare/presentation/home/bloc/serviceProvider/service_provider_bloc.dart';
 import 'package:ridecare/presentation/home/bloc/specialOffers/special_offer_bloc.dart';
 import 'package:ridecare/presentation/onboarding/bloc/onboarding_bloc.dart';
+import 'package:ridecare/presentation/serviceProvider/bloc/service_bloc.dart';
 
 import 'firebase_options.dart';
 
@@ -49,6 +50,9 @@ class MyApp extends StatelessWidget {
         ),
         BlocProvider<ServiceProviderBloc>(
           create: (context) => sl<ServiceProviderBloc>(),
+        ),
+        BlocProvider<ServiceBloc>(
+          create: (context) => sl<ServiceBloc>(),
         ),
       ],
       child: PopScope(

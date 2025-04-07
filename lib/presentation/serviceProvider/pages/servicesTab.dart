@@ -1,46 +1,69 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:ridecare/domain/entities/service_entity.dart';
 
 import '../../../core/configs/theme/app_colors.dart';
+import '../bloc/service_bloc.dart';
+import '../bloc/service_state.dart';
 
 class ServicesTab extends StatelessWidget {
-  final List<Map<String, dynamic>> services = [
-    {"icon": Icons.oil_barrel, "name": "Engine Oil Change"},
-    {"icon": Icons.local_car_wash, "name": "Car Wash"},
-    {"icon": Icons.car_repair, "name": "Scratch Removal"},
-    {"icon": Icons.oil_barrel, "name": "Engine Oil Change"},
-    {"icon": Icons.local_car_wash, "name": "Car Wash"},
-    {"icon": Icons.car_repair, "name": "Scratch Removal"},
-  ];
+  // final List<Map<String, dynamic>> services = [
+  //   {"icon": Icons.oil_barrel, "name": "Engine Oil Change"},
+  //   {"icon": Icons.local_car_wash, "name": "Car Wash"},
+  //   {"icon": Icons.car_repair, "name": "Scratch Removal"},
+  //   {"icon": Icons.oil_barrel, "name": "Engine Oil Change"},
+  //   {"icon": Icons.local_car_wash, "name": "Car Wash"},
+  //   {"icon": Icons.car_repair, "name": "Scratch Removal"},
+  // ];
 
-  ServicesTab({super.key});
+  const ServicesTab({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return SingleChildScrollView(
-      physics: const BouncingScrollPhysics(),
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const Text(
-            "Services",
-            style: TextStyle(
-              fontSize: 16,
-              fontWeight: FontWeight.w500,
-              color: AppColors.black,
-            ),
-          ),
-          const SizedBox(height: 12),
+    return BlocBuilder<ServiceBloc, ServiceState>(
+      builder: (context, state) {
+        if (state is ServiceLoading) {
+          return const Center(child: CircularProgressIndicator());
+        } else if (state is ServiceLoaded) {
+          final services = state.services;
 
-          Column(
-            children: services.map((service) => _serviceItem(service)).toList(),
-          ),
-        ],
-      ),
+          if (services.isEmpty) {
+            return const Center(child: Text('No services available.'));
+          }
+
+          return SingleChildScrollView(
+            physics: const BouncingScrollPhysics(),
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text(
+                  "Services",
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w500,
+                    color: AppColors.black,
+                  ),
+                ),
+                const SizedBox(height: 12),
+
+                Column(
+                  children:
+                      services.map((service) => _serviceItem(service)).toList(),
+                ),
+              ],
+            ),
+          );
+        } else if (state is ServiceError) {
+          return Center(child: Text(state.message));
+        } else {
+          return const SizedBox();
+        }
+      },
     );
   }
 
-  Widget _serviceItem(Map<String, dynamic> service) {
+  Widget _serviceItem(ServiceEntity service) {
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
       padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 12),
@@ -63,13 +86,14 @@ class ServicesTab extends StatelessWidget {
               shape: BoxShape.circle,
               color: AppColors.primary.withOpacity(0.15),
             ),
-            child: Icon(service["icon"], size: 24, color: AppColors.primary),
+            // child: Icon(service.iconUrl, size: 24, color: AppColors.primary),
+            child: Image.network(service.iconUrl, width: 24, height: 24),
           ),
           const SizedBox(width: 12),
 
           // Service Name
           Text(
-            service["name"],
+            service.name,
             style: const TextStyle(
               fontSize: 14,
               fontWeight: FontWeight.w500,

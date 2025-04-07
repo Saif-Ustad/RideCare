@@ -1,4 +1,3 @@
-
 class ServiceModel {
   final String imageUrl;
   final double rating;
@@ -8,11 +7,11 @@ class ServiceModel {
   final String priceRange;
 
   ServiceModel(
-      this.imageUrl,
-      this.rating,
-      this.serviceName,
-      this.distance,
-      this.time,
-      this.priceRange,
-      );
+    this.imageUrl,
+    this.rating,
+    this.serviceName,
+    this.distance,
+    this.time,
+    this.priceRange,
+  );
 }
