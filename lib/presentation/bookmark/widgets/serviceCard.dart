@@ -1,15 +1,22 @@
+import 'package:cached_network_image/cached_network_image.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:ridecare/presentation/bookmark/widgets/serviceModel.dart';
-
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:ridecare/domain/entities/service_provider_entity.dart';
 import '../../../core/configs/theme/app_colors.dart';
+import '../bloc/bookmark_bloc.dart';
+import '../bloc/bookmark_event.dart';
+import '../bloc/bookmark_state.dart';
 
 class ServiceCard extends StatelessWidget {
-  final ServiceModel service;
+  final ServiceProviderEntity serviceProvider;
 
-  const ServiceCard({super.key, required this.service});
+  const ServiceCard({super.key, required this.serviceProvider});
 
   @override
   Widget build(BuildContext context) {
+    final userId = FirebaseAuth.instance.currentUser?.uid;
+
     return Stack(
       clipBehavior: Clip.none,
       children: [
@@ -27,17 +34,35 @@ class ServiceCard extends StatelessWidget {
                   children: [
                     ClipRRect(
                       borderRadius: BorderRadius.circular(10),
-                      child: Image.asset(
-                        service.imageUrl,
+                      child: CachedNetworkImage(
+                        imageUrl: serviceProvider.workImageUrl,
                         height: 100,
-                        width: 140,
+                        width: 130,
                         fit: BoxFit.cover,
+                        placeholder:
+                            (context, url) => Container(
+                              height: 100,
+                              width: 130,
+                              color: Colors.grey[300],
+                            ),
+                        errorWidget:
+                            (context, url, error) => Container(
+                              height: 100,
+                              width: 130,
+                              color: Colors.grey[200],
+                              child: const Icon(
+                                Icons.broken_image,
+                                color: Colors.red,
+                              ),
+                            ),
+                        fadeInDuration: const Duration(milliseconds: 500),
                       ),
                     ),
+
                     Positioned(
                       left: 6,
                       top: 6,
-                      child: buildRatingBadge(service.rating),
+                      child: buildRatingBadge(serviceProvider.rating),
                     ),
                   ],
                 ),
@@ -47,23 +72,25 @@ class ServiceCard extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        service.serviceName,
+                        serviceProvider.name,
                         style: const TextStyle(
                           fontWeight: FontWeight.w500,
-                          fontSize: 14,
+                          fontSize: 15,
                         ),
                       ),
-                      const SizedBox(height: 4),
+                      const SizedBox(height: 2),
                       Row(
                         children: [
-                          buildInfoRow(Icons.location_on, service.distance),
+                          buildInfoRow(Icons.location_on, "0.5 Km"),
                           const SizedBox(width: 12),
-                          buildInfoRow(Icons.access_time_filled, service.time),
+                          buildInfoRow(Icons.access_time_filled, "10 Min"),
                         ],
                       ),
 
-                      const SizedBox(height: 4),
-                      buildPriceText(service.priceRange),
+                      const SizedBox(height: 5),
+                      buildPriceText(
+                        "${serviceProvider.serviceCharges.min} - ${serviceProvider.serviceCharges.max}",
+                      ),
                     ],
                   ),
                 ),
@@ -71,25 +98,52 @@ class ServiceCard extends StatelessWidget {
             ),
           ),
         ),
+
+        /// 🔖 Bookmark Toggle Button
         Positioned(
           right: -5,
           top: -10,
-          child: Container(
-            height: 35,
-            width: 35,
-            decoration: const BoxDecoration(
-              shape: BoxShape.circle,
-              color: Colors.white,
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black26,
-                  blurRadius: 4,
-                  offset: Offset(0, 2),
-                ),
-              ],
-            ),
-            child: const Center(
-              child: Icon(Icons.bookmark, color: Colors.purple, size: 22),
+          child: GestureDetector(
+            onTap: () {
+              if (userId != null) {
+                context.read<BookmarkBloc>().add(
+                  ToggleBookmarkedServiceProviders(userId, serviceProvider.id),
+                );
+              }
+            },
+            child: BlocBuilder<BookmarkBloc, BookmarkState>(
+              builder: (context, state) {
+                bool isBookmarked = false;
+
+                if (state is BookmarkLoaded) {
+                  isBookmarked = state.bookmarkedServices.any(
+                    (e) => e.id == serviceProvider.id,
+                  );
+                }
+
+                return Container(
+                  height: 35,
+                  width: 35,
+                  decoration: const BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: Colors.white,
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black26,
+                        blurRadius: 4,
+                        offset: Offset(0, 2),
+                      ),
+                    ],
+                  ),
+                  child: Center(
+                    child: Icon(
+                      isBookmarked ? Icons.bookmark : Icons.bookmark_border,
+                      color: AppColors.primary,
+                      size: 22,
+                    ),
+                  ),
+                );
+              },
             ),
           ),
         ),
@@ -105,7 +159,7 @@ class ServiceCard extends StatelessWidget {
     ),
     child: Row(
       children: [
-        Icon(Icons.star, color: AppColors.golden, size: 16),
+        Icon(Icons.star, color: Colors.amber, size: 16),
         const SizedBox(width: 4),
         Text(
           rating.toString(),
@@ -126,7 +180,8 @@ class ServiceCard extends StatelessWidget {
     ),
   );
 
-  Widget buildPriceText(String priceRange) => Row(
+  Widget buildPriceText(String priceRange) => Wrap(
+    crossAxisAlignment: WrapCrossAlignment.center,
     children: [
       const Text(
         "Rs. ",

@@ -7,9 +7,36 @@ class UserModel extends UserEntity {
     super.phoneNumber,
     super.displayName,
     super.photoURL,
+    super.bookmarkIds,
   });
 
-  // Factory method to convert Firebase User to UserModel
+  // Factory method to create UserModel from Firestore JSON
+  factory UserModel.fromJson(Map<String, dynamic> json) {
+    return UserModel(
+      uid: json['uid'] ?? '',
+      email: json['email'],
+      phoneNumber: json['phoneNumber'],
+      displayName: json['displayName'],
+      photoURL: json['photoURL'],
+      bookmarkIds: json['bookmarkIds'] != null
+          ? List<String>.from(json['bookmarkIds'])
+          : [],
+    );
+  }
+
+  // Serialize UserModel to Firestore JSON
+  Map<String, dynamic> toJson() {
+    return {
+      'uid': uid,
+      'email': email,
+      'phoneNumber': phoneNumber,
+      'displayName': displayName,
+      'photoURL': photoURL,
+      'bookmarkIds': bookmarkIds ?? [],
+    };
+  }
+
+  // Optional: Factory method to convert Firebase Auth User to UserModel (for login/registration only)
   factory UserModel.fromFirebaseUser(dynamic user) {
     return UserModel(
       uid: user.uid,
@@ -17,28 +44,7 @@ class UserModel extends UserEntity {
       phoneNumber: user.phoneNumber,
       displayName: user.displayName,
       photoURL: user.photoURL,
-    );
-  }
-
-  // Convert UserModel to Map for serialization
-  Map<String, dynamic> toJson() {
-    return {
-      "uid": uid,
-      "email": email,
-      "phoneNumber": phoneNumber,
-      "displayName": displayName,
-      "photoURL": photoURL,
-    };
-  }
-
-  // Convert from JSON Map to UserModel
-  factory UserModel.fromJson(Map<String, dynamic> json) {
-    return UserModel(
-      uid: json["uid"] ?? '',
-      email: json["email"],
-      phoneNumber: json["phoneNumber"],
-      displayName: json["displayName"],
-      photoURL: json["photoURL"],
+      bookmarkIds: [], // Not available from FirebaseAuth directly
     );
   }
 }

@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:ridecare/core/configs/assets/app_images.dart';
 import '../../../common/widgets/bottomNavigationBar/bottomNavigationBar.dart';
 import '../../../core/configs/theme/app_colors.dart';
+import '../bloc/bookmark_bloc.dart';
+import '../bloc/bookmark_state.dart';
 import '../widgets/serviceCard.dart';
 import '../widgets/serviceModel.dart';
 
@@ -39,77 +42,107 @@ class _BookmarkPageState extends State<BookmarkPage> {
   }
 
 
-  final services = [
-    ServiceModel(
-      AppImages.popularServiceProvider1,
-      4.6,
-      "Bajaj Service Center",
-      "0.5 km",
-      "2 Mins",
-      "100-1200",
-    ),
-    ServiceModel(
-      AppImages.popularServiceProvider2,
-      4.8,
-      "Honda Service Center",
-      "1.5 km",
-      "8 Mins",
-      "200-1500",
-    ),
-
-  ];
+  // final services = [
+  //   ServiceModel(
+  //     AppImages.popularServiceProvider1,
+  //     4.6,
+  //     "Bajaj Service Center",
+  //     "0.5 km",
+  //     "2 Mins",
+  //     "100-1200",
+  //   ),
+  //   ServiceModel(
+  //     AppImages.popularServiceProvider2,
+  //     4.8,
+  //     "Honda Service Center",
+  //     "1.5 km",
+  //     "8 Mins",
+  //     "200-1500",
+  //   ),
+  //
+  // ];
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.white,
-      appBar: AppBar(
-        backgroundColor: Colors.white,
-        elevation: 0,
-        leading: buildLeadingIconButton(() => context.go('/home')),
-        title: const Text(
-          "Bookmark",
-          style: TextStyle(
-            fontSize: 18,
-            fontWeight: FontWeight.w500,
-            color: Colors.black,
+    return BlocBuilder<BookmarkBloc, BookmarkState>(
+      builder: (context, state) {
+        return Scaffold(
+          backgroundColor: Colors.white,
+          appBar: AppBar(
+            backgroundColor: Colors.white,
+            elevation: 0,
+            leading: buildLeadingIconButton(() => context.go('/home')),
+            title: const Text(
+              "Bookmark",
+              style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.w500,
+                color: Colors.black,
+              ),
+            ),
+            centerTitle: true,
+            actions: [buildActionIconButton(() {})],
           ),
-        ),
-        centerTitle: true,
-        actions: [buildActionIconButton(() {})],
-      ),
 
-      body: Stack(
-        children: [
-          Padding(
-            padding: const EdgeInsets.all(15),
-            child: ListView.builder(
-              controller: _scrollController,
-              clipBehavior: Clip.none,
-              itemCount: services.length,
-              itemBuilder:
-                  (context, index) => Padding(
+          // body: Stack(
+          //   children: [
+          //     Padding(
+          //       padding: const EdgeInsets.all(15),
+          //       child: ListView.builder(
+          //         controller: _scrollController,
+          //         clipBehavior: Clip.none,
+          //         itemCount: services.length,
+          //         itemBuilder:
+          //             (context, index) => Padding(
+          //               padding: const EdgeInsets.only(bottom: 12),
+          //               child: ServiceCard(service: services[index]),
+          //             ),
+          //       ),
+          //     ),
+          //   ],
+          // ),
+          body: Stack(
+            children: [
+              Padding(
+                padding: const EdgeInsets.all(15),
+                child: state is BookmarkLoaded
+                    ? (state.bookmarkedServices.isEmpty
+                    ? const Center(child: Text('No bookmarks found.'))
+                    : ListView.builder(
+                  controller: _scrollController,
+                  clipBehavior: Clip.none,
+                  itemCount: state.bookmarkedServices.length,
+                  itemBuilder: (context, index) => Padding(
                     padding: const EdgeInsets.only(bottom: 12),
-                    child: ServiceCard(service: services[index]),
+                    child: ServiceCard(
+                      serviceProvider: state.bookmarkedServices[index],
+                    ),
                   ),
+                ))
+                    : state is BookmarkLoading
+                    ? const Center(child: CircularProgressIndicator())
+                    : const Center(child: Text('Something went wrong.')),
+              ),
+            ],
+          ),
+
+
+
+          bottomNavigationBar: AnimatedContainer(
+            duration: Duration(milliseconds: 300),
+            height: _isNavBarVisible ? kBottomNavigationBarHeight : 0,
+            // Animate height
+            child: Wrap(
+              children: [
+                Opacity(
+                  opacity: _isNavBarVisible ? 1.0 : 0.0, // Fade effect
+                  child: BottomNavigationBarSection(),
+                ),
+              ],
             ),
           ),
-        ],
-      ),
-
-      bottomNavigationBar: AnimatedContainer(
-        duration: Duration(milliseconds: 300),
-        height: _isNavBarVisible ? kBottomNavigationBarHeight : 0,
-        // Animate height
-        child: Wrap(
-          children: [
-            Opacity(
-              opacity: _isNavBarVisible ? 1.0 : 0.0, // Fade effect
-              child: BottomNavigationBarSection(),
-            ),
-          ],
-        ),
-      ),
+        );
+      }
     );
   }
 

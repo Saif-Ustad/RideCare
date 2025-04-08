@@ -7,8 +7,15 @@ import '../../../core/configs/theme/app_colors.dart';
 
 class ServiceProviderCard extends StatelessWidget {
   final ServiceProviderEntity provider;
+  final bool isBookmarked;
+  final VoidCallback onBookmarkToggle;
 
-  const ServiceProviderCard({super.key, required this.provider});
+  const ServiceProviderCard({
+    super.key,
+    required this.provider,
+    required this.isBookmarked,
+    required this.onBookmarkToggle,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -93,13 +100,20 @@ class ServiceProviderCard extends StatelessWidget {
           Positioned(
             top: 8,
             right: 8,
-            child: Container(
-              padding: EdgeInsets.all(3),
-              decoration: BoxDecoration(
-                color: Colors.white.withOpacity(0.8),
-                borderRadius: BorderRadius.circular(5),
+            child: GestureDetector(
+              onTap: onBookmarkToggle,
+              child: Container(
+                padding: const EdgeInsets.all(3),
+                decoration: BoxDecoration(
+                  color: Colors.white.withOpacity(0.8),
+                  borderRadius: BorderRadius.circular(5),
+                ),
+                child: Icon(
+                  isBookmarked ? Icons.bookmark : Icons.bookmark_outline,
+                  color: AppColors.primary,
+                  size: 14,
+                ),
               ),
-              child: Icon(Icons.bookmark, color: AppColors.primary, size: 14),
             ),
           ),
         ],

@@ -2,13 +2,17 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:get_it/get_it.dart';
 import 'package:go_router/go_router.dart';
 import 'package:ridecare/data/datasources/auth_remote_datasource.dart';
+import 'package:ridecare/data/datasources/bookmark_remote_datasource.dart';
 import 'package:ridecare/data/repositories/auth_repository_impl.dart';
+import 'package:ridecare/data/repositories/bookmark_repository_impl.dart';
 import 'package:ridecare/data/repositories/service_provider_repository_impl.dart';
 import 'package:ridecare/domain/repositories/auth_repository.dart';
+import 'package:ridecare/domain/repositories/bookmark_repository.dart';
 import 'package:ridecare/domain/repositories/service_provider_repository.dart';
 import 'package:ridecare/domain/usecases/auth/register_with_email.dart';
 import 'package:ridecare/domain/usecases/auth/sign_in_with_email.dart';
 import 'package:ridecare/domain/usecases/auth/sign_out.dart';
+import 'package:ridecare/domain/usecases/bookmark/toggle_bookmark_service_provider.dart';
 import 'package:ridecare/domain/usecases/service/get_services_for_provider.dart';
 import 'package:ridecare/domain/usecases/serviceProvider/get_all_service_providers.dart';
 import 'package:ridecare/domain/usecases/serviceProvider/get_nearby_service_providers.dart';
@@ -26,9 +30,12 @@ import '../../data/datasources/service_remote_datasource.dart';
 import '../../data/datasources/special_offer_remote_datasource.dart';
 import '../../data/repositories/service_repository_imp.dart';
 import '../../data/repositories/special_offer_repository_impl.dart';
+import '../../domain/entities/user_entity.dart';
 import '../../domain/repositories/service_repository.dart';
 import '../../domain/repositories/special_offer_repository.dart';
+import '../../domain/usecases/bookmark/get_bookmarked_service_providers.dart';
 import '../../domain/usecases/specialOffers/get_special_offers.dart';
+import '../../presentation/bookmark/bloc/bookmark_bloc.dart';
 import '../../presentation/home/bloc/specialOffers/special_offer_bloc.dart';
 import '../../presentation/serviceProvider/bloc/service_bloc.dart';
 
@@ -61,6 +68,10 @@ void setupServiceLocator() {
     () => ServiceRemoteDataSourceImpl(firestore: sl()),
   );
 
+  sl.registerLazySingleton<BookmarkRemoteDataSource>(
+    () => BookmarkRemoteDataSourceImpl(firestore: sl()),
+  );
+
   // ✅ Register Repository
   sl.registerLazySingleton<AuthRepository>(
     () => AuthRepositoryImpl(remoteDataSource: sl()),
@@ -78,6 +89,10 @@ void setupServiceLocator() {
     () => ServiceRepositoryImpl(remoteDataSource: sl()),
   );
 
+  sl.registerLazySingleton<BookmarkRepository>(
+    () => BookmarkRepositoryImpl(remoteDataSource: sl()),
+  );
+
   // ✅ Register Use Cases
   sl.registerLazySingleton(() => RegisterWithEmail(repository: sl()));
   sl.registerLazySingleton(() => SignInWithEmail(repository: sl()));
@@ -88,6 +103,13 @@ void setupServiceLocator() {
   sl.registerLazySingleton(() => GetAllServiceProviders(repository: sl()));
   sl.registerLazySingleton(() => GetNearbyServiceProviders(repository: sl()));
   sl.registerLazySingleton(() => GetAllServiceForProvider(repository: sl()));
+
+  sl.registerLazySingleton(
+    () => GetBookmarkedServiceProviders(repository: sl()),
+  );
+  sl.registerLazySingleton(
+    () => ToggleBookmarkedServiceProvider(repository: sl()),
+  );
 
   // ✅ Register BLoCs
   sl.registerLazySingleton<OnboardingBloc>(() => OnboardingBloc());
@@ -113,6 +135,11 @@ void setupServiceLocator() {
   sl.registerLazySingleton<ServiceBloc>(
     () => ServiceBloc(getAllServiceForProvider: sl()),
   );
+
+  sl.registerFactory(() => BookmarkBloc(
+    getBookmarks: sl(),
+    toggleBookmark: sl(),
+  ));
 
   sl.registerLazySingleton<GoRouter>(
     () => GoRouter(
