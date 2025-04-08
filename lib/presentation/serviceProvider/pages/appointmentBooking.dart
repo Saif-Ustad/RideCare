@@ -51,7 +51,7 @@ class _AppointmentBookingPageState extends State<AppointmentBookingPage> {
     return BlocBuilder<ServiceProviderBloc, ServiceProviderState>(
       builder: (context, state) {
         if (state is ServiceProviderLoaded) {
-          final provider = state.providers.firstWhere(
+          final provider = state.serviceProviders.firstWhere(
             (element) => element.id == widget.id,
             orElse: () => throw Exception('Provider not found'),
           );

@@ -1,6 +1,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:ridecare/domain/entities/service_provider_entity.dart';
+import 'package:share_plus/share_plus.dart';
 
 import '../../../core/configs/theme/app_colors.dart';
 
@@ -63,7 +64,14 @@ class ServiceInfoSection extends StatelessWidget {
                   ],
                 ),
               ),
-              Icon(Icons.telegram, size: 45, color: AppColors.primary),
+              GestureDetector(
+                onTap: () async {
+                  final shareUrl = 'https://your-app-link.com/provider/${provider.id}';
+                  await Share.share('Check this service provider on RideCare! 🚗\n\n$shareUrl');
+                },
+                child: Icon(Icons.telegram, size: 45, color: AppColors.primary),
+              ),
+
             ],
           ),
         ],

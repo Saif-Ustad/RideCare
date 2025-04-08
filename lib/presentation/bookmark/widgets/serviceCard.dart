@@ -116,7 +116,7 @@ class ServiceCard extends StatelessWidget {
                 bool isBookmarked = false;
 
                 if (state is BookmarkLoaded) {
-                  isBookmarked = state.bookmarkedServices.any(
+                  isBookmarked = state.bookmarkedServiceProviders.any(
                     (e) => e.id == serviceProvider.id,
                   );
                 }

@@ -54,7 +54,7 @@ class _ServiceProviderDetailPageState extends State<ServiceProviderDetailPage>
     return BlocBuilder<ServiceProviderBloc, ServiceProviderState>(
       builder: (context, state) {
         if (state is ServiceProviderLoaded) {
-          final provider = state.providers.firstWhere(
+          final provider = state.serviceProviders.firstWhere(
             (element) => element.id == widget.id,
             orElse: () => throw Exception('Provider not found'),
           );
@@ -65,7 +65,7 @@ class _ServiceProviderDetailPageState extends State<ServiceProviderDetailPage>
             body: SafeArea(
               child: Column(
                 children: [
-                  HeaderSection(images: images, provider: provider),
+                  HeaderSection(images: provider.galleryImageUrls, provider: provider),
                   const SizedBox(height: 12),
                   ServiceInfoSection(provider: provider),
                   const SizedBox(height: 12),

@@ -13,11 +13,11 @@ class BookmarkInitial extends BookmarkState {}
 class BookmarkLoading extends BookmarkState {}
 
 class BookmarkLoaded extends BookmarkState {
-  final List<ServiceProviderEntity> bookmarkedServices;
-  const BookmarkLoaded(this.bookmarkedServices);
+  final List<ServiceProviderEntity> bookmarkedServiceProviders;
+  const BookmarkLoaded(this.bookmarkedServiceProviders);
 
   @override
-  List<Object?> get props => [bookmarkedServices];
+  List<Object?> get props => [bookmarkedServiceProviders];
 }
 
 class BookmarkError extends BookmarkState {

@@ -106,16 +106,16 @@ class _BookmarkPageState extends State<BookmarkPage> {
               Padding(
                 padding: const EdgeInsets.all(15),
                 child: state is BookmarkLoaded
-                    ? (state.bookmarkedServices.isEmpty
+                    ? (state.bookmarkedServiceProviders.isEmpty
                     ? const Center(child: Text('No bookmarks found.'))
                     : ListView.builder(
                   controller: _scrollController,
                   clipBehavior: Clip.none,
-                  itemCount: state.bookmarkedServices.length,
+                  itemCount: state.bookmarkedServiceProviders.length,
                   itemBuilder: (context, index) => Padding(
                     padding: const EdgeInsets.only(bottom: 12),
                     child: ServiceCard(
-                      serviceProvider: state.bookmarkedServices[index],
+                      serviceProvider: state.bookmarkedServiceProviders[index],
                     ),
                   ),
                 ))

@@ -13,12 +13,12 @@ class ServiceProviderInitial extends ServiceProviderState {}
 class ServiceProviderLoading extends ServiceProviderState {}
 
 class ServiceProviderLoaded extends ServiceProviderState {
-  final List<ServiceProviderEntity> providers;
+  final List<ServiceProviderEntity> serviceProviders;
 
-  const ServiceProviderLoaded(this.providers);
+  const ServiceProviderLoaded(this.serviceProviders);
 
   @override
-  List<Object?> get props => [providers];
+  List<Object?> get props => [serviceProviders];
 }
 
 class ServiceProviderError extends ServiceProviderState {

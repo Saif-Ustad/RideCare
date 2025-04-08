@@ -61,7 +61,7 @@ class _ServiceProviderList extends StatelessWidget {
 
               if (bookmarkState is BookmarkLoaded) {
                 bookmarkedIds =
-                    bookmarkState.bookmarkedServices.map((e) => e.id).toList();
+                    bookmarkState.bookmarkedServiceProviders.map((e) => e.id).toList();
               }
 
               return CarouselSlider(
@@ -73,7 +73,7 @@ class _ServiceProviderList extends StatelessWidget {
                   enableInfiniteScroll: true,
                 ),
                 items:
-                    serviceProviderState.providers.map((provider) {
+                    serviceProviderState.serviceProviders.map((provider) {
                       final isBookmarked = bookmarkedIds.contains(provider.id);
                       return _ServiceProviderCard(
                         provider: provider,
