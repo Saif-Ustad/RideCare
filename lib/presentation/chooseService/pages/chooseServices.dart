@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import '../../../core/configs/theme/app_colors.dart';
+import '../../booking/bloc/booking_bloc.dart';
+import '../../booking/bloc/booking_event.dart';
 import '../../serviceProvider/bloc/services/service_bloc.dart';
 import '../../serviceProvider/bloc/services/service_event.dart';
 import '../../serviceProvider/bloc/services/service_state.dart';
@@ -116,6 +118,7 @@ class _ChooseServicesPageState extends State<ChooseServicesPage> {
       if (!alreadyExists) {
         existingServices.add(
           ServiceOption(
+            serviceId: service.id,
             name: service.name,
             price: service.price,
             isSelected: false,
@@ -272,8 +275,34 @@ class _ChooseServicesPageState extends State<ChooseServicesPage> {
               ),
             ),
             onPressed: () {
-              context.push("/appointment-booking?serviceProviderId=${widget.serviceProviderId}");
+              final selectedServices =
+                  categoryServices.values
+                      .expand((list) => list)
+                      .where((s) => s.isSelected)
+                      .map((s) => s.serviceId)
+                      .toList();
+
+              if (selectedServices.isEmpty) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(content: Text("Please select at least one service")),
+                );
+                return;
+              }
+
+              // Dispatch to BookingBloc
+              context.read<BookingBloc>().add(
+                SelectService(
+                  serviceIds: selectedServices,
+                  providerId: widget.serviceProviderId,
+                ),
+              );
+
+              // Navigate to next page
+              context.push(
+                "/appointment-booking?serviceProviderId=${widget.serviceProviderId}",
+              );
             },
+
             child: const Text(
               "Next",
               style: TextStyle(color: Colors.white, fontSize: 16),

@@ -4,6 +4,8 @@ import 'package:go_router/go_router.dart';
 import 'package:ridecare/core/configs/assets/app_images.dart';
 import '../../../common/widgets/bottomBar/bottomBar.dart';
 import '../../../core/configs/theme/app_colors.dart';
+import '../../booking/bloc/booking_bloc.dart';
+import '../../booking/bloc/booking_event.dart';
 import '../../home/bloc/serviceProvider/service_provider_bloc.dart';
 import '../../home/bloc/serviceProvider/service_provider_state.dart';
 import '../widgets/headerSection.dart';
@@ -62,7 +64,7 @@ class _AppointmentBookingPageState extends State<AppointmentBookingPage> {
             body: SafeArea(
               child: Column(
                 children: [
-                  HeaderSection(images: images, provider: provider,),
+                  HeaderSection(images: provider.galleryImageUrls, provider: provider,),
                   Expanded(
                     child: SingleChildScrollView(
                       physics: const BouncingScrollPhysics(),
@@ -103,6 +105,20 @@ class _AppointmentBookingPageState extends State<AppointmentBookingPage> {
             bottomNavigationBar: CustomBottomBar(
               text: "Continue",
               onPressed: () {
+                final dateTime = DateTime(
+                  selectedDate.year,
+                  selectedDate.month,
+                  selectedDate.day,
+                  selectedTime.hour,
+                  selectedTime.minute,
+                );
+
+                context.read<BookingBloc>().add(SetAppointment(
+                  date: dateTime,
+                  note: noteController.text,
+                  serviceType: selectedServiceType,
+                ));
+
                 context.push("/select-vehicle");
               },
             ),

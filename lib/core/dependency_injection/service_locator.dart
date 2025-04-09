@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:ridecare/data/datasources/auth_remote_datasource.dart';
 import 'package:ridecare/data/datasources/bookmark_remote_datasource.dart';
 import 'package:ridecare/data/repositories/auth_repository_impl.dart';
+import 'package:ridecare/data/repositories/booking_repository_impl.dart';
 import 'package:ridecare/data/repositories/bookmark_repository_impl.dart';
 import 'package:ridecare/data/repositories/service_provider_repository_impl.dart';
 import 'package:ridecare/domain/repositories/auth_repository.dart';
@@ -12,6 +13,8 @@ import 'package:ridecare/domain/repositories/service_provider_repository.dart';
 import 'package:ridecare/domain/usecases/auth/register_with_email.dart';
 import 'package:ridecare/domain/usecases/auth/sign_in_with_email.dart';
 import 'package:ridecare/domain/usecases/auth/sign_out.dart';
+import 'package:ridecare/domain/usecases/booking/booking_created.dart';
+import 'package:ridecare/domain/usecases/booking/booking_updated.dart';
 import 'package:ridecare/domain/usecases/bookmark/toggle_bookmark_service_provider.dart';
 import 'package:ridecare/domain/usecases/service/get_services_for_provider.dart';
 import 'package:ridecare/domain/usecases/serviceProvider/get_all_service_providers.dart';
@@ -20,11 +23,13 @@ import 'package:ridecare/presentation/auth/bloc/auth_bloc.dart';
 import 'package:ridecare/presentation/auth/bloc/otp_bloc.dart';
 import 'package:ridecare/presentation/auth/bloc/password_toggle_bloc.dart';
 import 'package:ridecare/presentation/auth/pages/signin.dart';
+import 'package:ridecare/presentation/booking/bloc/booking_bloc.dart';
 import 'package:ridecare/presentation/home/bloc/serviceProvider/service_provider_bloc.dart';
 import 'package:ridecare/presentation/home/pages/home.dart';
 import 'package:ridecare/presentation/onboarding/bloc/onboarding_bloc.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
+import '../../data/datasources/booking_remote_datasource.dart';
 import '../../data/datasources/review_remote_datasource.dart';
 import '../../data/datasources/service_provider_remote_datasource.dart';
 import '../../data/datasources/service_remote_datasource.dart';
@@ -32,6 +37,7 @@ import '../../data/datasources/special_offer_remote_datasource.dart';
 import '../../data/repositories/review_repository_impl.dart';
 import '../../data/repositories/service_repository_imp.dart';
 import '../../data/repositories/special_offer_repository_impl.dart';
+import '../../domain/repositories/booking_repository.dart';
 import '../../domain/repositories/review_repository.dart';
 import '../../domain/repositories/service_repository.dart';
 import '../../domain/repositories/special_offer_repository.dart';
@@ -77,7 +83,11 @@ void setupServiceLocator() {
   );
 
   sl.registerLazySingleton<ReviewRemoteDataSource>(
-        () => ReviewRemoteDataSourceImpl(firestore: sl()),
+    () => ReviewRemoteDataSourceImpl(firestore: sl()),
+  );
+
+  sl.registerLazySingleton<BookingRemoteDataSource>(
+    () => BookingRemoteDataSourceImpl(firestore: sl()),
   );
 
   // ✅ Register Repository
@@ -102,7 +112,11 @@ void setupServiceLocator() {
   );
 
   sl.registerLazySingleton<ReviewRepository>(
-        () => ReviewRepositoryImpl(remoteDataSource: sl()),
+    () => ReviewRepositoryImpl(remoteDataSource: sl()),
+  );
+
+  sl.registerLazySingleton<BookingRepository>(
+    () => BookingRepositoryImpl(remoteDataSource: sl()),
   );
 
   // ✅ Register Use Cases
@@ -124,6 +138,9 @@ void setupServiceLocator() {
   );
 
   sl.registerLazySingleton(() => GetReviews(repository: sl()));
+
+  sl.registerLazySingleton(() => BookingUpdatedUseCase(repository: sl()));
+  sl.registerLazySingleton(() => BookingCreatedUseCase(repository: sl()));
 
   // ✅ Register BLoCs
   sl.registerLazySingleton<OnboardingBloc>(() => OnboardingBloc());
@@ -150,12 +167,15 @@ void setupServiceLocator() {
     () => ServiceBloc(getAllServiceForProvider: sl()),
   );
 
-  sl.registerFactory(() => BookmarkBloc(
-    getBookmarks: sl(),
-    toggleBookmark: sl(),
-  ));
+  sl.registerFactory(
+    () => BookmarkBloc(getBookmarks: sl(), toggleBookmark: sl()),
+  );
 
   sl.registerFactory(() => ReviewBloc(getReviewsUseCase: sl()));
+
+  sl.registerFactory(
+    () => BookingBloc(bookingCreatedUseCase: sl(), bookingUpdatedUseCase: sl()),
+  );
 
   sl.registerLazySingleton<GoRouter>(
     () => GoRouter(

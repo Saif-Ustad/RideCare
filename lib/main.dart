@@ -8,6 +8,7 @@ import 'package:ridecare/presentation/auth/bloc/password_toggle_bloc.dart';
 import 'package:ridecare/presentation/auth/bloc/otp_bloc.dart';
 import 'package:ridecare/core/configs/theme/app_theme.dart';
 import 'package:ridecare/core/dependency_injection/service_locator.dart';
+import 'package:ridecare/presentation/booking/bloc/booking_bloc.dart';
 import 'package:ridecare/presentation/bookmark/bloc/bookmark_bloc.dart';
 import 'package:ridecare/presentation/home/bloc/serviceProvider/service_provider_bloc.dart';
 import 'package:ridecare/presentation/home/bloc/specialOffers/special_offer_bloc.dart';
@@ -48,6 +49,7 @@ class MyApp extends StatelessWidget {
         BlocProvider<ServiceBloc>(create: (context) => sl<ServiceBloc>()),
         BlocProvider<BookmarkBloc>(create: (context) => sl<BookmarkBloc>()),
         BlocProvider<ReviewBloc>(create: (context) => sl<ReviewBloc>()),
+        BlocProvider<BookingBloc>(create: (context) => sl<BookingBloc>()),
       ],
       child: PopScope(
         canPop: true,
