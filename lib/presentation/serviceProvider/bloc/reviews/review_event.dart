@@ -28,3 +28,13 @@ class SortReviewsByLatest extends ReviewEvent {
   const SortReviewsByLatest();
 }
 
+class SearchReviews extends ReviewEvent {
+  final String query;
+
+  const SearchReviews(this.query);
+
+  @override
+  List<Object?> get props => [query];
+}
+
+

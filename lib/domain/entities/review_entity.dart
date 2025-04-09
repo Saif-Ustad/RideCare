@@ -5,7 +5,7 @@ class ReviewEntity {
   final String? userProfileImageUrl;
   final String serviceProviderId;
   final String reviewText;
-  final int ratings;
+  final double ratings;
   final bool isVerified;
   final List<String> imageUrls;
   final DateTime createdAt;

@@ -89,6 +89,8 @@ class ReviewBloc extends Bloc<ReviewEvent, ReviewState> {
     on<FilterReviewsByVerified>(_onFilterVerified);
     on<SortReviewsByLatest>(_onSortByLatest);
     on<FilterReviewsWithPhotos>(_onFilterWithPhotos);
+    on<SearchReviews>(_onSearchReviews);
+
   }
 
   Future<void> _onLoadReviews(LoadReviews event, Emitter<ReviewState> emit) async {
@@ -128,6 +130,17 @@ class ReviewBloc extends Bloc<ReviewEvent, ReviewState> {
     }
     emit(ReviewLoaded(_applyActiveFilters(), activeFilters: _activeFilters));
   }
+
+  void _onSearchReviews(SearchReviews event, Emitter<ReviewState> emit) {
+    final query = event.query.toLowerCase();
+    final filtered = _applyActiveFilters().where((review) {
+      return review.reviewText.toLowerCase().contains(query) ||
+          review.userName.toLowerCase().contains(query); // Customize fields
+    }).toList();
+
+    emit(ReviewLoaded(filtered, activeFilters: _activeFilters));
+  }
+
 
   /// 🔁 Combines all active filters
   List<ReviewEntity> _applyActiveFilters() {
