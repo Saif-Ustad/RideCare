@@ -1,38 +1,25 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import '../../../core/configs/theme/app_colors.dart';
+import '../../serviceProvider/bloc/services/service_bloc.dart';
+import '../../serviceProvider/bloc/services/service_event.dart';
+import '../../serviceProvider/bloc/services/service_state.dart';
 import '../widgets/serviceOption.dart';
+import '../../../../domain/entities/service_entity.dart';
 
 class ChooseServicesPage extends StatefulWidget {
-  const ChooseServicesPage({super.key});
+  final String serviceProviderId;
+
+  const ChooseServicesPage({super.key, required this.serviceProviderId});
 
   @override
   _ChooseServicesPageState createState() => _ChooseServicesPageState();
 }
 
 class _ChooseServicesPageState extends State<ChooseServicesPage> {
-  String selectedCategory = "Car Wash";
-
-  final Map<String, List<ServiceOption>> categoryServices = {
-    "Car Wash": [
-      ServiceOption(name: "Wax", price: 250, isSelected: false),
-      ServiceOption(name: "Scratch Removal", price: 750, isSelected: false),
-      ServiceOption(name: "Water-dot Removal", price: 620, isSelected: false),
-    ],
-    "Repairs": [
-      ServiceOption(name: "Engine Fix", price: 1500, isSelected: false),
-      ServiceOption(name: "Brake Repair", price: 1200, isSelected: false),
-    ],
-    "Maintenance": [
-      ServiceOption(name: "Oil Change", price: 800, isSelected: false),
-      ServiceOption(name: "Tire Rotation", price: 500, isSelected: false),
-    ],
-    "Diagnostics": [
-      ServiceOption(name: "Full Car Scan", price: 2000, isSelected: false),
-    ],
-  };
-
-  List<ServiceOption> get services => categoryServices[selectedCategory] ?? [];
+  String selectedCategory = '';
+  final Map<String, List<ServiceOption>> categoryServices = {};
 
   double get subtotal {
     return categoryServices.values
@@ -42,104 +29,121 @@ class _ChooseServicesPageState extends State<ChooseServicesPage> {
   }
 
   @override
+  void initState() {
+    super.initState();
+    context.read<ServiceBloc>().add(
+      FetchAllServiceForProvider(widget.serviceProviderId),
+    );
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-      appBar: AppBar(
-        backgroundColor: Colors.white,
-        elevation: 0,
-        leading: buildLeadingIconButton(() => context.pop()),
-        title: const Text(
-          "Choose Services",
-          style: TextStyle(
-            fontSize: 18,
-            fontWeight: FontWeight.w500,
-            color: Colors.black,
-          ),
-        ),
-        centerTitle: true,
-        actions: [buildActionIconButton(() {})],
-      ),
-      body: Padding(
-        padding: const EdgeInsets.all(15),
-        child: Column(
-          children: [
-            SingleChildScrollView(
-              scrollDirection: Axis.horizontal,
-              child: Row(
-                children:
-                    categoryServices.keys
-                        .map((category) => _categoryTab(category))
-                        .toList(),
-              ),
-            ),
+      appBar: _buildAppBar(context),
+      body: BlocBuilder<ServiceBloc, ServiceState>(
+        builder: (context, state) {
+          if (state is ServiceLoading) {
+            return const Center(child: CircularProgressIndicator());
+          } else if (state is ServiceLoaded) {
+            // Only build category services if it's empty (to persist state)
+            if (categoryServices.isEmpty) {
+              _buildCategoryServices(state.services);
+            }
 
-            Divider(color: AppColors.lightGray, thickness: 1, height: 25),
-
-            Expanded(
-              child: ListView(
+            return Padding(
+              padding: const EdgeInsets.all(15),
+              child: Column(
                 children: [
-                  const Text(
-                    "Add Options",
-                    style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
+                  _buildCategoryTabs(),
+                  Divider(color: AppColors.lightGray, thickness: 1, height: 25),
+                  Expanded(
+                    child: ListView(
+                      children: [
+                        const Text(
+                          "Add Options",
+                          style: TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                        const SizedBox(height: 15),
+                        ..._getSelectedServices().map(
+                          (service) => _serviceTile(service),
+                        ),
+                      ],
+                    ),
                   ),
-                  const SizedBox(height: 15),
-                  ...services.map((service) => _serviceTile(service)),
                 ],
               ),
-            ),
-          ],
+            );
+          } else if (state is ServiceError) {
+            return Center(child: Text(state.message));
+          } else {
+            return const SizedBox();
+          }
+        },
+      ),
+      bottomNavigationBar: _buildBottomBar(context),
+    );
+  }
+
+  AppBar _buildAppBar(BuildContext context) {
+    return AppBar(
+      backgroundColor: Colors.white,
+      elevation: 0,
+      leading: buildLeadingIconButton(() => context.pop()),
+      title: const Text(
+        "Choose Services",
+        style: TextStyle(
+          fontSize: 18,
+          fontWeight: FontWeight.w500,
+          color: Colors.black,
         ),
       ),
-      bottomNavigationBar: Container(
-        padding: const EdgeInsets.all(15),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          boxShadow: [BoxShadow(color: Colors.black12, blurRadius: 4)],
-          borderRadius: BorderRadius.only(
-            topLeft: Radius.circular(10),
-            topRight: Radius.circular(10),
+      centerTitle: true,
+      actions: [buildActionIconButton(() {})],
+    );
+  }
+
+  void _buildCategoryServices(List<ServiceEntity> services) {
+    for (final service in services) {
+      final category = service.categoryName;
+      final existingServices = categoryServices[category] ?? [];
+
+      // Check if service already exists by name
+      final alreadyExists = existingServices.any((s) => s.name == service.name);
+      if (!alreadyExists) {
+        existingServices.add(
+          ServiceOption(
+            name: service.name,
+            price: service.price,
+            isSelected: false,
+            description: service.description,
           ),
-        ),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                const Text(
-                  "Subtotal",
-                  style: TextStyle(color: AppColors.darkGrey),
-                ),
-                Text(
-                  "Rs. ${subtotal.toStringAsFixed(0)}",
-                  style: const TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ],
-            ),
-            ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                backgroundColor: AppColors.primary,
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 30,
-                  vertical: 10,
-                ),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(10),
-                ),
-              ),
-              onPressed: () { context.push("/appointment-booking");},
-              child: const Text(
-                "Next",
-                style: TextStyle(color: Colors.white, fontSize: 16),
-              ),
-            ),
-          ],
-        ),
+        );
+      }
+
+      categoryServices[category] = existingServices;
+    }
+
+    if (selectedCategory.isEmpty && categoryServices.isNotEmpty) {
+      selectedCategory = categoryServices.keys.first;
+    }
+  }
+
+  List<ServiceOption> _getSelectedServices() {
+    return categoryServices[selectedCategory] ?? [];
+  }
+
+  Widget _buildCategoryTabs() {
+    return SingleChildScrollView(
+      scrollDirection: Axis.horizontal,
+      child: Row(
+        children:
+            categoryServices.keys
+                .map((category) => _categoryTab(category))
+                .toList(),
       ),
     );
   }
@@ -188,7 +192,7 @@ class _ChooseServicesPageState extends State<ChooseServicesPage> {
               activeColor: AppColors.primary,
               onChanged: (bool? value) {
                 setState(() {
-                  service.isSelected = value!;
+                  service.isSelected = value ?? false;
                 });
               },
             ),
@@ -205,9 +209,9 @@ class _ChooseServicesPageState extends State<ChooseServicesPage> {
                     ),
                   ),
                   const SizedBox(height: 4),
-                  const Text(
-                    "Post description facilisis dolor sapien, vef sodoles augue mollis ut ",
-                    style: TextStyle(
+                  Text(
+                    service.description,
+                    style: const TextStyle(
                       fontSize: 12,
                       color: AppColors.darkGrey,
                       fontWeight: FontWeight.w300,
@@ -225,6 +229,58 @@ class _ChooseServicesPageState extends State<ChooseServicesPage> {
         ),
         Divider(color: AppColors.lightGray, thickness: 1, height: 20),
       ],
+    );
+  }
+
+  Widget _buildBottomBar(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(15),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        boxShadow: [BoxShadow(color: Colors.black12, blurRadius: 4)],
+        borderRadius: const BorderRadius.only(
+          topLeft: Radius.circular(10),
+          topRight: Radius.circular(10),
+        ),
+      ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Text(
+                "Subtotal",
+                style: TextStyle(color: AppColors.darkGrey),
+              ),
+              Text(
+                "Rs. ${subtotal.toStringAsFixed(0)}",
+                style: const TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ],
+          ),
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: AppColors.primary,
+              padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 10),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(10),
+              ),
+            ),
+            onPressed: () {
+              context.push("/appointment-booking?serviceProviderId=${widget.serviceProviderId}");
+            },
+            child: const Text(
+              "Next",
+              style: TextStyle(color: Colors.white, fontSize: 16),
+            ),
+          ),
+        ],
+      ),
     );
   }
 
@@ -254,5 +310,3 @@ class _ChooseServicesPageState extends State<ChooseServicesPage> {
     ),
   );
 }
-
-

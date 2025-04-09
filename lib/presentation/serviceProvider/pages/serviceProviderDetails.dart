@@ -97,7 +97,7 @@ class _ServiceProviderDetailPageState extends State<ServiceProviderDetailPage>
             bottomNavigationBar: CustomBottomBar(
               text: "Book Service Now",
               onPressed: () {
-                context.push("/choose-service");
+                context.push("/choose-service?serviceProviderId=${provider.id}");
               },
             ),
           );

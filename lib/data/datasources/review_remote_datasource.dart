@@ -17,7 +17,7 @@ class ReviewRemoteDataSourceImpl implements ReviewRemoteDataSource {
         await firestore
             .collection('reviews')
             .where('serviceProviderId', isEqualTo: serviceProviderId)
-            .orderBy('createdAt', descending: true)
+            // .orderBy('createdAt', descending: true)
             .get();
 
     List<ReviewModel> reviewModels = [];

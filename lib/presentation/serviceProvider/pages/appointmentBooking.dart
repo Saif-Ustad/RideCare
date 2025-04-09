@@ -10,8 +10,8 @@ import '../widgets/headerSection.dart';
 import '../widgets/serviceInfoSection.dart';
 
 class AppointmentBookingPage extends StatefulWidget {
-  final String id;
-  const AppointmentBookingPage({super.key, required this.id});
+  final String serviceProviderId;
+  const AppointmentBookingPage({super.key, required this.serviceProviderId});
 
   @override
   _AppointmentBookingPageState createState() => _AppointmentBookingPageState();
@@ -52,7 +52,7 @@ class _AppointmentBookingPageState extends State<AppointmentBookingPage> {
       builder: (context, state) {
         if (state is ServiceProviderLoaded) {
           final provider = state.serviceProviders.firstWhere(
-            (element) => element.id == widget.id,
+            (element) => element.id == widget.serviceProviderId,
             orElse: () => throw Exception('Provider not found'),
           );
 

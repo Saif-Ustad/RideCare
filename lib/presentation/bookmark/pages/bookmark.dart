@@ -2,13 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
-import 'package:ridecare/core/configs/assets/app_images.dart';
 import '../../../common/widgets/bottomNavigationBar/bottomNavigationBar.dart';
 import '../../../core/configs/theme/app_colors.dart';
 import '../bloc/bookmark_bloc.dart';
 import '../bloc/bookmark_state.dart';
 import '../widgets/serviceCard.dart';
-import '../widgets/serviceModel.dart';
 
 class BookmarkPage extends StatefulWidget {
   const BookmarkPage({super.key});
@@ -84,23 +82,6 @@ class _BookmarkPageState extends State<BookmarkPage> {
             actions: [buildActionIconButton(() {})],
           ),
 
-          // body: Stack(
-          //   children: [
-          //     Padding(
-          //       padding: const EdgeInsets.all(15),
-          //       child: ListView.builder(
-          //         controller: _scrollController,
-          //         clipBehavior: Clip.none,
-          //         itemCount: services.length,
-          //         itemBuilder:
-          //             (context, index) => Padding(
-          //               padding: const EdgeInsets.only(bottom: 12),
-          //               child: ServiceCard(service: services[index]),
-          //             ),
-          //       ),
-          //     ),
-          //   ],
-          // ),
           body: Stack(
             children: [
               Padding(

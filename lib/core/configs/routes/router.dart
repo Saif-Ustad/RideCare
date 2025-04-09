@@ -53,13 +53,17 @@ final GoRouter router = GoRouter(
 
     GoRoute(
       path: '/choose-service',
-      builder: (context, state) => const ChooseServicesPage(),
+      builder: (context, state) {
+        final serviceProviderId = state.uri.queryParameters['serviceProviderId'];
+        return ChooseServicesPage(serviceProviderId: serviceProviderId ?? '');
+      },
     ),
+
     GoRoute(
       path: '/appointment-booking',
       builder: (context, state) {
-        final id = state.pathParameters['id']!;
-        return AppointmentBookingPage(id: id);
+        final serviceProviderId = state.uri.queryParameters['serviceProviderId'];
+        return AppointmentBookingPage(serviceProviderId: serviceProviderId ?? '' );
       },
     ),
     GoRoute(

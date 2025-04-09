@@ -5,7 +5,8 @@ class ServiceEntity {
   final String iconUrl;
   final String subCategory;
   final String categoryId;
-  final String price;
+  final String categoryName;
+  final double price;
   final int estimatedTime;
   final bool isAvailable;
 
@@ -16,6 +17,7 @@ class ServiceEntity {
     required this.iconUrl,
     required this.subCategory,
     required this.categoryId,
+    required this.categoryName,
     required this.price,
     required this.estimatedTime,
     required this.isAvailable,
