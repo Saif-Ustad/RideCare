@@ -1,7 +1,16 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:ridecare/presentation/booking/bloc/booking_event.dart';
+
 import '../../../common/widgets/bottomBar/bottomBar.dart';
 import '../../../core/configs/theme/app_colors.dart';
+import '../../../domain/entities/vehicle_entity.dart';
+import '../../booking/bloc/booking_bloc.dart';
+import '../bloc/vehicle_bloc.dart';
+import '../bloc/vehicle_event.dart';
+import '../bloc/vehicle_state.dart';
 
 class SelectVehiclePage extends StatefulWidget {
   const SelectVehiclePage({super.key});
@@ -12,12 +21,7 @@ class SelectVehiclePage extends StatefulWidget {
 
 class _SelectVehiclePageState extends State<SelectVehiclePage> {
   String? selectedVehicle;
-
-  final List<Map<String, String>> vehicles = [
-    {"name": "Toyota Fortuner", "type": "SUV", "number": "MH 09 65XX"},
-    {"name": "Honda Civic", "type": "Sedan", "number": "MH 10 45YY"},
-    {"name": "Ford Mustang", "type": "Sports", "number": "MH 12 89ZZ"},
-  ];
+  late final String? userId = FirebaseAuth.instance.currentUser?.uid;
 
   @override
   Widget build(BuildContext context) {
@@ -37,33 +41,57 @@ class _SelectVehiclePageState extends State<SelectVehiclePage> {
         ),
         centerTitle: true,
         actions: [
-          buildActionIconButton(() {
-            context.push("/add-vehicle");
+          buildActionIconButton(() async {
+            await context.push("/add-vehicle");
           }),
         ],
       ),
-
       body: Padding(
         padding: const EdgeInsets.all(15),
-        child: ListView.builder(
-          itemCount: vehicles.length,
-          itemBuilder: (context, index) {
-            final vehicle = vehicles[index];
-            return _buildVehicleCard(vehicle);
+        child: BlocBuilder<VehicleBloc, VehicleState>(
+          builder: (context, state) {
+            if (state is VehicleLoading) {
+              return const Center(child: CircularProgressIndicator());
+            } else if (state is VehicleLoaded) {
+              final vehicles = state.vehicles;
+              if (vehicles.isEmpty) {
+                return const Center(child: Text("No vehicles found."));
+              }
+
+              return ListView.builder(
+                itemCount: vehicles.length,
+                itemBuilder: (context, index) {
+                  final vehicle = vehicles[index];
+                  return _buildVehicleCard(vehicle);
+                },
+              );
+            } else if (state is VehicleError) {
+              return Center(child: Text("Error: ${state.message}"));
+            } else {
+              return const SizedBox();
+            }
           },
         ),
       ),
-
       bottomNavigationBar: CustomBottomBar(
         text: "Continue",
         onPressed: () {
-          context.push("/select-location");
+          final vehicleId = selectedVehicle;
+          if (vehicleId != null) {
+            context.read<BookingBloc>().add(SetVehicle(vehicleId: vehicleId));
+            context.push("/select-location");
+          } else {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(content: Text("Please select a vehicle")),
+            );
+          }
         },
       ),
     );
   }
 
-  Widget _buildVehicleCard(Map<String, String> vehicle) {
+  Widget _buildVehicleCard(VehicleEntity vehicle) {
+    final vehicleDisplayName = "${vehicle.brand} ${vehicle.model}";
     return Card(
       margin: const EdgeInsets.only(bottom: 12),
       elevation: 1,
@@ -87,15 +115,15 @@ class _SelectVehiclePageState extends State<SelectVehiclePage> {
           ],
         ),
         title: Text(
-          vehicle["name"]!,
+          vehicleDisplayName,
           style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
         ),
         subtitle: Text(
-          "${vehicle["type"]} • ${vehicle["number"]}",
+          "${vehicle.type} • ${vehicle.registrationNumber}",
           style: const TextStyle(fontSize: 14, color: AppColors.darkGrey),
         ),
         trailing: Radio<String>(
-          value: vehicle["name"]!,
+          value: vehicle.id,
           groupValue: selectedVehicle,
           onChanged: (value) {
             setState(() {

@@ -15,6 +15,7 @@ import 'package:ridecare/presentation/home/bloc/specialOffers/special_offer_bloc
 import 'package:ridecare/presentation/onboarding/bloc/onboarding_bloc.dart';
 import 'package:ridecare/presentation/serviceProvider/bloc/reviews/review_bloc.dart';
 import 'package:ridecare/presentation/serviceProvider/bloc/services/service_bloc.dart';
+import 'package:ridecare/presentation/vehicles/bloc/vehicle_bloc.dart';
 
 import 'firebase_options.dart';
 
@@ -50,7 +51,7 @@ class MyApp extends StatelessWidget {
         BlocProvider<BookmarkBloc>(create: (context) => sl<BookmarkBloc>()),
         BlocProvider<ReviewBloc>(create: (context) => sl<ReviewBloc>()),
         BlocProvider<BookingBloc>(create: (context) => sl<BookingBloc>()),
-      ],
+        BlocProvider<VehicleBloc>(create: (context) => sl<VehicleBloc>()),      ],
       child: PopScope(
         canPop: true,
         onPopInvokedWithResult: (didPop, result) {

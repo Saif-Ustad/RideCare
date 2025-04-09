@@ -7,6 +7,8 @@ import 'package:ridecare/core/configs/assets/app_vectors.dart';
 import 'package:ridecare/presentation/bookmark/bloc/bookmark_bloc.dart';
 import 'package:ridecare/presentation/home/bloc/serviceProvider/service_provider_bloc.dart';
 import 'package:ridecare/presentation/home/bloc/serviceProvider/service_provider_event.dart';
+import 'package:ridecare/presentation/vehicles/bloc/vehicle_bloc.dart';
+import 'package:ridecare/presentation/vehicles/bloc/vehicle_event.dart';
 
 import '../../bookmark/bloc/bookmark_event.dart';
 import '../../home/bloc/specialOffers/special_offer_bloc.dart';
@@ -33,7 +35,9 @@ class _SplashPageState extends State<SplashPage> {
     final currentUser = FirebaseAuth.instance.currentUser;
     if (currentUser != null) {
       context.read<BookmarkBloc>().add(LoadBookmarks(currentUser.uid));
+      context.read<VehicleBloc>().add(LoadVehicles(currentUser.uid));
     }
+
   }
 
   Future<void> _navigateToNext() async {

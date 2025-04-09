@@ -7,6 +7,7 @@ import 'package:ridecare/data/repositories/auth_repository_impl.dart';
 import 'package:ridecare/data/repositories/booking_repository_impl.dart';
 import 'package:ridecare/data/repositories/bookmark_repository_impl.dart';
 import 'package:ridecare/data/repositories/service_provider_repository_impl.dart';
+import 'package:ridecare/data/repositories/vehicle_repository_impl.dart';
 import 'package:ridecare/domain/repositories/auth_repository.dart';
 import 'package:ridecare/domain/repositories/bookmark_repository.dart';
 import 'package:ridecare/domain/repositories/service_provider_repository.dart';
@@ -19,6 +20,10 @@ import 'package:ridecare/domain/usecases/bookmark/toggle_bookmark_service_provid
 import 'package:ridecare/domain/usecases/service/get_services_for_provider.dart';
 import 'package:ridecare/domain/usecases/serviceProvider/get_all_service_providers.dart';
 import 'package:ridecare/domain/usecases/serviceProvider/get_nearby_service_providers.dart';
+import 'package:ridecare/domain/usecases/vehicle/addVehicleUseCase.dart';
+import 'package:ridecare/domain/usecases/vehicle/deleteVehicleUseCase.dart';
+import 'package:ridecare/domain/usecases/vehicle/getVehiclesUseCase.dart';
+import 'package:ridecare/domain/usecases/vehicle/updateVehicleUseCase.dart';
 import 'package:ridecare/presentation/auth/bloc/auth_bloc.dart';
 import 'package:ridecare/presentation/auth/bloc/otp_bloc.dart';
 import 'package:ridecare/presentation/auth/bloc/password_toggle_bloc.dart';
@@ -34,6 +39,7 @@ import '../../data/datasources/review_remote_datasource.dart';
 import '../../data/datasources/service_provider_remote_datasource.dart';
 import '../../data/datasources/service_remote_datasource.dart';
 import '../../data/datasources/special_offer_remote_datasource.dart';
+import '../../data/datasources/vehicle_remote_datasource.dart';
 import '../../data/repositories/review_repository_impl.dart';
 import '../../data/repositories/service_repository_imp.dart';
 import '../../data/repositories/special_offer_repository_impl.dart';
@@ -41,6 +47,7 @@ import '../../domain/repositories/booking_repository.dart';
 import '../../domain/repositories/review_repository.dart';
 import '../../domain/repositories/service_repository.dart';
 import '../../domain/repositories/special_offer_repository.dart';
+import '../../domain/repositories/vehicle_repository.dart';
 import '../../domain/usecases/bookmark/get_bookmarked_service_providers.dart';
 import '../../domain/usecases/review/get_reviews.dart';
 import '../../domain/usecases/specialOffers/get_special_offers.dart';
@@ -48,6 +55,7 @@ import '../../presentation/bookmark/bloc/bookmark_bloc.dart';
 import '../../presentation/home/bloc/specialOffers/special_offer_bloc.dart';
 import '../../presentation/serviceProvider/bloc/reviews/review_bloc.dart';
 import '../../presentation/serviceProvider/bloc/services/service_bloc.dart';
+import '../../presentation/vehicles/bloc/vehicle_bloc.dart';
 
 final GetIt sl = GetIt.instance;
 
@@ -90,6 +98,10 @@ void setupServiceLocator() {
     () => BookingRemoteDataSourceImpl(firestore: sl()),
   );
 
+  sl.registerLazySingleton<VehicleRemoteDataSource>(
+    () => VehicleRemoteDataSourceImpl(firestore: sl()),
+  );
+
   // ✅ Register Repository
   sl.registerLazySingleton<AuthRepository>(
     () => AuthRepositoryImpl(remoteDataSource: sl()),
@@ -119,6 +131,10 @@ void setupServiceLocator() {
     () => BookingRepositoryImpl(remoteDataSource: sl()),
   );
 
+  sl.registerLazySingleton<VehicleRepository>(
+    () => VehicleRepositoryImpl(remoteDataSource: sl()),
+  );
+
   // ✅ Register Use Cases
   sl.registerLazySingleton(() => RegisterWithEmail(repository: sl()));
   sl.registerLazySingleton(() => SignInWithEmail(repository: sl()));
@@ -141,6 +157,11 @@ void setupServiceLocator() {
 
   sl.registerLazySingleton(() => BookingUpdatedUseCase(repository: sl()));
   sl.registerLazySingleton(() => BookingCreatedUseCase(repository: sl()));
+
+  sl.registerLazySingleton(() => AddVehicleUseCase(repository: sl()));
+  sl.registerLazySingleton(() => UpdateVehicleUseCase(repository: sl()));
+  sl.registerLazySingleton(() => GetVehiclesUseCase(repository: sl()));
+  sl.registerLazySingleton(() => DeleteVehicleUseCase(repository: sl()));
 
   // ✅ Register BLoCs
   sl.registerLazySingleton<OnboardingBloc>(() => OnboardingBloc());
@@ -176,6 +197,13 @@ void setupServiceLocator() {
   sl.registerFactory(
     () => BookingBloc(bookingCreatedUseCase: sl(), bookingUpdatedUseCase: sl()),
   );
+
+  sl.registerFactory(() => VehicleBloc(
+    getVehicles: sl(),
+    addVehicle: sl(),
+    updateVehicle: sl(),
+    deleteVehicle: sl(),
+  ));
 
   sl.registerLazySingleton<GoRouter>(
     () => GoRouter(
