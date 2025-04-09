@@ -31,12 +31,12 @@ class BookingBloc extends Bloc<BookingEvent, BookingState> {
 
     on<SetVehicle>((event, emit) {
       _booking = _booking.copyWith(vehicleId: event.vehicleId);
-      print("📝 Booking Updated: ${_booking.scheduledAt} ${_booking.note} ${_booking.serviceType} ${_booking.serviceIds} ${_booking.vehicleId}");
       emit(BookingUpdated(booking: _booking));
     });
 
     on<SetAddress>((event, emit) {
       _booking = _booking.copyWith(addressId: event.addressId);
+      print("📝 Booking Updated: ${_booking.scheduledAt} ${_booking.note} ${_booking.serviceType} ${_booking.serviceIds} ${_booking.vehicleId} ${_booking.addressId}");
       emit(BookingUpdated(booking: _booking));
     });
 

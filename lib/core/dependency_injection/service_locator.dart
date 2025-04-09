@@ -3,6 +3,7 @@ import 'package:get_it/get_it.dart';
 import 'package:go_router/go_router.dart';
 import 'package:ridecare/data/datasources/auth_remote_datasource.dart';
 import 'package:ridecare/data/datasources/bookmark_remote_datasource.dart';
+import 'package:ridecare/data/repositories/address_repository_impl.dart';
 import 'package:ridecare/data/repositories/auth_repository_impl.dart';
 import 'package:ridecare/data/repositories/booking_repository_impl.dart';
 import 'package:ridecare/data/repositories/bookmark_repository_impl.dart';
@@ -11,6 +12,8 @@ import 'package:ridecare/data/repositories/vehicle_repository_impl.dart';
 import 'package:ridecare/domain/repositories/auth_repository.dart';
 import 'package:ridecare/domain/repositories/bookmark_repository.dart';
 import 'package:ridecare/domain/repositories/service_provider_repository.dart';
+import 'package:ridecare/domain/usecases/address/add_address.dart';
+import 'package:ridecare/domain/usecases/address/get_user_addresses.dart';
 import 'package:ridecare/domain/usecases/auth/register_with_email.dart';
 import 'package:ridecare/domain/usecases/auth/sign_in_with_email.dart';
 import 'package:ridecare/domain/usecases/auth/sign_out.dart';
@@ -34,6 +37,7 @@ import 'package:ridecare/presentation/home/pages/home.dart';
 import 'package:ridecare/presentation/onboarding/bloc/onboarding_bloc.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
+import '../../data/datasources/address_remote_datasource.dart';
 import '../../data/datasources/booking_remote_datasource.dart';
 import '../../data/datasources/review_remote_datasource.dart';
 import '../../data/datasources/service_provider_remote_datasource.dart';
@@ -43,16 +47,20 @@ import '../../data/datasources/vehicle_remote_datasource.dart';
 import '../../data/repositories/review_repository_impl.dart';
 import '../../data/repositories/service_repository_imp.dart';
 import '../../data/repositories/special_offer_repository_impl.dart';
+import '../../domain/repositories/address_repository.dart';
 import '../../domain/repositories/booking_repository.dart';
 import '../../domain/repositories/review_repository.dart';
 import '../../domain/repositories/service_repository.dart';
 import '../../domain/repositories/special_offer_repository.dart';
 import '../../domain/repositories/vehicle_repository.dart';
+import '../../domain/usecases/address/delete_address.dart';
+import '../../domain/usecases/address/update_address.dart';
 import '../../domain/usecases/bookmark/get_bookmarked_service_providers.dart';
 import '../../domain/usecases/review/get_reviews.dart';
 import '../../domain/usecases/specialOffers/get_special_offers.dart';
 import '../../presentation/bookmark/bloc/bookmark_bloc.dart';
 import '../../presentation/home/bloc/specialOffers/special_offer_bloc.dart';
+import '../../presentation/location/bloc/address_bloc.dart';
 import '../../presentation/serviceProvider/bloc/reviews/review_bloc.dart';
 import '../../presentation/serviceProvider/bloc/services/service_bloc.dart';
 import '../../presentation/vehicles/bloc/vehicle_bloc.dart';
@@ -102,6 +110,10 @@ void setupServiceLocator() {
     () => VehicleRemoteDataSourceImpl(firestore: sl()),
   );
 
+  sl.registerLazySingleton<AddressRemoteDataSource>(
+    () => AddressRemoteDataSourceImpl(firestore: sl()),
+  );
+
   // ✅ Register Repository
   sl.registerLazySingleton<AuthRepository>(
     () => AuthRepositoryImpl(remoteDataSource: sl()),
@@ -135,6 +147,10 @@ void setupServiceLocator() {
     () => VehicleRepositoryImpl(remoteDataSource: sl()),
   );
 
+  sl.registerLazySingleton<AddressRepository>(
+    () => AddressRepositoryImpl(remoteDataSource: sl()),
+  );
+
   // ✅ Register Use Cases
   sl.registerLazySingleton(() => RegisterWithEmail(repository: sl()));
   sl.registerLazySingleton(() => SignInWithEmail(repository: sl()));
@@ -162,6 +178,11 @@ void setupServiceLocator() {
   sl.registerLazySingleton(() => UpdateVehicleUseCase(repository: sl()));
   sl.registerLazySingleton(() => GetVehiclesUseCase(repository: sl()));
   sl.registerLazySingleton(() => DeleteVehicleUseCase(repository: sl()));
+
+  sl.registerLazySingleton(() => GetUserAddressesUseCase(repository: sl()));
+  sl.registerLazySingleton(() => AddAddressUseCase(repository: sl()));
+  sl.registerLazySingleton(() => UpdateAddressUseCase(repository: sl()));
+  sl.registerLazySingleton(() => DeleteAddressUseCase(repository: sl()));
 
   // ✅ Register BLoCs
   sl.registerLazySingleton<OnboardingBloc>(() => OnboardingBloc());
@@ -198,12 +219,23 @@ void setupServiceLocator() {
     () => BookingBloc(bookingCreatedUseCase: sl(), bookingUpdatedUseCase: sl()),
   );
 
-  sl.registerFactory(() => VehicleBloc(
-    getVehicles: sl(),
-    addVehicle: sl(),
-    updateVehicle: sl(),
-    deleteVehicle: sl(),
-  ));
+  sl.registerFactory(
+    () => VehicleBloc(
+      getVehicles: sl(),
+      addVehicle: sl(),
+      updateVehicle: sl(),
+      deleteVehicle: sl(),
+    ),
+  );
+
+  sl.registerFactory(
+    () => AddressBloc(
+      getUserAddressesUseCase: sl(),
+      addAddressUseCase: sl(),
+      updateAddressUseCase: sl(),
+      deleteAddressUseCase: sl(),
+    ),
+  );
 
   sl.registerLazySingleton<GoRouter>(
     () => GoRouter(

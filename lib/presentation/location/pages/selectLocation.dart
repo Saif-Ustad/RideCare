@@ -1,9 +1,17 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:dotted_border/dotted_border.dart';
+import 'package:ridecare/domain/entities/address_entity.dart';
+import 'package:ridecare/presentation/booking/bloc/booking_bloc.dart';
+import 'package:ridecare/presentation/booking/bloc/booking_event.dart';
 
 import '../../../common/widgets/bottomBar/bottomBar.dart';
 import '../../../core/configs/theme/app_colors.dart';
+import '../bloc/address_bloc.dart';
+import '../bloc/address_event.dart';
+import '../bloc/address_state.dart';
 
 class SelectLocationPage extends StatefulWidget {
   const SelectLocationPage({super.key});
@@ -15,14 +23,14 @@ class SelectLocationPage extends StatefulWidget {
 class _SelectLocationPageState extends State<SelectLocationPage> {
   String? selectedAddress;
 
-  final List<Map<String, String>> addresses = [
-    {"title": "Home", "details": "1002, Anand Nager, Kudnur 416508"},
-    {"title": "Office", "details": "231, Dmart road, Baner, Pune 411008"},
-    {
-      "title": "Friend’s House",
-      "details": "102, Laxmi Nagar lane no - 10, Kondhwa BK, Pune ",
-    },
-  ];
+  @override
+  void initState() {
+    super.initState();
+    final String? uid = FirebaseAuth.instance.currentUser?.uid;
+    if (uid != null) {
+      context.read<AddressBloc>().add(LoadAddresses(uid));
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -53,13 +61,30 @@ class _SelectLocationPageState extends State<SelectLocationPage> {
             ),
             const SizedBox(height: 15),
             Expanded(
-              child: ListView(
-                children: [
-                  ...addresses
-                      .map((address) => _buildAddressTile(address))
-                      .toList(),
-                  _buildAddAddressButton(),
-                ],
+              child: BlocBuilder<AddressBloc, AddressState>(
+                builder: (context, state) {
+                  if (state is AddressLoading) {
+                    return const Center(child: CircularProgressIndicator());
+                  } else if (state is AddressLoaded) {
+                    final addresses = state.addresses;
+                    return ListView(
+                      children: [
+                        ...addresses
+                            .map((address) => _buildAddressTile(address))
+                            .toList(),
+                        _buildAddAddressButton(),
+                      ],
+                    );
+                  } else if (state is AddressError) {
+                    return Center(
+                      child: Text(
+                        'Failed to load addresses: ${state.message}',
+                        style: const TextStyle(color: Colors.red),
+                      ),
+                    );
+                  }
+                  return const Center(child: Text("No addresses found."));
+                },
               ),
             ),
           ],
@@ -68,13 +93,21 @@ class _SelectLocationPageState extends State<SelectLocationPage> {
       bottomNavigationBar: CustomBottomBar(
         text: "Continue",
         onPressed: () {
-          context.push("/bill-summary/1");
+          final addressId = selectedAddress;
+          if (addressId != null) {
+            context.read<BookingBloc>().add(SetAddress(addressId: addressId));
+            context.push("/bill-summary/1");
+          } else {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(content: Text("Please select a address")),
+            );
+          }
         },
       ),
     );
   }
 
-  Widget _buildAddressTile(Map<String, String> address) {
+  Widget _buildAddressTile(AddressEntity address) {
     return Column(
       children: [
         ListTile(
@@ -88,15 +121,15 @@ class _SelectLocationPageState extends State<SelectLocationPage> {
             color: AppColors.primary,
           ),
           title: Text(
-            address["title"]!,
+            address.title,
             style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
           ),
           subtitle: Text(
-            address["details"]!,
+            address.address,
             style: const TextStyle(fontSize: 14, color: AppColors.darkGrey),
           ),
           trailing: Radio<String>(
-            value: address["title"]!,
+            value: address.id,
             groupValue: selectedAddress,
             onChanged: (value) {
               setState(() {
@@ -115,7 +148,7 @@ class _SelectLocationPageState extends State<SelectLocationPage> {
   Widget _buildAddAddressButton() {
     return GestureDetector(
       onTap: () {
-       context.push("/add-location");
+        context.push("/add-location");
       },
       child: Padding(
         padding: const EdgeInsets.symmetric(vertical: 15),

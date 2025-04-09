@@ -210,18 +210,20 @@
 //   }
 // }
 
-
-
-
-
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:ridecare/common/widgets/bottomBar/bottomBar.dart';
+import 'package:ridecare/domain/entities/address_entity.dart';
+import 'package:uuid/uuid.dart';
 
 import '../../../core/configs/theme/app_colors.dart';
+import '../bloc/address_bloc.dart';
+import '../bloc/address_event.dart';
 
 class AddLocationPage extends StatefulWidget {
   const AddLocationPage({super.key});
@@ -458,7 +460,30 @@ class _AddLocationPageState extends State<AddLocationPage> {
       ),
       bottomNavigationBar: CustomBottomBar(
         text: "Save Address",
-        onPressed: () => {_showSnackBar("Address saved successfully!")},
+        onPressed: () {
+          final userId = FirebaseAuth.instance.currentUser?.uid;
+
+          if (_selectedLocation != null &&
+              _addressTitleController.text.isNotEmpty &&
+              _fullAddressController.text.isNotEmpty &&
+              userId != null) {
+            final address = AddressEntity(
+              id: const Uuid().v4(),
+              userId: userId,
+              title: _addressTitleController.text.trim(),
+              address: _fullAddressController.text.trim(),
+            );
+
+            context.read<AddressBloc>().add(AddAddress(address));
+            context.push('/select-location');
+          } else {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(
+                content: Text("Please select a location and fill all fields"),
+              ),
+            );
+          }
+        },
       ),
     );
   }
