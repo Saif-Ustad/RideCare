@@ -4,8 +4,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:ridecare/domain/entities/service_entity.dart';
 
 import '../../../core/configs/theme/app_colors.dart';
-import '../bloc/service_bloc.dart';
-import '../bloc/service_state.dart';
+import '../bloc/services/service_bloc.dart';
+import '../bloc/services/service_state.dart';
 
 class ServicesTab extends StatelessWidget {
   // final List<Map<String, dynamic>> services = [

@@ -1,9 +1,9 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:ridecare/domain/usecases/service/get_services_for_provider.dart';
-import 'package:ridecare/presentation/serviceProvider/bloc/service_event.dart';
-import 'package:ridecare/presentation/serviceProvider/bloc/service_state.dart';
+import 'package:ridecare/presentation/serviceProvider/bloc/services/service_event.dart';
+import 'package:ridecare/presentation/serviceProvider/bloc/services/service_state.dart';
 
-import '../../../domain/entities/service_entity.dart';
+import '../../../../domain/entities/service_entity.dart';
 
 class ServiceBloc extends Bloc<ServiceEvent, ServiceState> {
   final GetAllServiceForProvider getAllServiceForProvider;

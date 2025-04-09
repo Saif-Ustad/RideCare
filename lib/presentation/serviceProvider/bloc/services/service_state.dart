@@ -1,5 +1,5 @@
 import 'package:equatable/equatable.dart';
-import '../../../domain/entities/service_entity.dart';
+import '../../../../domain/entities/service_entity.dart';
 
 abstract class ServiceState extends Equatable {
   const ServiceState();

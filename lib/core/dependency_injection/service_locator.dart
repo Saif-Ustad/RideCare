@@ -25,19 +25,23 @@ import 'package:ridecare/presentation/home/pages/home.dart';
 import 'package:ridecare/presentation/onboarding/bloc/onboarding_bloc.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
+import '../../data/datasources/review_remote_datasource.dart';
 import '../../data/datasources/service_provider_remote_datasource.dart';
 import '../../data/datasources/service_remote_datasource.dart';
 import '../../data/datasources/special_offer_remote_datasource.dart';
+import '../../data/repositories/review_repository_impl.dart';
 import '../../data/repositories/service_repository_imp.dart';
 import '../../data/repositories/special_offer_repository_impl.dart';
-import '../../domain/entities/user_entity.dart';
+import '../../domain/repositories/review_repository.dart';
 import '../../domain/repositories/service_repository.dart';
 import '../../domain/repositories/special_offer_repository.dart';
 import '../../domain/usecases/bookmark/get_bookmarked_service_providers.dart';
+import '../../domain/usecases/review/get_reviews.dart';
 import '../../domain/usecases/specialOffers/get_special_offers.dart';
 import '../../presentation/bookmark/bloc/bookmark_bloc.dart';
 import '../../presentation/home/bloc/specialOffers/special_offer_bloc.dart';
-import '../../presentation/serviceProvider/bloc/service_bloc.dart';
+import '../../presentation/serviceProvider/bloc/reviews/review_bloc.dart';
+import '../../presentation/serviceProvider/bloc/services/service_bloc.dart';
 
 final GetIt sl = GetIt.instance;
 
@@ -72,6 +76,10 @@ void setupServiceLocator() {
     () => BookmarkRemoteDataSourceImpl(firestore: sl()),
   );
 
+  sl.registerLazySingleton<ReviewRemoteDataSource>(
+        () => ReviewRemoteDataSourceImpl(firestore: sl()),
+  );
+
   // ✅ Register Repository
   sl.registerLazySingleton<AuthRepository>(
     () => AuthRepositoryImpl(remoteDataSource: sl()),
@@ -93,6 +101,10 @@ void setupServiceLocator() {
     () => BookmarkRepositoryImpl(remoteDataSource: sl()),
   );
 
+  sl.registerLazySingleton<ReviewRepository>(
+        () => ReviewRepositoryImpl(remoteDataSource: sl()),
+  );
+
   // ✅ Register Use Cases
   sl.registerLazySingleton(() => RegisterWithEmail(repository: sl()));
   sl.registerLazySingleton(() => SignInWithEmail(repository: sl()));
@@ -110,6 +122,8 @@ void setupServiceLocator() {
   sl.registerLazySingleton(
     () => ToggleBookmarkedServiceProvider(repository: sl()),
   );
+
+  sl.registerLazySingleton(() => GetReviews(repository: sl()));
 
   // ✅ Register BLoCs
   sl.registerLazySingleton<OnboardingBloc>(() => OnboardingBloc());
@@ -140,6 +154,8 @@ void setupServiceLocator() {
     getBookmarks: sl(),
     toggleBookmark: sl(),
   ));
+
+  sl.registerFactory(() => ReviewBloc(getReviewsUseCase: sl()));
 
   sl.registerLazySingleton<GoRouter>(
     () => GoRouter(

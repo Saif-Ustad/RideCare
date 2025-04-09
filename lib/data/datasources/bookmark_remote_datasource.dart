@@ -1,10 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-
-import '../../domain/entities/service_provider_entity.dart';
 import '../models/service_provider_model.dart';
 
 abstract class BookmarkRemoteDataSource {
-  Future<List<ServiceProviderEntity>> getBookmarkedServices(String userId);
+  Future<List<ServiceProviderModel>> getBookmarkedServices(String userId);
 
   Future<void> toggleBookmark(String userId, String serviceProviderId);
 }
@@ -15,7 +13,7 @@ class BookmarkRemoteDataSourceImpl implements BookmarkRemoteDataSource {
   BookmarkRemoteDataSourceImpl({required this.firestore});
 
   @override
-  Future<List<ServiceProviderEntity>> getBookmarkedServices(
+  Future<List<ServiceProviderModel>> getBookmarkedServices(
     String userId,
   ) async {
     final userDoc = await firestore.collection('users').doc(userId).get();

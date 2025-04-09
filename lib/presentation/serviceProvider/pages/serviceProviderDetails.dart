@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:ridecare/core/configs/assets/app_images.dart';
-import 'package:ridecare/presentation/serviceProvider/bloc/service_event.dart';
 import 'package:ridecare/presentation/serviceProvider/pages/aboutTab.dart';
 import 'package:ridecare/presentation/serviceProvider/pages/galleryTab.dart';
 import 'package:ridecare/presentation/serviceProvider/pages/reviewTab.dart';
@@ -11,7 +10,8 @@ import 'package:ridecare/presentation/serviceProvider/pages/servicesTab.dart';
 import '../../../common/widgets/bottomBar/bottomBar.dart';
 import '../../home/bloc/serviceProvider/service_provider_bloc.dart';
 import '../../home/bloc/serviceProvider/service_provider_state.dart';
-import '../bloc/service_bloc.dart';
+import '../bloc/services/service_bloc.dart';
+import '../bloc/services/service_event.dart';
 import '../widgets/headerSection.dart';
 import '../widgets/serviceInfoSection.dart';
 import '../widgets/tabSection.dart';
@@ -87,7 +87,7 @@ class _ServiceProviderDetailPageState extends State<ServiceProviderDetailPage>
                         ),
                         ServicesTab(),
                         GalleryTab(galleryImages: provider.galleryImageUrls),
-                        ReviewTab(),
+                        ReviewTab(serviceProviderId: provider.id,),
                       ],
                     ),
                   ),
