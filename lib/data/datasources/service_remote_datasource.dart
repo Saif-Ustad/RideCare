@@ -47,7 +47,7 @@ class ServiceRemoteDataSourceImpl implements ServiceRemoteDataSource {
         // Inject 'id' to mainServiceData
         final mainServiceJson = {
           ...mainServiceData,
-          'id': mainServiceSnapshot.id,
+          'id': serviceRefId,
         };
 
         final serviceModel = ServiceModel.fromJson(serviceData, mainServiceJson, categoryData);

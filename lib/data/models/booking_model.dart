@@ -1,34 +1,113 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-
-import '../../domain/entities/booking_entity.dart';
+import 'package:ridecare/domain/entities/booking_entity.dart';
+import 'package:ridecare/domain/entities/service_provider_entity.dart';
+import 'package:ridecare/domain/entities/vehicle_entity.dart';
+import 'package:ridecare/domain/entities/address_entity.dart';
+import 'package:ridecare/domain/entities/service_entity.dart';
+import 'package:ridecare/domain/entities/user_entity.dart';
 
 class BookingModel extends BookingEntity {
   BookingModel({
     super.bookingId,
     super.serviceIds,
+    super.services,
     super.serviceProviderId,
+    super.serviceProvider,
     super.scheduledAt,
     super.note,
     super.vehicleId,
+    super.vehicle,
     super.addressId,
+    super.address,
     super.userId,
+    super.user,
     super.trackingId,
     super.paymentStatus,
     super.status,
     super.serviceType,
   });
 
-  // Converts Firestore document to BookingModel
+  // ✅ Convert from Firestore document
   factory BookingModel.fromJson(Map<String, dynamic> json, String id) {
     return BookingModel(
       bookingId: id,
       serviceIds: List<String>.from(json['serviceIds'] ?? []),
       serviceProviderId: json['serviceProviderId'],
+      serviceProvider:
+          json['serviceProvider'] != null
+              ? ServiceProviderEntity(
+                id: json['serviceProvider']['id'],
+                name: json['serviceProvider']['name'],
+                ownerName: '',
+                about: '',
+                contactPhone: '',
+                experienceYears: '',
+                profileImageUrl: '',
+                workImageUrl: json['serviceProvider']['workImageUrl'],
+                galleryImageUrls: [''],
+                rating: json['serviceProvider']['rating'],
+                reviewsCount: json['serviceProvider']['reviewsCount'],
+                availability: AvailabilityEntity(from: "", to: ""),
+                location: LocationEntity(address: "", lat: "", lng: ""),
+                serviceCharges: ServiceChargesEntity(min: 0, max: 0),
+                categoryIds: [""],
+                providerServiceIds: [""],
+              )
+              : null,
       scheduledAt: (json['scheduledAt'] as Timestamp?)?.toDate(),
       note: json['note'],
       vehicleId: json['vehicleId'],
+      vehicle:
+          json['vehicleInfo'] != null
+              ? VehicleEntity(
+                id: json['vehicleInfo']['id'] ?? '',
+                brand: json['vehicleInfo']['brand'] ?? '',
+                model: json['vehicleInfo']['model'] ?? '',
+                type: '',
+                fuelType: '',
+                registrationNumber: '',
+                userId: '',
+              )
+              : null,
       addressId: json['addressId'],
+      address:
+          json['addressInfo'] != null
+              ? AddressEntity(
+                id: json['addressInfo']['id'] ?? '',
+                address: json['addressInfo']['address'] ?? '',
+                title: '',
+                userId: '',
+              )
+              : null,
       userId: json['userId'],
+      user:
+          json['userInfo'] != null
+              ? UserEntity(
+                uid: json['userInfo']['uid'] ?? '',
+                displayName: json['userInfo']['displayName'],
+                email: null,
+                phoneNumber: null,
+                photoURL: null,
+                bookmarkIds: null,
+              )
+              : null,
+      services:
+          (json['services'] as List<dynamic>?)
+              ?.map(
+                (s) => ServiceEntity(
+                  id: s['id'],
+                  name: s['name'],
+                  description: '',
+                  iconUrl: '',
+                  subCategory: '',
+                  categoryId: '',
+                  categoryName: '',
+                  price: (s['price'] ?? 0).toDouble(),
+                  estimatedTime: 0,
+                  isAvailable: true, // default
+                ),
+              )
+              .toList(),
       trackingId: json['trackingId'],
       paymentStatus: json['paymentStatus'],
       status: json['status'],
@@ -36,17 +115,47 @@ class BookingModel extends BookingEntity {
     );
   }
 
-  // Converts BookingModel to JSON map for Firestore
+  // ✅ Convert to Firestore document (only selected fields)
   Map<String, dynamic> toJson() {
     return {
       'serviceIds': serviceIds,
       'serviceProviderId': serviceProviderId,
+      'serviceProvider':
+          serviceProvider != null
+              ? {
+                'id': serviceProvider!.id,
+                'name': serviceProvider!.name,
+                'workImageUrl': serviceProvider!.workImageUrl,
+                'rating': serviceProvider!.rating,
+                'reviewsCount': serviceProvider!.reviewsCount,
+              }
+              : null,
       'scheduledAt':
           scheduledAt != null ? Timestamp.fromDate(scheduledAt!) : null,
       'note': note,
       'vehicleId': vehicleId,
+      'vehicleInfo':
+          vehicle != null
+              ? {
+                'id': vehicle!.id,
+                'brand': vehicle!.brand,
+                'model': vehicle!.model,
+              }
+              : null,
       'addressId': addressId,
+      'addressInfo':
+          address != null
+              ? {'id': address!.id, 'address': address!.address}
+              : null,
       'userId': userId,
+      'userInfo':
+          user != null
+              ? {'uid': user!.uid, 'displayName': user!.displayName}
+              : null,
+      'services':
+          services
+              ?.map((s) => {'id': s.id, 'name': s.name, 'price': s.price})
+              .toList(),
       'trackingId': trackingId,
       'paymentStatus': paymentStatus,
       'status': status,
@@ -54,17 +163,22 @@ class BookingModel extends BookingEntity {
     };
   }
 
-  // ✅ Add this method to convert BookingEntity to BookingModel
+  // ✅ Optional: from BookingEntity to BookingModel
   factory BookingModel.fromEntity(BookingEntity entity) {
     return BookingModel(
       bookingId: entity.bookingId,
       serviceIds: entity.serviceIds,
+      serviceProvider: entity.serviceProvider,
+      services: entity.services,
       serviceProviderId: entity.serviceProviderId,
       scheduledAt: entity.scheduledAt,
       note: entity.note,
       vehicleId: entity.vehicleId,
+      vehicle: entity.vehicle,
       addressId: entity.addressId,
+      address: entity.address,
       userId: entity.userId,
+      user: entity.user,
       trackingId: entity.trackingId,
       paymentStatus: entity.paymentStatus,
       status: entity.status,

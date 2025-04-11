@@ -1,11 +1,29 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:ridecare/core/configs/assets/app_images.dart';
+import 'package:ridecare/domain/entities/service_provider_entity.dart';
+import 'package:ridecare/presentation/booking/bloc/booking_event.dart';
 import '../../../common/widgets/bottomBar/bottomBar.dart';
 import '../../../core/configs/theme/app_colors.dart';
+import '../../booking/bloc/booking_bloc.dart';
+import '../../booking/bloc/booking_state.dart';
+import 'package:intl/intl.dart';
 
-class BillSummaryPage extends StatelessWidget {
+class BillSummaryPage extends StatefulWidget {
   const BillSummaryPage({super.key});
+
+  @override
+  State<BillSummaryPage> createState() => _BillSummaryPageState();
+}
+
+class _BillSummaryPageState extends State<BillSummaryPage> {
+  @override
+  void initState() {
+    super.initState();
+    context.read<BookingBloc>().add(PrepareBillSummary());
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -48,27 +66,56 @@ class BillSummaryPage extends StatelessWidget {
         centerTitle: true,
       ),
       body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.all(15.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Expanded(
-                child: SingleChildScrollView(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      _buildServiceCenterDetails(serviceCenter),
-                      const Divider(thickness: 1, height: 20),
-                      _buildSummaryDetails(bookingDetails, billItems),
-                    ],
-                  ),
+        child: BlocBuilder<BookingBloc, BookingState>(
+          builder: (context, state) {
+            if (state is BookingUpdated) {
+              final booking = state.booking;
+
+              final services = booking.services ?? [];
+              final totalAmount = services.fold<double>(
+                0.0,
+                (sum, service) => sum + (service.price ?? 0),
+              );
+
+              return Padding(
+                padding: const EdgeInsets.all(15.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Expanded(
+                      child: SingleChildScrollView(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            booking.serviceProvider != null
+                                ? _buildServiceCenterDetails(
+                                  booking.serviceProvider!,
+                                )
+                                : const Text("Service provider not available"),
+
+                            const Divider(thickness: 1, height: 20),
+                            _buildSummaryDetails(
+                              booking,
+                              services,
+                              totalAmount,
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 10),
+                    _buildPromoCodeSection(),
+                  ],
                 ),
-              ),
-              const SizedBox(height: 10),
-              _buildPromoCodeSection(),
-            ],
-          ),
+              );
+            } else if (state is BookingLoading) {
+              return const Center(child: CircularProgressIndicator());
+            } else if (state is BookingError) {
+              return Center(child: Text("Error: ${state.message}"));
+            } else {
+              return const SizedBox();
+            }
+          },
         ),
       ),
       bottomNavigationBar: CustomBottomBar(
@@ -80,16 +127,20 @@ class BillSummaryPage extends StatelessWidget {
     );
   }
 
-  Widget _buildServiceCenterDetails(ServiceCenter serviceCenter) {
+  Widget _buildServiceCenterDetails(ServiceProviderEntity serviceCenter) {
     return Row(
       children: [
         ClipRRect(
           borderRadius: BorderRadius.circular(8),
-          child: Image.asset(
-            serviceCenter.imageUrl,
+          child: CachedNetworkImage(
+            imageUrl: serviceCenter.workImageUrl,
             width: 150,
             height: 100,
             fit: BoxFit.cover,
+            placeholder:
+                (context, url) =>
+                    const Center(child: CircularProgressIndicator()),
+            errorWidget: (context, url, error) => const Icon(Icons.error),
           ),
         ),
         const SizedBox(width: 10),
@@ -108,7 +159,7 @@ class BillSummaryPage extends StatelessWidget {
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: Text(
-                    serviceCenter.serviceType,
+                    "Car Repairs",
                     style: const TextStyle(
                       color: AppColors.primary,
                       fontSize: 12,
@@ -137,7 +188,7 @@ class BillSummaryPage extends StatelessWidget {
                   color: AppColors.primary.withOpacity(0.8),
                 ),
                 Text(
-                  "${serviceCenter.distance} km ",
+                  "1.5 km ",
                   style: const TextStyle(
                     fontSize: 12,
                     color: AppColors.darkGrey,
@@ -150,7 +201,7 @@ class BillSummaryPage extends StatelessWidget {
                   color: AppColors.primary.withOpacity(0.8),
                 ),
                 Text(
-                  " ${serviceCenter.time} mins",
+                  "8 mins",
                   style: const TextStyle(
                     fontSize: 12,
                     color: AppColors.darkGrey,
@@ -164,26 +215,27 @@ class BillSummaryPage extends StatelessWidget {
     );
   }
 
-  Widget _buildSummaryDetails(
-    BookingDetails bookingDetails,
-    List<BillItem> billItems,
-  ) {
+  Widget _buildSummaryDetails(booking, List services, double totalAmount) {
+    final date =
+        booking.scheduledAt != null
+            ? DateFormat("MMM dd, yyyy").format(booking.scheduledAt!)
+            : "Not Set";
+
+    final carDetails =
+        "${booking.vehicle?.brand} ${booking.vehicle?.type ?? "Vehicle"} | ${booking.vehicle?.registrationNumber ?? "Not Available"}";
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        _buildSummaryRow("Booking Date", bookingDetails.dateTime),
-        _buildSummaryRow("Car", bookingDetails.carDetails),
-        _buildSummaryRow("Service Type", bookingDetails.serviceType),
+        _buildSummaryRow("Booking Date", date),
+        _buildSummaryRow("Car", carDetails),
+        _buildSummaryRow("Service Type", booking.serviceType ?? "N/A"),
         const Divider(thickness: 1),
-        ...billItems.map(
-          (item) => _buildSummaryRow(item.name, "Rs. ${item.price}"),
+        ...services.map<Widget>(
+          (s) => _buildSummaryRow(s.name ?? "", "Rs. ${s.price ?? 0}"),
         ),
         const Divider(thickness: 1, color: Colors.grey),
-        _buildSummaryRow(
-          "Total",
-          "Rs. ${billItems.fold(0.0, (sum, item) => sum + item.price)}",
-          isBold: true,
-        ),
+        _buildSummaryRow("Total", "Rs. $totalAmount", isBold: true),
       ],
     );
   }

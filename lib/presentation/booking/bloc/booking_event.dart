@@ -27,4 +27,6 @@ class SetAddress extends BookingEvent {
   SetAddress({required this.addressId});
 }
 
+class PrepareBillSummary extends BookingEvent {}
+
 class SubmitBooking extends BookingEvent {}

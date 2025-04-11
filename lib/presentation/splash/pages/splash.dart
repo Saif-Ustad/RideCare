@@ -25,20 +25,20 @@ class _SplashPageState extends State<SplashPage> {
   @override
   void initState() {
     super.initState();
-    _loadData();
+    // _loadData();
     _navigateToNext();
   }
 
-  Future<void> _loadData() async {
-    context.read<SpecialOfferBloc>().add(FetchSpecialOffers());
-    context.read<ServiceProviderBloc>().add(FetchAllServiceProviders());
-    final currentUser = FirebaseAuth.instance.currentUser;
-    if (currentUser != null) {
-      context.read<BookmarkBloc>().add(LoadBookmarks(currentUser.uid));
-      context.read<VehicleBloc>().add(LoadVehicles(currentUser.uid));
-    }
-
-  }
+  // Future<void> _loadData() async {
+  //   context.read<SpecialOfferBloc>().add(FetchSpecialOffers());
+  //   context.read<ServiceProviderBloc>().add(FetchAllServiceProviders());
+  //   final currentUser = FirebaseAuth.instance.currentUser;
+  //   if (currentUser != null) {
+  //     context.read<BookmarkBloc>().add(LoadBookmarks(currentUser.uid));
+  //     context.read<VehicleBloc>().add(LoadVehicles(currentUser.uid));
+  //   }
+  //
+  // }
 
   Future<void> _navigateToNext() async {
     await Future.delayed(const Duration(seconds: 3));

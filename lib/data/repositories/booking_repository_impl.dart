@@ -19,4 +19,11 @@ class BookingRepositoryImpl implements BookingRepository {
   Future<void> updateBooking(String bookingId, Map<String, dynamic> data) {
     return remoteDataSource.updateBooking(bookingId, data);
   }
+
+  @override
+  Future<BookingEntity> prepareBillSummary(BookingEntity booking) {
+    return remoteDataSource.prepareBillSummary(
+      BookingModel.fromEntity(booking),
+    );
+  }
 }
