@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:ridecare/domain/entities/user_entity.dart';
@@ -91,17 +92,33 @@ class BookingBloc extends Bloc<BookingEvent, BookingState> {
       emit(BookingLoading());
       try {
         final currentUser = FirebaseAuth.instance.currentUser;
-
         if (currentUser != null) {
-          _booking = _booking.copyWith(
-            status: "Order Pending",
-            userId: currentUser.uid,
-            user: UserEntity(
-              uid: currentUser.uid,
-              email: currentUser.email,
-              displayName: currentUser.displayName,
-            ),
-          );
+          final userDoc =
+              await FirebaseFirestore.instance
+                  .collection('users')
+                  .doc(currentUser.uid)
+                  .get();
+
+          final userData = userDoc.data();
+
+          if (userData != null) {
+            _booking = _booking.copyWith(
+              status: "Order Pending",
+              paymentMode: event.paymentMode,
+              userId: currentUser.uid,
+              user: UserEntity(
+                uid: currentUser.uid,
+                email: userData['email'],
+                displayName: "${userData['firstName']} ${userData['lastName']}",
+              ),
+            );
+          } else {
+            emit(BookingError("User data not found"));
+            return;
+          }
+        } else {
+          emit(BookingError("User not logged in"));
+          return;
         }
 
         final id = await bookingCreatedUseCase(_booking);

@@ -1,6 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:ridecare/domain/entities/booking_entity.dart';
-import 'package:ridecare/domain/entities/promo_code_entity.dart';
 import 'package:ridecare/domain/entities/service_provider_entity.dart';
 import 'package:ridecare/domain/entities/vehicle_entity.dart';
 import 'package:ridecare/domain/entities/address_entity.dart';
@@ -23,7 +22,7 @@ class BookingModel extends BookingEntity {
     super.userId,
     super.user,
     super.trackingId,
-    super.paymentStatus,
+    super.paymentMode,
     super.status,
     super.serviceType,
     super.totalCharges,
@@ -109,7 +108,7 @@ class BookingModel extends BookingEntity {
               )
               .toList(),
       trackingId: json['trackingId'],
-      paymentStatus: json['paymentStatus'],
+      paymentMode: json['paymentMode'],
       status: json['status'],
       serviceType: json['serviceType'],
       totalCharges: (json['totalCharges'] as num).toDouble(),
@@ -166,7 +165,7 @@ class BookingModel extends BookingEntity {
               ?.map((s) => {'id': s.id, 'name': s.name, 'price': s.price})
               .toList(),
       'trackingId': trackingId,
-      'paymentStatus': paymentStatus,
+      'paymentMode': paymentMode,
       'status': status,
       'serviceType': serviceType,
       'totalCharges': totalCharges,
@@ -191,7 +190,7 @@ class BookingModel extends BookingEntity {
       userId: entity.userId,
       user: entity.user,
       trackingId: entity.trackingId,
-      paymentStatus: entity.paymentStatus,
+      paymentMode: entity.paymentMode,
       status: entity.status,
       serviceType: entity.serviceType,
       totalCharges: entity.totalCharges,

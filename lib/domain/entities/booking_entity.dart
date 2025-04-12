@@ -21,7 +21,7 @@ class BookingEntity {
   final String? userId;
   final UserEntity? user;
   final String? trackingId;
-  final String? paymentStatus;
+  final String? paymentMode;
   final String? status;
   final String? serviceType;
   final double? totalCharges;
@@ -42,7 +42,7 @@ class BookingEntity {
     this.userId,
     this.user,
     this.trackingId,
-    this.paymentStatus,
+    this.paymentMode,
     this.status,
     this.serviceType,
     this.totalCharges,
@@ -60,7 +60,7 @@ class BookingEntity {
     VehicleEntity? vehicle,
     String? addressId,
     AddressEntity? address,
-    String? paymentStatus,
+    String? paymentMode,
     String? status,
     String? trackingId,
     String? userId,
@@ -84,7 +84,7 @@ class BookingEntity {
       trackingId: trackingId ?? this.trackingId,
       userId: userId ?? this.userId,
       user: user ?? this.user,
-      paymentStatus: paymentStatus ?? this.paymentStatus,
+      paymentMode: paymentMode ?? this.paymentMode,
       status: status ?? this.status,
       serviceType: serviceType ?? this.serviceType,
       totalCharges: totalCharges ?? this.totalCharges,

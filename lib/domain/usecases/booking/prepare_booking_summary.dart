@@ -8,7 +8,6 @@ class PrepareBookingSummaryUseCase {
   PrepareBookingSummaryUseCase({required this.repository});
 
   Future<BookingEntity> call(BookingEntity booking) {
-    print("hhhhh");
     return repository.prepareBillSummary(booking);
   }
 }

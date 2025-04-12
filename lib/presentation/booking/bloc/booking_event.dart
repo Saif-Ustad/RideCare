@@ -46,4 +46,8 @@ class SetTotalAmount extends BookingEvent {
   SetTotalAmount({required this.totalAmount});
 }
 
-class SubmitBooking extends BookingEvent {}
+class SubmitBooking extends BookingEvent {
+  final String paymentMode;
+
+  SubmitBooking({required this.paymentMode});
+}

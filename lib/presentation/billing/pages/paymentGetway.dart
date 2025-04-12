@@ -36,7 +36,7 @@ class _PaymentGatewayPageState extends State<PaymentGatewayPage> {
     return BlocConsumer<PaymentBloc, PaymentState>(
       listener: (context, state) {
         if (state is PaymentSuccess) {
-          context.read<BookingBloc>().add(SubmitBooking());
+          context.read<BookingBloc>().add(SubmitBooking(paymentMode: _selectedPayment));
 
           ScaffoldMessenger.of(
             context,
@@ -129,7 +129,7 @@ class _PaymentGatewayPageState extends State<PaymentGatewayPage> {
             bottomNavigationBar: CustomBottomBar(
               text: "Continue",
               onPressed: () {
-                context.read<BookingBloc>().add(SubmitBooking());
+                context.read<BookingBloc>().add(SubmitBooking(paymentMode: _selectedPayment));
               },
             ),
           ),
