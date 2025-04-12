@@ -1,8 +1,12 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:ridecare/domain/entities/user_entity.dart';
 import 'package:ridecare/domain/usecases/booking/booking_created.dart';
 import 'package:ridecare/domain/usecases/booking/booking_updated.dart';
 import 'package:ridecare/domain/usecases/booking/prepare_booking_summary.dart';
+import 'package:ridecare/domain/usecases/booking_tracking/create_booking_tracking_usecase.dart';
 import '../../../domain/entities/booking_entity.dart';
+import '../../../domain/entities/booking_tracking_entity.dart';
 import 'booking_event.dart';
 import 'booking_state.dart';
 
@@ -10,6 +14,7 @@ class BookingBloc extends Bloc<BookingEvent, BookingState> {
   final BookingUpdatedUseCase bookingUpdatedUseCase;
   final BookingCreatedUseCase bookingCreatedUseCase;
   final PrepareBookingSummaryUseCase prepareBookingSummaryUseCase;
+  final CreateBookingTrackingUseCase createBookingTrackingUseCase;
 
   BookingEntity _booking = BookingEntity();
 
@@ -17,6 +22,7 @@ class BookingBloc extends Bloc<BookingEvent, BookingState> {
     required this.bookingUpdatedUseCase,
     required this.bookingCreatedUseCase,
     required this.prepareBookingSummaryUseCase,
+    required this.createBookingTrackingUseCase,
   }) : super(BookingInitial()) {
     on<SelectService>((event, emit) {
       _booking = _booking.copyWith(
@@ -84,7 +90,29 @@ class BookingBloc extends Bloc<BookingEvent, BookingState> {
     on<SubmitBooking>((event, emit) async {
       emit(BookingLoading());
       try {
+        final currentUser = FirebaseAuth.instance.currentUser;
+
+        if (currentUser != null) {
+          _booking = _booking.copyWith(
+            status: "Order Pending",
+            userId: currentUser.uid,
+            user: UserEntity(
+              uid: currentUser.uid,
+              email: currentUser.email,
+              displayName: currentUser.displayName,
+            ),
+          );
+        }
+
         final id = await bookingCreatedUseCase(_booking);
+
+        await createBookingTrackingUseCase(id, [
+          BookingTrackingUpdateEntity(
+            status: "Order Pending",
+            timestamp: DateTime.now(),
+          ),
+        ]);
+
         emit(BookingSubmitted(id));
       } catch (e) {
         emit(BookingError(e.toString()));

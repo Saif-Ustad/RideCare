@@ -58,7 +58,7 @@ dependencies:
   dartz:
   share_plus: ^7.2.1
   flutter_stripe: ^9.0.0
-
+  awesome_dialog: ^3.1.0
 
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.

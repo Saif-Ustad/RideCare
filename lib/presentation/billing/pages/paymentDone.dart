@@ -1,10 +1,45 @@
+import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:flutter/material.dart';
+
 import 'package:go_router/go_router.dart';
 
 import '../../../core/configs/theme/app_colors.dart';
 
-class PaymentDonePage extends StatelessWidget {
+class PaymentDonePage extends StatefulWidget {
   const PaymentDonePage({super.key});
+
+  @override
+  State<PaymentDonePage> createState() => _PaymentDonePageState();
+}
+
+class _PaymentDonePageState extends State<PaymentDonePage> {
+  @override
+  void initState() {
+    super.initState();
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      // Custom success dialog
+      AwesomeDialog(
+        context: context,
+        dialogType: DialogType.success,
+        animType: AnimType.scale,
+        title: 'Payment Successful!',
+        desc: 'Your car washing service has been successfully booked.',
+        btnOkText: 'View E-Receipt',
+        btnOkColor: AppColors.primary,
+        btnOkOnPress: () {
+          context.push("/e-receipt");
+        },
+        btnCancelText: 'My Bookings',
+        btnCancelColor: Colors.grey.shade400,
+        btnCancelOnPress: () {
+          context.push("/my-bookings");
+        },
+        headerAnimationLoop: false,
+        buttonsBorderRadius: BorderRadius.circular(8),
+      ).show();
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -35,11 +70,7 @@ class PaymentDonePage extends StatelessWidget {
               shape: BoxShape.circle,
               color: AppColors.primary,
             ),
-            child: const Icon(
-              Icons.check,
-              size: 50,
-              color: Colors.white,
-            ),
+            child: const Icon(Icons.check, size: 50, color: Colors.white),
           ),
 
           const SizedBox(height: 20),
@@ -92,10 +123,7 @@ class PaymentDonePage extends StatelessWidget {
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(10),
                     ),
-                    minimumSize: const Size(
-                      double.infinity,
-                      50,
-                    ),
+                    minimumSize: const Size(double.infinity, 50),
                   ),
                   child: const Text(
                     "View E-Receipt",

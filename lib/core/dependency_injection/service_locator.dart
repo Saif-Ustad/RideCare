@@ -3,15 +3,18 @@ import 'package:get_it/get_it.dart';
 import 'package:go_router/go_router.dart';
 import 'package:ridecare/core/stripe_service/stripe_customer.dart';
 import 'package:ridecare/data/datasources/auth_remote_datasource.dart';
+import 'package:ridecare/data/datasources/booking_tracking_remote_datasource.dart';
 import 'package:ridecare/data/datasources/bookmark_remote_datasource.dart';
 import 'package:ridecare/data/repositories/address_repository_impl.dart';
 import 'package:ridecare/data/repositories/auth_repository_impl.dart';
 import 'package:ridecare/data/repositories/booking_repository_impl.dart';
+import 'package:ridecare/data/repositories/booking_tracking_repository_impl.dart';
 import 'package:ridecare/data/repositories/bookmark_repository_impl.dart';
 import 'package:ridecare/data/repositories/promo_code_repository_Impl.dart';
 import 'package:ridecare/data/repositories/service_provider_repository_impl.dart';
 import 'package:ridecare/data/repositories/vehicle_repository_impl.dart';
 import 'package:ridecare/domain/repositories/auth_repository.dart';
+import 'package:ridecare/domain/repositories/booking_tracking_repository.dart';
 import 'package:ridecare/domain/repositories/bookmark_repository.dart';
 import 'package:ridecare/domain/repositories/service_provider_repository.dart';
 import 'package:ridecare/domain/usecases/address/add_address.dart';
@@ -22,6 +25,8 @@ import 'package:ridecare/domain/usecases/auth/sign_out.dart';
 import 'package:ridecare/domain/usecases/booking/booking_created.dart';
 import 'package:ridecare/domain/usecases/booking/booking_updated.dart';
 import 'package:ridecare/domain/usecases/booking/prepare_booking_summary.dart';
+import 'package:ridecare/domain/usecases/booking_tracking/create_booking_tracking_usecase.dart';
+import 'package:ridecare/domain/usecases/booking_tracking/get_booking_tracking_usecase.dart';
 import 'package:ridecare/domain/usecases/bookmark/toggle_bookmark_service_provider.dart';
 import 'package:ridecare/domain/usecases/promoCode/validate_promo_code.dart';
 import 'package:ridecare/domain/usecases/service/get_services_for_provider.dart';
@@ -83,12 +88,10 @@ void setupServiceLocator() {
   // ✅ Register FirebaseFireStore instance
   sl.registerLazySingleton<FirebaseFirestore>(() => FirebaseFirestore.instance);
 
-
   // Services
   // sl.registerLazySingleton(() => StripeService());
   sl.registerSingleton<StripeService>(StripeService()..init());
   sl.registerLazySingleton<StripeCustomer>(() => StripeCustomer());
-
 
   // ✅ Register Remote Data Source
   sl.registerLazySingleton<AuthRemoteDataSource>(
@@ -134,6 +137,10 @@ void setupServiceLocator() {
     () => PromoCodeRemoteDataSourceImpl(firestore: sl()),
   );
 
+  sl.registerLazySingleton<BookingTrackingRemoteDataSource>(
+    () => BookingTrackingRemoteDataSourceImpl(firestore: sl()),
+  );
+
   // ✅ Register Repository
   sl.registerLazySingleton<AuthRepository>(
     () => AuthRepositoryImpl(remoteDataSource: sl()),
@@ -175,6 +182,10 @@ void setupServiceLocator() {
     () => PromoCodeRepositoryImpl(remoteDataSource: sl()),
   );
 
+  sl.registerLazySingleton<BookingTrackingRepository>(
+    () => BookingTrackingRepositoryImpl(remoteDataSource: sl()),
+  );
+
   // ✅ Register Use Cases
   sl.registerLazySingleton(() => RegisterWithEmail(repository: sl()));
   sl.registerLazySingleton(() => SignInWithEmail(repository: sl()));
@@ -213,6 +224,10 @@ void setupServiceLocator() {
 
   sl.registerLazySingleton(() => ValidatePromoCodeUseCase(repository: sl()));
 
+  sl.registerLazySingleton(() => GetBookingTrackingUseCase(repository: sl()));
+  sl.registerLazySingleton(() => CreateBookingTrackingUseCase(repository: sl()));
+
+
   // ✅ Register BLoCs
   sl.registerLazySingleton<OnboardingBloc>(() => OnboardingBloc());
   sl.registerLazySingleton<PasswordToggleBloc>(() => PasswordToggleBloc());
@@ -249,6 +264,7 @@ void setupServiceLocator() {
       bookingCreatedUseCase: sl(),
       bookingUpdatedUseCase: sl(),
       prepareBookingSummaryUseCase: sl(),
+      createBookingTrackingUseCase: sl(),
     ),
   );
 
@@ -274,7 +290,9 @@ void setupServiceLocator() {
     () => PromoCodeBloc(validatePromoCodeUseCase: sl()),
   );
 
-  sl.registerFactory(() => PaymentBloc(stripeService: sl(), stripeCustomer: sl()));
+  sl.registerFactory(
+    () => PaymentBloc(stripeService: sl(), stripeCustomer: sl()),
+  );
 
   sl.registerLazySingleton<GoRouter>(
     () => GoRouter(

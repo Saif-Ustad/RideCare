@@ -88,10 +88,7 @@ class BookingModel extends BookingEntity {
               ? UserEntity(
                 uid: json['userInfo']['uid'] ?? '',
                 displayName: json['userInfo']['displayName'],
-                email: null,
-                phoneNumber: null,
-                photoURL: null,
-                bookmarkIds: null,
+                email: json['userInfo']['email'],
               )
               : null,
       services:
@@ -162,7 +159,7 @@ class BookingModel extends BookingEntity {
       'userId': userId,
       'userInfo':
           user != null
-              ? {'uid': user!.uid, 'displayName': user!.displayName}
+              ? {'uid': user!.uid, 'displayName': user!.displayName, 'email': user!.email}
               : null,
       'services':
           services

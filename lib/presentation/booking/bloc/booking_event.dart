@@ -1,5 +1,7 @@
 import 'dart:ffi';
 
+import 'package:ridecare/domain/entities/booking_tracking_entity.dart';
+
 abstract class BookingEvent {}
 
 class SelectService extends BookingEvent {

@@ -22,6 +22,9 @@ class BookingRemoteDataSourceImpl implements BookingRemoteDataSource {
   @override
   Future<String> createBooking(BookingModel booking) async {
     final docRef = await firestore.collection('bookings').add(booking.toJson());
+    await firestore.collection('users').doc(booking.userId).update({
+      'bookingIds': FieldValue.arrayUnion([docRef.id]),
+    });
     return docRef.id;
   }
 
