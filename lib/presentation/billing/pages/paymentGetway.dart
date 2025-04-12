@@ -1,11 +1,19 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../common/widgets/bottomBar/bottomBar.dart';
 import '../../../core/configs/theme/app_colors.dart';
+import '../bloc/payment/payment_bloc.dart';
+import '../bloc/payment/payment_event.dart';
+import '../bloc/payment/payment_state.dart';
 
 class PaymentGatewayPage extends StatefulWidget {
-  const PaymentGatewayPage({super.key});
+  final double amount;
+
+  const PaymentGatewayPage({super.key, required this.amount});
 
   @override
   _PaymentGatewayPageState createState() => _PaymentGatewayPageState();
@@ -81,10 +89,56 @@ class _PaymentGatewayPageState extends State<PaymentGatewayPage> {
           ],
         ),
       ),
-      bottomNavigationBar: CustomBottomBar(
-        text: "Continue",
-        onPressed: () {
-          context.push("/payment-done");
+      bottomNavigationBar: BlocConsumer<PaymentBloc, PaymentState>(
+        listener: (context, state) {
+          if (state is PaymentSuccess) {
+            ScaffoldMessenger.of(
+              context,
+            ).showSnackBar(SnackBar(content: Text("Payment Successful")));
+            context.push("/payment-done");
+          } else if (state is PaymentFailed) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text("Payment Failed: ${state.error}")),
+            );
+          }
+        },
+        builder: (context, state) {
+          return CustomBottomBar(
+            text: "Continue",
+            onPressed: () async {
+              try {
+                User? currentUser = FirebaseAuth.instance.currentUser;
+
+                if (currentUser != null) {
+                  DocumentSnapshot userDoc =
+                      await FirebaseFirestore.instance
+                          .collection('users')
+                          .doc(currentUser.uid)
+                          .get();
+
+                  if (userDoc.exists) {
+                    String name =
+                        '${userDoc['firstName']} ${userDoc['lastName']}';
+                    String email = userDoc['email'];
+
+                    context.read<PaymentBloc>().add(
+                      StartPayment(
+                        name: name,
+                        email: email,
+                        amount: widget.amount,
+                      ),
+                    );
+                  } else {
+                    print('User document not found');
+                  }
+                } else {
+                  print('No user is logged in');
+                }
+              } catch (e) {
+                print('Error fetching user data: $e');
+              }
+            },
+          );
         },
       ),
     );

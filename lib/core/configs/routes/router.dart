@@ -86,10 +86,19 @@ final GoRouter router = GoRouter(
       path: '/bill-summary/:id',
       builder: (context, state) => const BillSummaryPage(),
     ),
+
+    // GoRoute(
+    //   path: '/payment-gateway',
+    //   builder: (context, state) => const PaymentGatewayPage(),
+    // ),
     GoRoute(
       path: '/payment-gateway',
-      builder: (context, state) => const PaymentGatewayPage(),
+      builder: (context, state) {
+        final discountedTotal = state.extra as double;
+        return PaymentGatewayPage(amount: discountedTotal);
+      },
     ),
+
     GoRoute(
       path: '/payment-done',
       builder: (context, state) => const PaymentDonePage(),

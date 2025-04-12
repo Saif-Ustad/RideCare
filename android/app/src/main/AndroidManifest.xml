@@ -16,7 +16,10 @@
     <application
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher"
-        android:label="RideCare">
+        android:label="RideCare"
+        android:theme="@style/NormalTheme"
+        android:enableOnBackInvokedCallback="true"
+        >
 
         <meta-data
             android:name="com.google.android.geo.API_KEY"

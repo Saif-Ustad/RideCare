@@ -25,6 +25,7 @@ class _BillSummaryPageState extends State<BillSummaryPage> {
   final TextEditingController _promoCodeController = TextEditingController();
   String? _appliedPromo;
   double _discount = 0.0;
+  double _finalAmount = 0.0;
 
   @override
   void initState() {
@@ -62,7 +63,9 @@ class _BillSummaryPageState extends State<BillSummaryPage> {
                 (sum, service) => sum + (service.price ?? 0),
               );
 
-              final discountedTotal = originalTotal - (originalTotal * _discount)/100;
+              final discountedTotal =
+                  originalTotal - (originalTotal * _discount) / 100;
+              _finalAmount = discountedTotal;
 
               return Padding(
                 padding: const EdgeInsets.all(15.0),
@@ -110,7 +113,10 @@ class _BillSummaryPageState extends State<BillSummaryPage> {
       bottomNavigationBar: CustomBottomBar(
         text: "Continue",
         onPressed: () {
-          context.push("/payment-gateway");
+          context.read<BookingBloc>().add(
+            SetTotalAmount(totalAmount: _finalAmount),
+          );
+          context.push("/payment-gateway", extra: _finalAmount);
         },
       ),
     );
@@ -230,7 +236,11 @@ class _BillSummaryPageState extends State<BillSummaryPage> {
         ),
         if (_appliedPromo != null)
           _buildSummaryRow("Promo Applied", _appliedPromo!),
-        if (_discount > 0) _buildSummaryRow("Discount", "- Rs. ${(originalTotal * _discount)/100}"),
+        if (_discount > 0)
+          _buildSummaryRow(
+            "Discount",
+            "- Rs. ${(originalTotal * _discount) / 100}",
+          ),
         const Divider(thickness: 1, color: Colors.grey),
         _buildSummaryRow("Total", "Rs. $discountedTotal", isBold: true),
       ],

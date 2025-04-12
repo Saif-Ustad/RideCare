@@ -70,9 +70,13 @@ class BookingBloc extends Bloc<BookingEvent, BookingState> {
           'discountPercentage': event.discountPercentage,
         },
       );
-      // print(
-      //   "📝 Booking Updated: ${_booking.promoCodeInfo}",
-      // );
+
+      emit(BookingUpdated(booking: _booking));
+    });
+
+    on<SetTotalAmount>((event, emit) {
+      _booking = _booking.copyWith(totalCharges: event.totalAmount);
+      print("📝 Booking Updated: ${_booking.totalCharges}");
 
       emit(BookingUpdated(booking: _booking));
     });

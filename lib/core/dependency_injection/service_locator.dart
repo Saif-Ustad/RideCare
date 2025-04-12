@@ -1,6 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:get_it/get_it.dart';
 import 'package:go_router/go_router.dart';
+import 'package:ridecare/core/stripe_service/stripe_customer.dart';
 import 'package:ridecare/data/datasources/auth_remote_datasource.dart';
 import 'package:ridecare/data/datasources/bookmark_remote_datasource.dart';
 import 'package:ridecare/data/repositories/address_repository_impl.dart';
@@ -64,12 +65,14 @@ import '../../domain/usecases/address/update_address.dart';
 import '../../domain/usecases/bookmark/get_bookmarked_service_providers.dart';
 import '../../domain/usecases/review/get_reviews.dart';
 import '../../domain/usecases/specialOffers/get_special_offers.dart';
+import '../../presentation/billing/bloc/payment/payment_bloc.dart';
 import '../../presentation/bookmark/bloc/bookmark_bloc.dart';
 import '../../presentation/home/bloc/specialOffers/special_offer_bloc.dart';
 import '../../presentation/location/bloc/address_bloc.dart';
 import '../../presentation/serviceProvider/bloc/reviews/review_bloc.dart';
 import '../../presentation/serviceProvider/bloc/services/service_bloc.dart';
 import '../../presentation/vehicles/bloc/vehicle_bloc.dart';
+import '../stripe_service/stripe_service.dart';
 
 final GetIt sl = GetIt.instance;
 
@@ -79,6 +82,13 @@ void setupServiceLocator() {
 
   // ✅ Register FirebaseFireStore instance
   sl.registerLazySingleton<FirebaseFirestore>(() => FirebaseFirestore.instance);
+
+
+  // Services
+  // sl.registerLazySingleton(() => StripeService());
+  sl.registerSingleton<StripeService>(StripeService()..init());
+  sl.registerLazySingleton<StripeCustomer>(() => StripeCustomer());
+
 
   // ✅ Register Remote Data Source
   sl.registerLazySingleton<AuthRemoteDataSource>(
@@ -263,6 +273,8 @@ void setupServiceLocator() {
   sl.registerLazySingleton<PromoCodeBloc>(
     () => PromoCodeBloc(validatePromoCodeUseCase: sl()),
   );
+
+  sl.registerFactory(() => PaymentBloc(stripeService: sl(), stripeCustomer: sl()));
 
   sl.registerLazySingleton<GoRouter>(
     () => GoRouter(

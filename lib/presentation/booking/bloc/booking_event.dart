@@ -38,4 +38,10 @@ class ApplyPromoCode extends BookingEvent {
   ApplyPromoCode({required this.promoCode, required this.discountPercentage});
 }
 
+class SetTotalAmount extends BookingEvent {
+  final double totalAmount;
+
+  SetTotalAmount({required this.totalAmount});
+}
+
 class SubmitBooking extends BookingEvent {}
