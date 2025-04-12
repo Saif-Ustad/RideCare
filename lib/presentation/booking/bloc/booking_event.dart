@@ -1,3 +1,5 @@
+import 'dart:ffi';
+
 abstract class BookingEvent {}
 
 class SelectService extends BookingEvent {
@@ -28,5 +30,12 @@ class SetAddress extends BookingEvent {
 }
 
 class PrepareBillSummary extends BookingEvent {}
+
+class ApplyPromoCode extends BookingEvent {
+  final String promoCode;
+  final double discountPercentage;
+
+  ApplyPromoCode({required this.promoCode, required this.discountPercentage});
+}
 
 class SubmitBooking extends BookingEvent {}

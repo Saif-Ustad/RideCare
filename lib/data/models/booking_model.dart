@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:ridecare/domain/entities/booking_entity.dart';
+import 'package:ridecare/domain/entities/promo_code_entity.dart';
 import 'package:ridecare/domain/entities/service_provider_entity.dart';
 import 'package:ridecare/domain/entities/vehicle_entity.dart';
 import 'package:ridecare/domain/entities/address_entity.dart';
@@ -25,6 +26,8 @@ class BookingModel extends BookingEntity {
     super.paymentStatus,
     super.status,
     super.serviceType,
+    super.totalCharges,
+    super.promoCodeInfo,
   });
 
   // ✅ Convert from Firestore document
@@ -112,6 +115,15 @@ class BookingModel extends BookingEntity {
       paymentStatus: json['paymentStatus'],
       status: json['status'],
       serviceType: json['serviceType'],
+      totalCharges: (json['totalCharges'] as num).toDouble(),
+      promoCodeInfo:
+          json['promoCodeInfo'] != null
+              ? {
+                'code': json['promoCodeInfo']['code'],
+                'discountPercentage':
+                    (json['promoCodeInfo']['discountPercentage'] as num).toDouble(),
+              }
+              : null,
     );
   }
 
@@ -160,6 +172,8 @@ class BookingModel extends BookingEntity {
       'paymentStatus': paymentStatus,
       'status': status,
       'serviceType': serviceType,
+      'totalCharges': totalCharges,
+      'promoCodeInfo': promoCodeInfo,
     };
   }
 
@@ -183,6 +197,8 @@ class BookingModel extends BookingEntity {
       paymentStatus: entity.paymentStatus,
       status: entity.status,
       serviceType: entity.serviceType,
+      totalCharges: entity.totalCharges,
+      promoCodeInfo: entity.promoCodeInfo,
     );
   }
 }

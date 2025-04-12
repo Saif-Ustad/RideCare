@@ -1,3 +1,5 @@
+import 'dart:ffi';
+
 import 'package:ridecare/domain/entities/address_entity.dart';
 import 'package:ridecare/domain/entities/service_entity.dart';
 import 'package:ridecare/domain/entities/service_provider_entity.dart';
@@ -22,6 +24,8 @@ class BookingEntity {
   final String? paymentStatus;
   final String? status;
   final String? serviceType;
+  final double? totalCharges;
+  final Map<String, dynamic>? promoCodeInfo;
 
   BookingEntity({
     this.bookingId,
@@ -41,6 +45,8 @@ class BookingEntity {
     this.paymentStatus,
     this.status,
     this.serviceType,
+    this.totalCharges,
+    this.promoCodeInfo,
   });
 
   BookingEntity copyWith({
@@ -60,6 +66,8 @@ class BookingEntity {
     String? userId,
     UserEntity? user,
     String? serviceType,
+    double? totalCharges,
+    Map<String, dynamic>? promoCodeInfo,
   }) {
     return BookingEntity(
       bookingId: bookingId,
@@ -79,6 +87,8 @@ class BookingEntity {
       paymentStatus: paymentStatus ?? this.paymentStatus,
       status: status ?? this.status,
       serviceType: serviceType ?? this.serviceType,
+      totalCharges: totalCharges ?? this.totalCharges,
+      promoCodeInfo: promoCodeInfo ?? this.promoCodeInfo,
     );
   }
 }

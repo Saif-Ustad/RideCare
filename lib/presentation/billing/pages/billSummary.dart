@@ -2,7 +2,6 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
-import 'package:ridecare/core/configs/assets/app_images.dart';
 import 'package:ridecare/domain/entities/service_provider_entity.dart';
 import 'package:ridecare/presentation/booking/bloc/booking_event.dart';
 import '../../../common/widgets/bottomBar/bottomBar.dart';
@@ -10,6 +9,10 @@ import '../../../core/configs/theme/app_colors.dart';
 import '../../booking/bloc/booking_bloc.dart';
 import '../../booking/bloc/booking_state.dart';
 import 'package:intl/intl.dart';
+
+import '../bloc/promoCode/promo_code_bloc.dart';
+import '../bloc/promoCode/promo_code_event.dart';
+import '../bloc/promoCode/promo_code_state.dart';
 
 class BillSummaryPage extends StatefulWidget {
   const BillSummaryPage({super.key});
@@ -19,6 +22,10 @@ class BillSummaryPage extends StatefulWidget {
 }
 
 class _BillSummaryPageState extends State<BillSummaryPage> {
+  final TextEditingController _promoCodeController = TextEditingController();
+  String? _appliedPromo;
+  double _discount = 0.0;
+
   @override
   void initState() {
     super.initState();
@@ -27,28 +34,6 @@ class _BillSummaryPageState extends State<BillSummaryPage> {
 
   @override
   Widget build(BuildContext context) {
-    // Sample Data Defined Inside the Class
-    final ServiceCenter serviceCenter = ServiceCenter(
-      name: "Bajaj Service Center",
-      serviceType: "Car Repair",
-      imageUrl: AppImages.serviceProvider1,
-      rating: 4.6,
-      distance: 5.2,
-      time: 15,
-    );
-
-    final BookingDetails bookingDetails = BookingDetails(
-      dateTime: "Mar 04, 2025",
-      carDetails: "SUV | MH 09 ER 65XX",
-      serviceType: "Pick-Up",
-    );
-
-    final List<BillItem> billItems = [
-      BillItem(name: "Wax", price: 250),
-      BillItem(name: "Scratch Removal", price: 750),
-      BillItem(name: "Tax & Fees", price: 35),
-    ];
-
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
@@ -72,10 +57,12 @@ class _BillSummaryPageState extends State<BillSummaryPage> {
               final booking = state.booking;
 
               final services = booking.services ?? [];
-              final totalAmount = services.fold<double>(
+              double originalTotal = services.fold<double>(
                 0.0,
                 (sum, service) => sum + (service.price ?? 0),
               );
+
+              final discountedTotal = originalTotal - (originalTotal * _discount)/100;
 
               return Padding(
                 padding: const EdgeInsets.all(15.0),
@@ -97,14 +84,16 @@ class _BillSummaryPageState extends State<BillSummaryPage> {
                             _buildSummaryDetails(
                               booking,
                               services,
-                              totalAmount,
+                              originalTotal,
+                              discountedTotal,
                             ),
                           ],
                         ),
                       ),
                     ),
                     const SizedBox(height: 10),
-                    _buildPromoCodeSection(),
+                    if (booking.serviceProvider != null)
+                      _buildPromoCodeSection(booking.serviceProvider!),
                   ],
                 ),
               );
@@ -215,7 +204,12 @@ class _BillSummaryPageState extends State<BillSummaryPage> {
     );
   }
 
-  Widget _buildSummaryDetails(booking, List services, double totalAmount) {
+  Widget _buildSummaryDetails(
+    booking,
+    List services,
+    double originalTotal,
+    double discountedTotal,
+  ) {
     final date =
         booking.scheduledAt != null
             ? DateFormat("MMM dd, yyyy").format(booking.scheduledAt!)
@@ -234,8 +228,11 @@ class _BillSummaryPageState extends State<BillSummaryPage> {
         ...services.map<Widget>(
           (s) => _buildSummaryRow(s.name ?? "", "Rs. ${s.price ?? 0}"),
         ),
+        if (_appliedPromo != null)
+          _buildSummaryRow("Promo Applied", _appliedPromo!),
+        if (_discount > 0) _buildSummaryRow("Discount", "- Rs. ${(originalTotal * _discount)/100}"),
         const Divider(thickness: 1, color: Colors.grey),
-        _buildSummaryRow("Total", "Rs. $totalAmount", isBold: true),
+        _buildSummaryRow("Total", "Rs. $discountedTotal", isBold: true),
       ],
     );
   }
@@ -266,43 +263,99 @@ class _BillSummaryPageState extends State<BillSummaryPage> {
     );
   }
 
-  Widget _buildPromoCodeSection() {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        Container(
-          height: 50,
-          width: 250,
-          decoration: BoxDecoration(
-            color: AppColors.lightGray,
-            borderRadius: BorderRadius.circular(8),
-          ),
-          child: TextField(
-            decoration: const InputDecoration(
-              contentPadding: EdgeInsets.symmetric(
-                horizontal: 10,
-                vertical: 10,
+  Widget _buildPromoCodeSection(ServiceProviderEntity serviceProvider) {
+    return BlocConsumer<PromoCodeBloc, PromoCodeState>(
+      listener: (context, state) {
+        if (state is PromoCodeApplied) {
+          final promo = state.promoCode;
+          final now = DateTime.now();
+          if (promo.validUntil.isAfter(now) &&
+              promo.applicableServiceProviderIds.contains(serviceProvider.id)) {
+            setState(() {
+              _appliedPromo = promo.code;
+              _discount = promo.discountPercentage;
+            });
+
+            // Dispatch ApplyPromoCode event to BookingBloc
+            context.read<BookingBloc>().add(
+              ApplyPromoCode(
+                promoCode: promo.code,
+                discountPercentage: promo.discountPercentage,
               ),
-              hintText: "Promo Code",
-              border: InputBorder.none,
+            );
+
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(content: Text("Promo code applied successfully")),
+            );
+          } else {
+            setState(() {
+              _appliedPromo = null;
+              _discount = 0;
+            });
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(
+                content: Text("Promo code is not valid or expired"),
+              ),
+            );
+          }
+        } else if (state is PromoCodeInvalid) {
+          setState(() {
+            _appliedPromo = null;
+            _discount = 0;
+          });
+          ScaffoldMessenger.of(
+            context,
+          ).showSnackBar(const SnackBar(content: Text("Invalid promo code")));
+        }
+      },
+      builder: (context, state) {
+        return Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Container(
+              height: 50,
+              width: 250,
+              decoration: BoxDecoration(
+                color: AppColors.lightGray,
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: TextField(
+                controller: _promoCodeController,
+                decoration: const InputDecoration(
+                  contentPadding: EdgeInsets.symmetric(
+                    horizontal: 10,
+                    vertical: 10,
+                  ),
+                  hintText: "Promo Code",
+                  border: InputBorder.none,
+                ),
+              ),
             ),
-          ),
-        ),
-        ElevatedButton(
-          onPressed: () => _applyPromo("PROMO"),
-          style: ElevatedButton.styleFrom(
-            backgroundColor: AppColors.primary,
-            padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 12),
-          ),
-          child: const Text("Apply", style: TextStyle(color: Colors.white)),
-        ),
-      ],
+            ElevatedButton(
+              onPressed:
+                  () => _applyPromo(
+                    _promoCodeController.text.trim(),
+                    serviceProvider.id,
+                  ),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: AppColors.primary,
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 15,
+                  vertical: 12,
+                ),
+              ),
+              child: const Text("Apply", style: TextStyle(color: Colors.white)),
+            ),
+          ],
+        );
+      },
     );
   }
 
-  void _applyPromo(String code) {
-    // Implement promo code logic here
-    print("Promo code applied: $code");
+  void _applyPromo(String code, String serviceProviderId) {
+    context.read<PromoCodeBloc>().add(
+      ApplyPromoCodeEvent(code: code, serviceProviderId: serviceProviderId),
+    );
   }
 
   Widget _buildLeadingIconButton(VoidCallback onPressed) => Padding(
@@ -320,36 +373,4 @@ class _BillSummaryPageState extends State<BillSummaryPage> {
       ),
     ),
   );
-}
-
-// Data Models
-class ServiceCenter {
-  final String name, serviceType, imageUrl;
-  final double rating, distance, time;
-
-  ServiceCenter({
-    required this.name,
-    required this.serviceType,
-    required this.imageUrl,
-    required this.rating,
-    required this.distance,
-    required this.time,
-  });
-}
-
-class BookingDetails {
-  final String dateTime, carDetails, serviceType;
-
-  BookingDetails({
-    required this.dateTime,
-    required this.carDetails,
-    required this.serviceType,
-  });
-}
-
-class BillItem {
-  final String name;
-  final double price;
-
-  BillItem({required this.name, required this.price});
 }

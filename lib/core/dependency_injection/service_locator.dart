@@ -7,6 +7,7 @@ import 'package:ridecare/data/repositories/address_repository_impl.dart';
 import 'package:ridecare/data/repositories/auth_repository_impl.dart';
 import 'package:ridecare/data/repositories/booking_repository_impl.dart';
 import 'package:ridecare/data/repositories/bookmark_repository_impl.dart';
+import 'package:ridecare/data/repositories/promo_code_repository_Impl.dart';
 import 'package:ridecare/data/repositories/service_provider_repository_impl.dart';
 import 'package:ridecare/data/repositories/vehicle_repository_impl.dart';
 import 'package:ridecare/domain/repositories/auth_repository.dart';
@@ -21,6 +22,7 @@ import 'package:ridecare/domain/usecases/booking/booking_created.dart';
 import 'package:ridecare/domain/usecases/booking/booking_updated.dart';
 import 'package:ridecare/domain/usecases/booking/prepare_booking_summary.dart';
 import 'package:ridecare/domain/usecases/bookmark/toggle_bookmark_service_provider.dart';
+import 'package:ridecare/domain/usecases/promoCode/validate_promo_code.dart';
 import 'package:ridecare/domain/usecases/service/get_services_for_provider.dart';
 import 'package:ridecare/domain/usecases/serviceProvider/get_all_service_providers.dart';
 import 'package:ridecare/domain/usecases/serviceProvider/get_nearby_service_providers.dart';
@@ -32,6 +34,7 @@ import 'package:ridecare/presentation/auth/bloc/auth_bloc.dart';
 import 'package:ridecare/presentation/auth/bloc/otp_bloc.dart';
 import 'package:ridecare/presentation/auth/bloc/password_toggle_bloc.dart';
 import 'package:ridecare/presentation/auth/pages/signin.dart';
+import 'package:ridecare/presentation/billing/bloc/promoCode/promo_code_bloc.dart';
 import 'package:ridecare/presentation/booking/bloc/booking_bloc.dart';
 import 'package:ridecare/presentation/home/bloc/serviceProvider/service_provider_bloc.dart';
 import 'package:ridecare/presentation/home/pages/home.dart';
@@ -40,6 +43,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 
 import '../../data/datasources/address_remote_datasource.dart';
 import '../../data/datasources/booking_remote_datasource.dart';
+import '../../data/datasources/promo_code_remote_datasource.dart';
 import '../../data/datasources/review_remote_datasource.dart';
 import '../../data/datasources/service_provider_remote_datasource.dart';
 import '../../data/datasources/service_remote_datasource.dart';
@@ -50,6 +54,7 @@ import '../../data/repositories/service_repository_imp.dart';
 import '../../data/repositories/special_offer_repository_impl.dart';
 import '../../domain/repositories/address_repository.dart';
 import '../../domain/repositories/booking_repository.dart';
+import '../../domain/repositories/promo_code_repository.dart';
 import '../../domain/repositories/review_repository.dart';
 import '../../domain/repositories/service_repository.dart';
 import '../../domain/repositories/special_offer_repository.dart';
@@ -115,6 +120,10 @@ void setupServiceLocator() {
     () => AddressRemoteDataSourceImpl(firestore: sl()),
   );
 
+  sl.registerLazySingleton<PromoCodeRemoteDataSource>(
+    () => PromoCodeRemoteDataSourceImpl(firestore: sl()),
+  );
+
   // ✅ Register Repository
   sl.registerLazySingleton<AuthRepository>(
     () => AuthRepositoryImpl(remoteDataSource: sl()),
@@ -152,6 +161,10 @@ void setupServiceLocator() {
     () => AddressRepositoryImpl(remoteDataSource: sl()),
   );
 
+  sl.registerLazySingleton<PromoCodeRepository>(
+    () => PromoCodeRepositoryImpl(remoteDataSource: sl()),
+  );
+
   // ✅ Register Use Cases
   sl.registerLazySingleton(() => RegisterWithEmail(repository: sl()));
   sl.registerLazySingleton(() => SignInWithEmail(repository: sl()));
@@ -187,6 +200,8 @@ void setupServiceLocator() {
   sl.registerLazySingleton(() => AddAddressUseCase(repository: sl()));
   sl.registerLazySingleton(() => UpdateAddressUseCase(repository: sl()));
   sl.registerLazySingleton(() => DeleteAddressUseCase(repository: sl()));
+
+  sl.registerLazySingleton(() => ValidatePromoCodeUseCase(repository: sl()));
 
   // ✅ Register BLoCs
   sl.registerLazySingleton<OnboardingBloc>(() => OnboardingBloc());
@@ -243,6 +258,10 @@ void setupServiceLocator() {
       updateAddressUseCase: sl(),
       deleteAddressUseCase: sl(),
     ),
+  );
+
+  sl.registerLazySingleton<PromoCodeBloc>(
+    () => PromoCodeBloc(validatePromoCodeUseCase: sl()),
   );
 
   sl.registerLazySingleton<GoRouter>(

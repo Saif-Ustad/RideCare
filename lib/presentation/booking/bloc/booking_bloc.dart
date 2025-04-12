@@ -49,17 +49,32 @@ class BookingBloc extends Bloc<BookingEvent, BookingState> {
     on<PrepareBillSummary>((event, emit) async {
       emit(BookingLoading());
       try {
-
         final bookingSummary = await prepareBookingSummaryUseCase(_booking);
-        _booking = _booking.copyWith(services: bookingSummary.services, vehicle: bookingSummary.vehicle, address: bookingSummary.address, serviceProvider: bookingSummary.serviceProvider);
-
-        print(
-          "📝 Booking Updated: ${_booking.scheduledAt} ${_booking.note} ${_booking.serviceType} ${_booking.serviceIds} ${_booking.vehicleId} ${_booking.addressId} services: ${_booking.services} vehicle: ${_booking.vehicle} address: ${_booking.address} serviceProvider : ${_booking.serviceProvider}",
+        _booking = _booking.copyWith(
+          services: bookingSummary.services,
+          vehicle: bookingSummary.vehicle,
+          address: bookingSummary.address,
+          serviceProvider: bookingSummary.serviceProvider,
         );
+
         emit(BookingUpdated(booking: _booking));
       } catch (e) {
         emit(BookingError('Failed to prepare bill summary: $e'));
       }
+    });
+
+    on<ApplyPromoCode>((event, emit) {
+      _booking = _booking.copyWith(
+        promoCodeInfo: {
+          'code': event.promoCode,
+          'discountPercentage': event.discountPercentage,
+        },
+      );
+      // print(
+      //   "📝 Booking Updated: ${_booking.promoCodeInfo}",
+      // );
+
+      emit(BookingUpdated(booking: _booking));
     });
 
     on<SubmitBooking>((event, emit) async {
