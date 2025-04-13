@@ -4,6 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:ridecare/domain/entities/user_entity.dart';
 import 'package:ridecare/domain/usecases/booking/booking_created.dart';
 import 'package:ridecare/domain/usecases/booking/booking_updated.dart';
+import 'package:ridecare/domain/usecases/booking/get_all_booking_usecase.dart';
 import 'package:ridecare/domain/usecases/booking/prepare_booking_summary.dart';
 import 'package:ridecare/domain/usecases/booking_tracking/create_booking_tracking_usecase.dart';
 import '../../../domain/entities/booking_entity.dart';
@@ -16,6 +17,7 @@ class BookingBloc extends Bloc<BookingEvent, BookingState> {
   final BookingCreatedUseCase bookingCreatedUseCase;
   final PrepareBookingSummaryUseCase prepareBookingSummaryUseCase;
   final CreateBookingTrackingUseCase createBookingTrackingUseCase;
+  final GetAllBookingUseCase getAllBookingUseCase;
 
   BookingEntity _booking = BookingEntity();
 
@@ -24,6 +26,7 @@ class BookingBloc extends Bloc<BookingEvent, BookingState> {
     required this.bookingCreatedUseCase,
     required this.prepareBookingSummaryUseCase,
     required this.createBookingTrackingUseCase,
+    required this.getAllBookingUseCase,
   }) : super(BookingInitial()) {
     on<SelectService>((event, emit) {
       _booking = _booking.copyWith(
@@ -59,8 +62,8 @@ class BookingBloc extends Bloc<BookingEvent, BookingState> {
         final bookingSummary = await prepareBookingSummaryUseCase(_booking);
         _booking = _booking.copyWith(
           services: bookingSummary.services,
-          vehicle: bookingSummary.vehicle,
-          address: bookingSummary.address,
+          vehicleInfo: bookingSummary.vehicleInfo,
+          addressInfo: bookingSummary.addressInfo,
           serviceProvider: bookingSummary.serviceProvider,
         );
 
@@ -131,6 +134,19 @@ class BookingBloc extends Bloc<BookingEvent, BookingState> {
         ]);
 
         emit(BookingSubmitted(id));
+        _booking = BookingEntity();
+
+      } catch (e) {
+        emit(BookingError(e.toString()));
+      }
+    });
+
+    on<GetAllBookings>((event, emit) async {
+      emit(BookingLoading());
+
+      try {
+        final bookings = await getAllBookingUseCase(event.userId);
+        emit(BookingsLoaded(bookings));
       } catch (e) {
         emit(BookingError(e.toString()));
       }

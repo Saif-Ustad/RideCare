@@ -6,7 +6,8 @@ import 'package:go_router/go_router.dart';
 import '../../../core/configs/theme/app_colors.dart';
 
 class PaymentDonePage extends StatefulWidget {
-  const PaymentDonePage({super.key});
+  final String bookingId;
+  const PaymentDonePage({super.key, required this.bookingId});
 
   @override
   State<PaymentDonePage> createState() => _PaymentDonePageState();
@@ -28,7 +29,7 @@ class _PaymentDonePageState extends State<PaymentDonePage> {
         btnOkText: 'View E-Receipt',
         btnOkColor: AppColors.primary,
         btnOkOnPress: () {
-          context.push("/e-receipt");
+          context.push("/e-receipt/${widget.bookingId}");
         },
         btnCancelText: 'My Bookings',
         btnCancelColor: Colors.grey.shade400,
@@ -116,7 +117,7 @@ class _PaymentDonePageState extends State<PaymentDonePage> {
               children: [
                 ElevatedButton(
                   onPressed: () {
-                    context.push("/e-receipt");
+                    context.push("/e-receipt/${widget.bookingId}");
                   },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: AppColors.primary,
@@ -135,7 +136,7 @@ class _PaymentDonePageState extends State<PaymentDonePage> {
 
                 TextButton(
                   onPressed: () {
-                    context.push("/my-bookings");
+                    context.go("/my-bookings");
                   },
                   child: const Text(
                     "View My Bookings",

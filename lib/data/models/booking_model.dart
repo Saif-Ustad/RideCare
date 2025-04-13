@@ -16,9 +16,9 @@ class BookingModel extends BookingEntity {
     super.scheduledAt,
     super.note,
     super.vehicleId,
-    super.vehicle,
+    super.vehicleInfo,
     super.addressId,
-    super.address,
+    super.addressInfo,
     super.userId,
     super.user,
     super.trackingId,
@@ -59,20 +59,20 @@ class BookingModel extends BookingEntity {
       scheduledAt: (json['scheduledAt'] as Timestamp?)?.toDate(),
       note: json['note'],
       vehicleId: json['vehicleId'],
-      vehicle:
+      vehicleInfo:
           json['vehicleInfo'] != null
               ? VehicleEntity(
                 id: json['vehicleInfo']['id'] ?? '',
                 brand: json['vehicleInfo']['brand'] ?? '',
                 model: json['vehicleInfo']['model'] ?? '',
-                type: '',
-                fuelType: '',
-                registrationNumber: '',
+                type: json['vehicleInfo']['type'],
+                fuelType: json['vehicleInfo']['fuelType'],
+                registrationNumber: json['vehicleInfo']['registrationNumber'],
                 userId: '',
               )
               : null,
       addressId: json['addressId'],
-      address:
+      addressInfo:
           json['addressInfo'] != null
               ? AddressEntity(
                 id: json['addressInfo']['id'] ?? '',
@@ -143,17 +143,20 @@ class BookingModel extends BookingEntity {
       'note': note,
       'vehicleId': vehicleId,
       'vehicleInfo':
-          vehicle != null
+      vehicleInfo != null
               ? {
-                'id': vehicle!.id,
-                'brand': vehicle!.brand,
-                'model': vehicle!.model,
+                'id': vehicleInfo!.id,
+                'brand': vehicleInfo!.brand,
+                'model': vehicleInfo!.model,
+                'type' : vehicleInfo!.type,
+                'registrationNumber': vehicleInfo!.registrationNumber,
+                'fuelType': vehicleInfo!.fuelType,
               }
               : null,
       'addressId': addressId,
       'addressInfo':
-          address != null
-              ? {'id': address!.id, 'address': address!.address}
+      addressInfo != null
+              ? {'id': addressInfo!.id, 'address': addressInfo!.address}
               : null,
       'userId': userId,
       'userInfo':
@@ -184,9 +187,9 @@ class BookingModel extends BookingEntity {
       scheduledAt: entity.scheduledAt,
       note: entity.note,
       vehicleId: entity.vehicleId,
-      vehicle: entity.vehicle,
+      vehicleInfo: entity.vehicleInfo,
       addressId: entity.addressId,
-      address: entity.address,
+      addressInfo: entity.addressInfo,
       userId: entity.userId,
       user: entity.user,
       trackingId: entity.trackingId,

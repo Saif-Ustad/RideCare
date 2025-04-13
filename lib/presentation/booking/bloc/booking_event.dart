@@ -1,5 +1,6 @@
 import 'dart:ffi';
 
+import 'package:ridecare/domain/entities/booking_entity.dart';
 import 'package:ridecare/domain/entities/booking_tracking_entity.dart';
 
 abstract class BookingEvent {}
@@ -50,4 +51,10 @@ class SubmitBooking extends BookingEvent {
   final String paymentMode;
 
   SubmitBooking({required this.paymentMode});
+}
+
+class GetAllBookings extends BookingEvent {
+  final String userId;
+
+  GetAllBookings({required this.userId});
 }

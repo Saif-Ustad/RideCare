@@ -15,9 +15,9 @@ class BookingEntity {
   final DateTime? scheduledAt;
   final String? note;
   final String? vehicleId;
-  final VehicleEntity? vehicle;
+  final VehicleEntity? vehicleInfo;
   final String? addressId;
-  final AddressEntity? address;
+  final AddressEntity? addressInfo;
   final String? userId;
   final UserEntity? user;
   final String? trackingId;
@@ -36,9 +36,9 @@ class BookingEntity {
     this.scheduledAt,
     this.note,
     this.vehicleId,
-    this.vehicle,
+    this.vehicleInfo,
     this.addressId,
-    this.address,
+    this.addressInfo,
     this.userId,
     this.user,
     this.trackingId,
@@ -57,9 +57,9 @@ class BookingEntity {
     DateTime? scheduledAt,
     String? note,
     String? vehicleId,
-    VehicleEntity? vehicle,
+    VehicleEntity? vehicleInfo,
     String? addressId,
-    AddressEntity? address,
+    AddressEntity? addressInfo,
     String? paymentMode,
     String? status,
     String? trackingId,
@@ -78,9 +78,9 @@ class BookingEntity {
       scheduledAt: scheduledAt ?? this.scheduledAt,
       note: note ?? this.note,
       vehicleId: vehicleId ?? this.vehicleId,
-      vehicle: vehicle ?? this.vehicle,
+      vehicleInfo: vehicleInfo ?? this.vehicleInfo,
       addressId: addressId ?? this.addressId,
-      address: address ?? this.address,
+      addressInfo: addressInfo ?? this.addressInfo,
       trackingId: trackingId ?? this.trackingId,
       userId: userId ?? this.userId,
       user: user ?? this.user,

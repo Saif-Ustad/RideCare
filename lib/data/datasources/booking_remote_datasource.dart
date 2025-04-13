@@ -12,6 +12,8 @@ abstract class BookingRemoteDataSource {
   Future<void> updateBooking(String bookingId, Map<String, dynamic> data);
 
   Future<BookingModel> prepareBillSummary(BookingModel booking);
+
+  Future<List<BookingModel>> getAllBookings(String userId);
 }
 
 class BookingRemoteDataSourceImpl implements BookingRemoteDataSource {
@@ -134,11 +136,36 @@ class BookingRemoteDataSourceImpl implements BookingRemoteDataSource {
       return BookingModel(
         serviceProvider: selectedServiceProvider,
         services: serviceEntities,
-        vehicle: selectedVehicle,
-        address: selectedAddress,
+        vehicleInfo: selectedVehicle,
+        addressInfo: selectedAddress,
       );
     } catch (e) {
       throw Exception('❌ Failed to prepare bill summary: $e');
     }
+  }
+
+  @override
+  Future<List<BookingModel>> getAllBookings(String userId) async {
+    final userDoc = await firestore.collection('users').doc(userId).get();
+    final userData = userDoc.data();
+
+    if (userData == null || !userData.containsKey('bookingIds')) {
+      throw Exception('No booking IDs found for user');
+    }
+
+    final List<dynamic> bookingIds = userData['bookingIds'];
+    List<BookingModel> bookings = [];
+
+    for (String id in bookingIds) {
+      final docSnapshot = await firestore.collection('bookings').doc(id).get();
+      if (docSnapshot.exists) {
+        final data = docSnapshot.data();
+        if (data != null) {
+          bookings.add(BookingModel.fromJson(data, docSnapshot.id));
+        }
+      }
+    }
+
+    return bookings;
   }
 }

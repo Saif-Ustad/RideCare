@@ -222,7 +222,7 @@ class _BillSummaryPageState extends State<BillSummaryPage> {
             : "Not Set";
 
     final carDetails =
-        "${booking.vehicle?.brand} ${booking.vehicle?.type ?? "Vehicle"} | ${booking.vehicle?.registrationNumber ?? "Not Available"}";
+        "${booking.vehicleInfo?.brand} ${booking.vehicleInfo?.type ?? "Vehicle"} | ${booking.vehicleInfo?.registrationNumber ?? "Not Available"}";
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,

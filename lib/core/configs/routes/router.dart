@@ -54,7 +54,8 @@ final GoRouter router = GoRouter(
     GoRoute(
       path: '/choose-service',
       builder: (context, state) {
-        final serviceProviderId = state.uri.queryParameters['serviceProviderId'];
+        final serviceProviderId =
+            state.uri.queryParameters['serviceProviderId'];
         return ChooseServicesPage(serviceProviderId: serviceProviderId ?? '');
       },
     ),
@@ -62,8 +63,11 @@ final GoRouter router = GoRouter(
     GoRoute(
       path: '/appointment-booking',
       builder: (context, state) {
-        final serviceProviderId = state.uri.queryParameters['serviceProviderId'];
-        return AppointmentBookingPage(serviceProviderId: serviceProviderId ?? '' );
+        final serviceProviderId =
+            state.uri.queryParameters['serviceProviderId'];
+        return AppointmentBookingPage(
+          serviceProviderId: serviceProviderId ?? '',
+        );
       },
     ),
     GoRoute(
@@ -101,11 +105,19 @@ final GoRouter router = GoRouter(
 
     GoRoute(
       path: '/payment-done',
-      builder: (context, state) => const PaymentDonePage(),
+      builder: (context, state) {
+        final bookingId = state.extra as String;
+        return PaymentDonePage(bookingId: bookingId);
+      },
     ),
+
+
     GoRoute(
-      path: '/e-receipt',
-      builder: (context, state) => const EReceiptPage(),
+      path: '/e-receipt/:id',
+      builder: (context, state) {
+        final id = state.pathParameters['id']!;
+        return EReceiptPage(bookingId: id);
+      },
     ),
 
     GoRoute(

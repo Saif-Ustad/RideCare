@@ -24,6 +24,7 @@ import 'package:ridecare/domain/usecases/auth/sign_in_with_email.dart';
 import 'package:ridecare/domain/usecases/auth/sign_out.dart';
 import 'package:ridecare/domain/usecases/booking/booking_created.dart';
 import 'package:ridecare/domain/usecases/booking/booking_updated.dart';
+import 'package:ridecare/domain/usecases/booking/get_all_booking_usecase.dart';
 import 'package:ridecare/domain/usecases/booking/prepare_booking_summary.dart';
 import 'package:ridecare/domain/usecases/booking_tracking/create_booking_tracking_usecase.dart';
 import 'package:ridecare/domain/usecases/booking_tracking/get_booking_tracking_usecase.dart';
@@ -208,6 +209,7 @@ void setupServiceLocator() {
 
   sl.registerLazySingleton(() => BookingUpdatedUseCase(repository: sl()));
   sl.registerLazySingleton(() => BookingCreatedUseCase(repository: sl()));
+  sl.registerLazySingleton(() => GetAllBookingUseCase(repository: sl()));
   sl.registerLazySingleton(
     () => PrepareBookingSummaryUseCase(repository: sl()),
   );
@@ -225,8 +227,9 @@ void setupServiceLocator() {
   sl.registerLazySingleton(() => ValidatePromoCodeUseCase(repository: sl()));
 
   sl.registerLazySingleton(() => GetBookingTrackingUseCase(repository: sl()));
-  sl.registerLazySingleton(() => CreateBookingTrackingUseCase(repository: sl()));
-
+  sl.registerLazySingleton(
+    () => CreateBookingTrackingUseCase(repository: sl()),
+  );
 
   // ✅ Register BLoCs
   sl.registerLazySingleton<OnboardingBloc>(() => OnboardingBloc());
@@ -265,6 +268,7 @@ void setupServiceLocator() {
       bookingUpdatedUseCase: sl(),
       prepareBookingSummaryUseCase: sl(),
       createBookingTrackingUseCase: sl(),
+      getAllBookingUseCase: sl(),
     ),
   );
 

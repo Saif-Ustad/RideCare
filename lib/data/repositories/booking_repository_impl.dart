@@ -26,4 +26,9 @@ class BookingRepositoryImpl implements BookingRepository {
       BookingModel.fromEntity(booking),
     );
   }
+
+  @override
+  Future<List<BookingEntity>> getAllBookings(String userId) {
+    return remoteDataSource.getAllBookings(userId);
+  }
 }
