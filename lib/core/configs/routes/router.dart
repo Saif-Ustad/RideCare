@@ -13,17 +13,21 @@ import 'package:ridecare/presentation/bookmark/pages/bookmark.dart';
 import 'package:ridecare/presentation/chooseService/pages/chooseServices.dart';
 import 'package:ridecare/presentation/home/pages/home.dart';
 import 'package:ridecare/presentation/explore/pages/explore.dart';
-import 'package:ridecare/presentation/location/pages/addLocation.dart';
-import 'package:ridecare/presentation/location/pages/selectLocation.dart';
+import 'package:ridecare/presentation/location/pages/bookingPages/addLocationFromBooking.dart';
+import 'package:ridecare/presentation/location/pages/bookingPages/selectLocationFromBooking.dart';
 import 'package:ridecare/presentation/profile/pages/profile.dart';
 import 'package:ridecare/presentation/serviceProvider/pages/appointmentBooking.dart';
 import 'package:ridecare/presentation/serviceProvider/pages/serviceProviderDetails.dart';
 import 'package:ridecare/presentation/splash/pages/splash.dart';
 import '../../../common/helper/prefService.dart';
 import '../../../presentation/auth/pages/form.dart';
+import '../../../presentation/location/pages/profilePages/addLocationFromProfile.dart';
+import '../../../presentation/location/pages/profilePages/selectLocationFromProfile.dart';
 import '../../../presentation/onboarding/pages/onboarding.dart';
-import '../../../presentation/vehicles/pages/addVehicle.dart';
-import '../../../presentation/vehicles/pages/selectVehicle.dart';
+import '../../../presentation/vehicles/pages/bookingPages/addVehicleFromBooking.dart';
+import '../../../presentation/vehicles/pages/bookingPages/selectVehicleFromBooking.dart';
+import '../../../presentation/vehicles/pages/profilePages/addVehicleFromProfile.dart';
+import '../../../presentation/vehicles/pages/profilePages/selectVehicleFromProfile.dart';
 
 final GoRouter router = GoRouter(
   initialLocation: '/splash',
@@ -71,21 +75,41 @@ final GoRouter router = GoRouter(
       },
     ),
     GoRoute(
-      path: '/select-vehicle',
-      builder: (context, state) => const SelectVehiclePage(),
+      path: '/select-vehicle-booking',
+      builder: (context, state) => const SelectVehicleFromBookingPage(),
     ),
     GoRoute(
-      path: '/add-vehicle',
-      builder: (context, state) => const AddVehiclePage(),
+      path: '/add-vehicle-booking',
+      builder: (context, state) => const AddVehicleFromBookingPage(),
+    ),
+
+    GoRoute(
+      path: '/select-vehicle-profile',
+      builder: (context, state) => const SelectVehicleFromProfilePage(),
     ),
     GoRoute(
-      path: '/select-location',
-      builder: (context, state) => const SelectLocationPage(),
+      path: '/add-vehicle-profile',
+      builder: (context, state) => const AddVehicleFromProfilePage(),
+    ),
+
+    GoRoute(
+      path: '/select-location-booking',
+      builder: (context, state) => const SelectLocationFromBookingPage(),
     ),
     GoRoute(
-      path: '/add-location',
-      builder: (context, state) => const AddLocationPage(),
+      path: '/add-location-booking',
+      builder: (context, state) => const AddLocationFromBookingPage(),
     ),
+
+    GoRoute(
+      path: '/select-location-profile',
+      builder: (context, state) => const SelectLocationFromProfilePage(),
+    ),
+    GoRoute(
+      path: '/add-location-profile',
+      builder: (context, state) => const AddLocationFromProfilePage(),
+    ),
+
     GoRoute(
       path: '/bill-summary/:id',
       builder: (context, state) => const BillSummaryPage(),
@@ -110,7 +134,6 @@ final GoRouter router = GoRouter(
         return PaymentDonePage(bookingId: bookingId);
       },
     ),
-
 
     GoRoute(
       path: '/e-receipt/:id',

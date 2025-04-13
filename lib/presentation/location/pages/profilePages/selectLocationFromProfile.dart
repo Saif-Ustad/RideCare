@@ -7,20 +7,20 @@ import 'package:ridecare/domain/entities/address_entity.dart';
 import 'package:ridecare/presentation/booking/bloc/booking_bloc.dart';
 import 'package:ridecare/presentation/booking/bloc/booking_event.dart';
 
-import '../../../common/widgets/bottomBar/bottomBar.dart';
-import '../../../core/configs/theme/app_colors.dart';
-import '../bloc/address_bloc.dart';
-import '../bloc/address_event.dart';
-import '../bloc/address_state.dart';
+import '../../../../common/widgets/bottomBar/bottomBar.dart';
+import '../../../../core/configs/theme/app_colors.dart';
+import '../../bloc/address_bloc.dart';
+import '../../bloc/address_event.dart';
+import '../../bloc/address_state.dart';
 
-class SelectLocationPage extends StatefulWidget {
-  const SelectLocationPage({super.key});
+class SelectLocationFromProfilePage extends StatefulWidget {
+  const SelectLocationFromProfilePage({super.key});
 
   @override
-  _SelectLocationPageState createState() => _SelectLocationPageState();
+  _SelectLocationFromProfilePageState createState() => _SelectLocationFromProfilePageState();
 }
 
-class _SelectLocationPageState extends State<SelectLocationPage> {
+class _SelectLocationFromProfilePageState extends State<SelectLocationFromProfilePage> {
   String? selectedAddress;
 
   @override
@@ -90,20 +90,6 @@ class _SelectLocationPageState extends State<SelectLocationPage> {
           ],
         ),
       ),
-      bottomNavigationBar: CustomBottomBar(
-        text: "Continue",
-        onPressed: () {
-          final addressId = selectedAddress;
-          if (addressId != null) {
-            context.read<BookingBloc>().add(SetAddress(addressId: addressId));
-            context.push("/bill-summary/1");
-          } else {
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(content: Text("Please select a address")),
-            );
-          }
-        },
-      ),
     );
   }
 
@@ -148,7 +134,7 @@ class _SelectLocationPageState extends State<SelectLocationPage> {
   Widget _buildAddAddressButton() {
     return GestureDetector(
       onTap: () {
-        context.push("/add-location");
+        context.push("/add-location-profile");
       },
       child: Padding(
         padding: const EdgeInsets.symmetric(vertical: 15),

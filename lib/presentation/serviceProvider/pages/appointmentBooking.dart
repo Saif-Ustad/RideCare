@@ -119,7 +119,7 @@ class _AppointmentBookingPageState extends State<AppointmentBookingPage> {
                   serviceType: selectedServiceType,
                 ));
 
-                context.push("/select-vehicle");
+                context.push("/select-vehicle-booking");
               },
             ),
           );

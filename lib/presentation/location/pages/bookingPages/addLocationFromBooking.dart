@@ -221,18 +221,18 @@ import 'package:ridecare/common/widgets/bottomBar/bottomBar.dart';
 import 'package:ridecare/domain/entities/address_entity.dart';
 import 'package:uuid/uuid.dart';
 
-import '../../../core/configs/theme/app_colors.dart';
-import '../bloc/address_bloc.dart';
-import '../bloc/address_event.dart';
+import '../../../../core/configs/theme/app_colors.dart';
+import '../../bloc/address_bloc.dart';
+import '../../bloc/address_event.dart';
 
-class AddLocationPage extends StatefulWidget {
-  const AddLocationPage({super.key});
+class AddLocationFromBookingPage extends StatefulWidget {
+  const AddLocationFromBookingPage({super.key});
 
   @override
-  State<AddLocationPage> createState() => _AddLocationPageState();
+  State<AddLocationFromBookingPage> createState() => _AddLocationFromBookingPageState();
 }
 
-class _AddLocationPageState extends State<AddLocationPage> {
+class _AddLocationFromBookingPageState extends State<AddLocationFromBookingPage> {
   GoogleMapController? _mapController;
   LatLng? _selectedLocation;
   bool _isLoading = false;
@@ -475,7 +475,7 @@ class _AddLocationPageState extends State<AddLocationPage> {
             );
 
             context.read<AddressBloc>().add(AddAddress(address));
-            context.push('/select-location');
+            context.push('/select-location-booking');
           } else {
             ScaffoldMessenger.of(context).showSnackBar(
               const SnackBar(

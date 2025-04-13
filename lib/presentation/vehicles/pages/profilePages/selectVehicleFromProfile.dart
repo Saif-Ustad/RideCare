@@ -4,22 +4,24 @@ import 'package:go_router/go_router.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:ridecare/presentation/booking/bloc/booking_event.dart';
 
-import '../../../common/widgets/bottomBar/bottomBar.dart';
-import '../../../core/configs/theme/app_colors.dart';
-import '../../../domain/entities/vehicle_entity.dart';
-import '../../booking/bloc/booking_bloc.dart';
-import '../bloc/vehicle_bloc.dart';
-import '../bloc/vehicle_event.dart';
-import '../bloc/vehicle_state.dart';
+import '../../../../common/widgets/bottomBar/bottomBar.dart';
+import '../../../../core/configs/theme/app_colors.dart';
+import '../../../../domain/entities/vehicle_entity.dart';
+import '../../../booking/bloc/booking_bloc.dart';
+import '../../bloc/vehicle_bloc.dart';
+import '../../bloc/vehicle_event.dart';
+import '../../bloc/vehicle_state.dart';
 
-class SelectVehiclePage extends StatefulWidget {
-  const SelectVehiclePage({super.key});
+class SelectVehicleFromProfilePage extends StatefulWidget {
+  const SelectVehicleFromProfilePage({super.key});
 
   @override
-  _SelectVehiclePageState createState() => _SelectVehiclePageState();
+  _SelectVehicleFromProfilePageState createState() =>
+      _SelectVehicleFromProfilePageState();
 }
 
-class _SelectVehiclePageState extends State<SelectVehiclePage> {
+class _SelectVehicleFromProfilePageState
+    extends State<SelectVehicleFromProfilePage> {
   String? selectedVehicle;
   late final String? userId = FirebaseAuth.instance.currentUser?.uid;
 
@@ -42,7 +44,7 @@ class _SelectVehiclePageState extends State<SelectVehiclePage> {
         centerTitle: true,
         actions: [
           buildActionIconButton(() async {
-            await context.push("/add-vehicle");
+            await context.push("/add-vehicle-profile");
           }),
         ],
       ),
@@ -72,20 +74,6 @@ class _SelectVehiclePageState extends State<SelectVehiclePage> {
             }
           },
         ),
-      ),
-      bottomNavigationBar: CustomBottomBar(
-        text: "Continue",
-        onPressed: () {
-          final vehicleId = selectedVehicle;
-          if (vehicleId != null) {
-            context.read<BookingBloc>().add(SetVehicle(vehicleId: vehicleId));
-            context.push("/select-location");
-          } else {
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(content: Text("Please select a vehicle")),
-            );
-          }
-        },
       ),
     );
   }

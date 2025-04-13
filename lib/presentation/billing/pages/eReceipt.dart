@@ -404,6 +404,7 @@ class _EReceiptPageState extends State<EReceiptPage> {
         }
 
         return const Scaffold(
+          backgroundColor: Colors.white,
           body: Center(child: Text("No booking data available.")),
         );
       },

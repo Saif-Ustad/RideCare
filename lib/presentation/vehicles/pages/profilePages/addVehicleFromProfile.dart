@@ -5,21 +5,21 @@ import 'package:dropdown_search/dropdown_search.dart';
 import 'package:go_router/go_router.dart';
 import 'package:uuid/uuid.dart';
 
-import '../../../common/widgets/bottomBar/bottomBar.dart';
-import '../../../core/configs/theme/app_colors.dart';
-import '../../../domain/entities/vehicle_entity.dart';
-import '../bloc/vehicle_bloc.dart';
-import '../bloc/vehicle_event.dart';
-import '../bloc/vehicle_state.dart';
+import '../../../../common/widgets/bottomBar/bottomBar.dart';
+import '../../../../core/configs/theme/app_colors.dart';
+import '../../../../domain/entities/vehicle_entity.dart';
+import '../../bloc/vehicle_bloc.dart';
+import '../../bloc/vehicle_event.dart';
+import '../../bloc/vehicle_state.dart';
 
-class AddVehiclePage extends StatefulWidget {
-  const AddVehiclePage({super.key});
+class AddVehicleFromProfilePage extends StatefulWidget {
+  const AddVehicleFromProfilePage({super.key});
 
   @override
-  _AddVehiclePageState createState() => _AddVehiclePageState();
+  _AddVehicleFromProfilePageState createState() => _AddVehicleFromProfilePageState();
 }
 
-class _AddVehiclePageState extends State<AddVehiclePage> {
+class _AddVehicleFromProfilePageState extends State<AddVehicleFromProfilePage> {
   final TextEditingController numberPlateController = TextEditingController();
   final String? userId = FirebaseAuth.instance.currentUser?.uid;
 
@@ -61,7 +61,7 @@ class _AddVehiclePageState extends State<AddVehiclePage> {
             ScaffoldMessenger.of(context).showSnackBar(
               const SnackBar(content: Text("Vehicle added successfully")),
             );
-            context.push("/select-vehicle");
+            context.push("/select-vehicle-profile");
           } else if (state is VehicleError) {
             ScaffoldMessenger.of(
               context,
@@ -145,7 +145,6 @@ class _AddVehiclePageState extends State<AddVehiclePage> {
       );
 
       context.read<VehicleBloc>().add(AddVehicle(vehicle));
-      context.push('/select-vehicle');
     } else {
       ScaffoldMessenger.of(
         context,
