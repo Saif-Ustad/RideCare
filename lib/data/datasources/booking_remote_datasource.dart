@@ -41,7 +41,6 @@ class BookingRemoteDataSourceImpl implements BookingRemoteDataSource {
   @override
   Future<BookingModel> prepareBillSummary(BookingModel booking) async {
     try {
-      // Step 1: Fetch Provider Services
       final providerServicesSnapshot =
           await firestore
               .collection('provider_services')
@@ -87,7 +86,6 @@ class BookingRemoteDataSourceImpl implements BookingRemoteDataSource {
         }
       }
 
-      // Step 4: Fetch Vehicle
       final vehicleSnapshot =
           await firestore.collection('vehicles').doc(booking.vehicleId).get();
 
@@ -101,7 +99,6 @@ class BookingRemoteDataSourceImpl implements BookingRemoteDataSource {
                 'Vehicle not found for ID: ${booking.vehicleId}',
               );
 
-      // Step 5: Fetch Address
       final addressSnapshot =
           await firestore.collection('addresses').doc(booking.addressId).get();
 
@@ -115,7 +112,6 @@ class BookingRemoteDataSourceImpl implements BookingRemoteDataSource {
                 'Address not found for ID: ${booking.addressId}',
               );
 
-      // Step 6: Fetch Address
       final serviceProviderSnapshot =
           await firestore
               .collection('service_providers')
@@ -132,7 +128,6 @@ class BookingRemoteDataSourceImpl implements BookingRemoteDataSource {
                 'Service Provider not found for ID: ${booking.serviceProviderId}',
               );
 
-      // Step 7: Return BookingModel with summary
       return BookingModel(
         serviceProvider: selectedServiceProvider,
         services: serviceEntities,

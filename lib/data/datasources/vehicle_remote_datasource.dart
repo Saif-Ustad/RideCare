@@ -30,8 +30,14 @@ class VehicleRemoteDataSourceImpl implements VehicleRemoteDataSource {
   }
 
   @override
-  Future<void> addVehicle(VehicleModel vehicle) {
-    return firestore.collection('vehicles').add(vehicle.toJson());
+  Future<void> addVehicle(VehicleModel vehicle) async {
+    final vehicleRef = await firestore
+        .collection('vehicles')
+        .add(vehicle.toJson());
+
+    await firestore.collection('users').doc(vehicle.userId).update({
+      'vehicleIds': FieldValue.arrayUnion([vehicleRef.id]),
+    });
   }
 
   @override
@@ -43,7 +49,20 @@ class VehicleRemoteDataSourceImpl implements VehicleRemoteDataSource {
   }
 
   @override
-  Future<void> deleteVehicle(String vehicleId) {
-    return firestore.collection('vehicles').doc(vehicleId).delete();
+  Future<void> deleteVehicle(String vehicleId) async {
+    final vehicleDoc =
+        await firestore.collection('vehicles').doc(vehicleId).get();
+
+    if (vehicleDoc.exists) {
+      final userId = vehicleDoc.data()?['userId'];
+
+      await firestore.collection('vehicles').doc(vehicleId).delete();
+
+      if (userId != null) {
+        await firestore.collection('users').doc(userId).update({
+          'vehicleIds': FieldValue.arrayRemove([vehicleId]),
+        });
+      }
+    }
   }
 }

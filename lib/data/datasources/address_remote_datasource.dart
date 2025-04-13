@@ -18,25 +18,48 @@ class AddressRemoteDataSourceImpl implements AddressRemoteDataSource {
 
   @override
   Future<List<AddressModel>> getUserAddresses(String userId) async {
-    final snapshot =
-        await firestore
-            .collection('addresses')
-            .where('userId', isEqualTo: userId)
-            .get();
+    final userDoc = await firestore.collection('users').doc(userId).get();
+    final addressIds = List<String>.from(userDoc.data()?['addressIds'] ?? []);
 
-    return snapshot.docs
-        .map((doc) => AddressModel.fromJson(doc.id, doc.data()))
-        .toList();
+    final addressFutures = addressIds.map((id) async {
+      final doc = await firestore.collection('addresses').doc(id).get();
+      if (doc.exists) {
+        return AddressModel.fromJson(doc.id, doc.data()!);
+      }
+      return null;
+    });
+
+    final addressList = await Future.wait(addressFutures);
+    return addressList.whereType<AddressModel>().toList();
   }
 
   @override
-  Future<void> addAddress(AddressModel address) {
-    return firestore.collection('addresses').add(address.toJson());
+  Future<void> addAddress(AddressModel address) async {
+    final addressRef = await firestore
+        .collection('addresses')
+        .add(address.toJson());
+
+    await firestore.collection('users').doc(address.userId).update({
+      'addressIds': FieldValue.arrayUnion([addressRef.id]),
+    });
   }
 
   @override
-  Future<void> deleteAddress(String addressId) {
-    return firestore.collection('addresses').doc(addressId).delete();
+  Future<void> deleteAddress(String addressId) async {
+    final addressDoc =
+        await firestore.collection('addresses').doc(addressId).get();
+
+    if (addressDoc.exists) {
+      final userId = addressDoc.data()?['userId'];
+
+      await firestore.collection('addresses').doc(addressId).delete();
+
+      if (userId != null) {
+        await firestore.collection('users').doc(userId).update({
+          'addressIds': FieldValue.arrayRemove([addressId]),
+        });
+      }
+    }
   }
 
   @override
