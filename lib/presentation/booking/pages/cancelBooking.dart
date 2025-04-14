@@ -1,18 +1,26 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:ridecare/common/widgets/bottomBar/bottomBar.dart';
 
 import '../../../core/configs/theme/app_colors.dart';
+import '../../home/bloc/user/user_bloc.dart';
+import '../../home/bloc/user/user_state.dart';
+import '../bloc/booking_bloc.dart';
+import '../bloc/booking_event.dart';
 
 class CancelBookingPage extends StatefulWidget {
-  const CancelBookingPage({super.key});
+  final String bookingId;
+
+  const CancelBookingPage({super.key, required this.bookingId});
 
   @override
   _CancelBookingPageState createState() => _CancelBookingPageState();
 }
 
 class _CancelBookingPageState extends State<CancelBookingPage> {
-  String _selectedReason = "Change in Plans"; // Default selected reason
+  String _selectedReason = "Change in Plans";
   final TextEditingController _otherReasonController = TextEditingController();
 
   @override
@@ -52,7 +60,7 @@ class _CancelBookingPageState extends State<CancelBookingPage> {
               _buildRadioOption("Unexpected Commitments."),
               _buildRadioOption("Personal Reasons."),
               _buildRadioOption("Other"),
-          
+
               // TextField for "Other" option
               if (_selectedReason == "Other") ...[
                 const SizedBox(height: 10),
@@ -76,7 +84,20 @@ class _CancelBookingPageState extends State<CancelBookingPage> {
       ),
       bottomNavigationBar: CustomBottomBar(
         text: "Cancel Booking",
-        onPressed: () => {},
+        onPressed: () {
+          final currentUser =
+              (context.read<UserBloc>().state as UserLoaded).user;
+
+          context.read<BookingBloc>().add(
+            CancelBooking(bookingId: widget.bookingId, userId: currentUser.uid),
+          );
+
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Booking cancelled successfully')),
+          );
+
+          context.pop();
+        },
       ),
     );
   }
@@ -111,5 +132,4 @@ class _CancelBookingPageState extends State<CancelBookingPage> {
       visualDensity: VisualDensity.compact,
     );
   }
-
 }

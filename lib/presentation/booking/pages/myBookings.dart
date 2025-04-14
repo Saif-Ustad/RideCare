@@ -140,7 +140,7 @@ class _MyBookingsPageState extends State<MyBookingsPage>
         "btnText": tabName == "Active" ? "Cancel" : "Leave Review",
         "btnRoute":
             tabName == "Active"
-                ? "/cancel-booking"
+                ? "/cancel-booking/${booking.bookingId}"
                 : "/add-review/${booking.serviceProviderId}",
       },
       "btn2": {

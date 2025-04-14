@@ -53,7 +53,6 @@ class ProfileSection extends StatelessWidget {
           "${user.firstName} ${user.lastName}",
           style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
         ),
-        const SizedBox(height: 20),
       ],
     );
   }

@@ -1,9 +1,18 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:ridecare/data/models/user_model.dart';
+import 'package:ridecare/domain/entities/user_entity.dart';
 
 abstract class AuthRemoteDataSource {
-  Future<void> registerWithEmailAndPassword(String firstName, String lastName, String email, String password);
-  Future<User?> signInWithEmailAndPassword(String email, String password);
+  Future<void> registerWithEmailAndPassword(
+    String firstName,
+    String lastName,
+    String email,
+    String password,
+  );
+
+  Future<UserModel> signInWithEmailAndPassword(String email, String password);
+
   Future<void> signOut();
 }
 
@@ -15,7 +24,11 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
 
   @override
   Future<void> registerWithEmailAndPassword(
-      String firstName, String lastName, String email, String password) async {
+    String firstName,
+    String lastName,
+    String email,
+    String password,
+  ) async {
     try {
       // Create user with email and password
       UserCredential userCredential = await auth.createUserWithEmailAndPassword(
@@ -35,11 +48,28 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
     }
   }
 
-
   @override
-  Future<User?> signInWithEmailAndPassword(String email, String password) async {
-    final credential = await auth.signInWithEmailAndPassword(email: email, password: password);
-    return credential.user;
+  Future<UserModel> signInWithEmailAndPassword(
+    String email,
+    String password,
+  ) async {
+    try {
+      final credential = await auth.signInWithEmailAndPassword(
+        email: email,
+        password: password,
+      );
+
+      final doc =
+          await fireStore.collection('users').doc(credential.user!.uid).get();
+
+      if (doc.exists) {
+        return UserModel.fromJson(doc.data()!, doc.id);
+      } else {
+        throw Exception('No user data found in Firestore.');
+      }
+    } catch (e) {
+      throw Exception('Sign-in failed: $e');
+    }
   }
 
   @override

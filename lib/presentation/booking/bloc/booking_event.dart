@@ -58,3 +58,11 @@ class GetAllBookings extends BookingEvent {
 
   GetAllBookings({required this.userId});
 }
+
+class CancelBooking extends BookingEvent {
+  final String bookingId;
+  final String userId;
+
+  CancelBooking({required this.bookingId, required this.userId});
+}
+

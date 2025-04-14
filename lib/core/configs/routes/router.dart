@@ -148,8 +148,8 @@ final GoRouter router = GoRouter(
       builder: (context, state) => const MyBookingsPage(),
     ),
     GoRoute(
-      path: '/cancel-booking',
-      builder: (context, state) => const CancelBookingPage(),
+      path: '/cancel-booking/:id',
+      builder: (context, state) => CancelBookingPage(bookingId: state.pathParameters['id']!),
     ),
     GoRoute(
       path: '/track-order/:id',

@@ -128,10 +128,7 @@ class BookingBloc extends Bloc<BookingEvent, BookingState> {
         final now = _booking.scheduledAt;
 
         await createBookingTrackingUseCase(id, [
-          BookingTrackingUpdateEntity(
-            status: "Order Pending",
-            timestamp: now!,
-          ),
+          BookingTrackingUpdateEntity(status: "Order Pending", timestamp: now!),
           BookingTrackingUpdateEntity(
             status: "Order Accepted",
             timestamp: now.add(Duration(hours: 2)),
@@ -156,7 +153,6 @@ class BookingBloc extends Bloc<BookingEvent, BookingState> {
 
         emit(BookingSubmitted(id));
         _booking = BookingEntity();
-
       } catch (e) {
         emit(BookingError(e.toString()));
       }
@@ -170,6 +166,19 @@ class BookingBloc extends Bloc<BookingEvent, BookingState> {
         emit(BookingsLoaded(bookings));
       } catch (e) {
         emit(BookingError(e.toString()));
+      }
+    });
+
+    on<CancelBooking>((event, emit) async {
+      emit(BookingLoading());
+
+      try {
+        await bookingUpdatedUseCase(event.bookingId, {'status': 'Order Cancelled'});
+
+        final bookings = await getAllBookingUseCase(event.userId);
+        emit(BookingsLoaded(bookings));
+      } catch (e) {
+        emit(BookingError("Failed to cancel booking: $e"));
       }
     });
   }

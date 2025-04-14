@@ -53,9 +53,11 @@ class _ProfilePageState extends State<ProfilePage> {
 
                 return Column(
                   children: [
-                    SizedBox(height: 20),
+                    SizedBox(height: 10),
                     ProfileSection(user: user),
+                    SizedBox(height: 10),
                     Expanded(child: ProfileMenuList()),
+                    SizedBox(height: 60),
                   ],
                 );
               } else if (state is UserError) {

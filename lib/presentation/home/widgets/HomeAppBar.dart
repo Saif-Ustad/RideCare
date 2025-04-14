@@ -27,7 +27,10 @@ class HomeAppBar extends StatelessWidget {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             crossAxisAlignment: CrossAxisAlignment.start,
-            children: [_buildLocationInfo(context), _buildNotificationIcon(context)],
+            children: [
+              _buildLocationInfo(context),
+              _buildNotificationIcon(context),
+            ],
           ),
         ),
       ),
@@ -98,15 +101,7 @@ class HomeAppBar extends StatelessWidget {
           ),
           child: IconButton(
             icon: Icon(Icons.notifications, color: Colors.white),
-            onPressed: () async {
-              final signOutUseCase = GetIt.instance<SignOut>();
-              await signOutUseCase();
-
-              if (context.mounted) {
-                // Ensure context is valid
-                GoRouter.of(context).go('/signin'); // Redirect to Sign-In Page
-              }
-            },
+            onPressed: () async {},
           ),
         ),
 

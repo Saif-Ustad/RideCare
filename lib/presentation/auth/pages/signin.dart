@@ -27,6 +27,7 @@ class _SignInPageState extends State<SignInPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.white,
       resizeToAvoidBottomInset: true,
       body: BlocListener<AuthBloc, AuthState>(
         listener: (context, state) {

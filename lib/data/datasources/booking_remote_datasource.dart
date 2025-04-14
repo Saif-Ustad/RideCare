@@ -145,7 +145,7 @@ class BookingRemoteDataSourceImpl implements BookingRemoteDataSource {
     final userData = userDoc.data();
 
     if (userData == null || !userData.containsKey('bookingIds')) {
-      throw Exception('No booking IDs found for user');
+      return [];
     }
 
     final List<dynamic> bookingIds = userData['bookingIds'];
