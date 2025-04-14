@@ -37,12 +37,12 @@ class OrderStep extends StatelessWidget {
             if (title != "Delivered")
               Container(
                 width: 4,
-                height: 50,
+                height: 45,
                 color: isCompleted ? AppColors.primary : AppColors.darkGrey,
               ),
           ],
         ),
-        const SizedBox(width: 10),
+        const SizedBox(width: 15),
         Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [

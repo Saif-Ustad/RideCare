@@ -47,6 +47,7 @@ import 'package:ridecare/presentation/auth/bloc/password_toggle_bloc.dart';
 import 'package:ridecare/presentation/auth/pages/signin.dart';
 import 'package:ridecare/presentation/billing/bloc/promoCode/promo_code_bloc.dart';
 import 'package:ridecare/presentation/booking/bloc/booking_bloc.dart';
+import 'package:ridecare/presentation/booking/bloc/booking_tracking_bloc/booking_tracking_bloc.dart';
 import 'package:ridecare/presentation/home/bloc/serviceProvider/service_provider_bloc.dart';
 import 'package:ridecare/presentation/home/bloc/user/user_bloc.dart';
 import 'package:ridecare/presentation/home/pages/home.dart';
@@ -314,6 +315,10 @@ void setupServiceLocator() {
   );
 
   sl.registerFactory(() => UserBloc(getCurrentUserUseCase: sl()));
+
+  sl.registerFactory(
+    () => BookingTrackingBloc(getBookingTrackingUseCase: sl()),
+  );
 
   sl.registerLazySingleton<GoRouter>(
     () => GoRouter(

@@ -153,7 +153,9 @@ final GoRouter router = GoRouter(
     ),
     GoRoute(
       path: '/track-order/:id',
-      builder: (context, state) => const TrackOrderPage(),
+      builder:
+          (context, state) =>
+              TrackOrderPage(bookingId: state.pathParameters['id']!),
     ),
   ],
 

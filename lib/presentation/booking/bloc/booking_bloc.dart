@@ -125,11 +125,32 @@ class BookingBloc extends Bloc<BookingEvent, BookingState> {
         }
 
         final id = await bookingCreatedUseCase(_booking);
+        final now = _booking.scheduledAt;
 
         await createBookingTrackingUseCase(id, [
           BookingTrackingUpdateEntity(
             status: "Order Pending",
-            timestamp: DateTime.now(),
+            timestamp: now!,
+          ),
+          BookingTrackingUpdateEntity(
+            status: "Order Accepted",
+            timestamp: now.add(Duration(hours: 2)),
+          ),
+          BookingTrackingUpdateEntity(
+            status: "Car Received at Center",
+            timestamp: now.add(Duration(hours: 5)),
+          ),
+          BookingTrackingUpdateEntity(
+            status: "Order in Progressed",
+            timestamp: now.add(Duration(hours: 8)),
+          ),
+          BookingTrackingUpdateEntity(
+            status: "Ready for Pick or Delivery",
+            timestamp: now.add(Duration(hours: 12)),
+          ),
+          BookingTrackingUpdateEntity(
+            status: "Delivered",
+            timestamp: now.add(Duration(hours: 24)),
           ),
         ]);
 
