@@ -7,23 +7,35 @@ import '../../bookmark/bloc/bookmark_event.dart';
 import '../../bookmark/bloc/bookmark_state.dart';
 import '../../home/bloc/serviceProvider/service_provider_bloc.dart';
 import '../../home/bloc/serviceProvider/service_provider_state.dart';
+import '../../home/bloc/user/user_bloc.dart';
+import '../../home/bloc/user/user_state.dart';
 
 class ServiceProviderList extends StatelessWidget {
   const ServiceProviderList({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final userState = context.watch<UserBloc>().state;
+    if (userState is! UserLoaded) {
+      return const Scaffold(
+        backgroundColor: Colors.white,
+        body: Center(child: CircularProgressIndicator()),
+      );
+    }
+    final currentUser = userState.user;
+
     return BlocBuilder<ServiceProviderBloc, ServiceProviderState>(
       builder: (context, serviceProviderState) {
         if (serviceProviderState is ServiceProviderLoaded) {
           return BlocBuilder<BookmarkBloc, BookmarkState>(
             builder: (context, bookmarkState) {
               List<String> bookmarkedIds = [];
-              final userId = FirebaseAuth.instance.currentUser?.uid;
 
               if (bookmarkState is BookmarkLoaded) {
                 bookmarkedIds =
-                    bookmarkState.bookmarkedServiceProviders.map((e) => e.id).toList();
+                    bookmarkState.bookmarkedServiceProviders
+                        .map((e) => e.id)
+                        .toList();
               }
 
               return Align(
@@ -43,14 +55,12 @@ class ServiceProviderList extends StatelessWidget {
                             provider: provider,
                             isBookmarked: isBookmarked,
                             onBookmarkToggle: () {
-                              if (userId != null) {
-                                context.read<BookmarkBloc>().add(
-                                  ToggleBookmarkedServiceProviders(
-                                    userId,
-                                    provider.id,
-                                  ),
-                                );
-                              }
+                              context.read<BookmarkBloc>().add(
+                                ToggleBookmarkedServiceProviders(
+                                  currentUser.uid,
+                                  provider.id,
+                                ),
+                              );
                             },
                           );
                         }).toList(),

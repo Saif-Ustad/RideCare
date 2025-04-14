@@ -23,7 +23,6 @@ class SelectVehicleFromProfilePage extends StatefulWidget {
 class _SelectVehicleFromProfilePageState
     extends State<SelectVehicleFromProfilePage> {
   String? selectedVehicle;
-  late final String? userId = FirebaseAuth.instance.currentUser?.uid;
 
   @override
   Widget build(BuildContext context) {

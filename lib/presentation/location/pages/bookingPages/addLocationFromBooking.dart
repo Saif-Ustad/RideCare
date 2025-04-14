@@ -210,7 +210,6 @@
 //   }
 // }
 
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
@@ -222,6 +221,8 @@ import 'package:ridecare/domain/entities/address_entity.dart';
 import 'package:uuid/uuid.dart';
 
 import '../../../../core/configs/theme/app_colors.dart';
+import '../../../home/bloc/user/user_bloc.dart';
+import '../../../home/bloc/user/user_state.dart';
 import '../../bloc/address_bloc.dart';
 import '../../bloc/address_event.dart';
 
@@ -229,10 +230,12 @@ class AddLocationFromBookingPage extends StatefulWidget {
   const AddLocationFromBookingPage({super.key});
 
   @override
-  State<AddLocationFromBookingPage> createState() => _AddLocationFromBookingPageState();
+  State<AddLocationFromBookingPage> createState() =>
+      _AddLocationFromBookingPageState();
 }
 
-class _AddLocationFromBookingPageState extends State<AddLocationFromBookingPage> {
+class _AddLocationFromBookingPageState
+    extends State<AddLocationFromBookingPage> {
   GoogleMapController? _mapController;
   LatLng? _selectedLocation;
   bool _isLoading = false;
@@ -461,26 +464,33 @@ class _AddLocationFromBookingPageState extends State<AddLocationFromBookingPage>
       bottomNavigationBar: CustomBottomBar(
         text: "Save Address",
         onPressed: () {
-          final userId = FirebaseAuth.instance.currentUser?.uid;
+          final userState = context.read<UserBloc>().state;
 
-          if (_selectedLocation != null &&
-              _addressTitleController.text.isNotEmpty &&
-              _fullAddressController.text.isNotEmpty &&
-              userId != null) {
-            final address = AddressEntity(
-              id: const Uuid().v4(),
-              userId: userId,
-              title: _addressTitleController.text.trim(),
-              address: _fullAddressController.text.trim(),
-            );
+          if (userState is UserLoaded) {
+            final userId = userState.user.uid;
 
-            context.read<AddressBloc>().add(AddAddress(address));
-            context.push('/select-location-booking');
+            if (_selectedLocation != null &&
+                _addressTitleController.text.isNotEmpty &&
+                _fullAddressController.text.isNotEmpty) {
+              final address = AddressEntity(
+                id: const Uuid().v4(),
+                userId: userId,
+                title: _addressTitleController.text.trim(),
+                address: _fullAddressController.text.trim(),
+              );
+
+              context.read<AddressBloc>().add(AddAddress(address));
+              context.push('/select-location-booking');
+            } else {
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(
+                  content: Text("Please select a location and fill all fields"),
+                ),
+              );
+            }
           } else {
             ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(
-                content: Text("Please select a location and fill all fields"),
-              ),
+              const SnackBar(content: Text("User not loaded. Please log in.")),
             );
           }
         },

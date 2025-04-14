@@ -33,9 +33,6 @@ class _ChooseServicesPageState extends State<ChooseServicesPage> {
   @override
   void initState() {
     super.initState();
-    context.read<ServiceBloc>().add(
-      FetchAllServiceForProvider(widget.serviceProviderId),
-    );
   }
 
   @override

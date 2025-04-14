@@ -1,4 +1,3 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:dropdown_search/dropdown_search.dart';
@@ -8,6 +7,8 @@ import 'package:uuid/uuid.dart';
 import '../../../../common/widgets/bottomBar/bottomBar.dart';
 import '../../../../core/configs/theme/app_colors.dart';
 import '../../../../domain/entities/vehicle_entity.dart';
+import '../../../home/bloc/user/user_bloc.dart';
+import '../../../home/bloc/user/user_state.dart';
 import '../../bloc/vehicle_bloc.dart';
 import '../../bloc/vehicle_event.dart';
 import '../../bloc/vehicle_state.dart';
@@ -16,17 +17,19 @@ class AddVehicleFromBookingPage extends StatefulWidget {
   const AddVehicleFromBookingPage({super.key});
 
   @override
-  _AddVehicleFromBookingPageState createState() => _AddVehicleFromBookingPageState();
+  _AddVehicleFromBookingPageState createState() =>
+      _AddVehicleFromBookingPageState();
 }
 
 class _AddVehicleFromBookingPageState extends State<AddVehicleFromBookingPage> {
   final TextEditingController numberPlateController = TextEditingController();
-  final String? userId = FirebaseAuth.instance.currentUser?.uid;
 
   String? selectedBrand;
   String? selectedCar;
   String? selectedType;
   String? selectedFuel;
+
+  String? userId;
 
   final List<String> brands = ["Toyota", "Honda", "Ford"];
   final Map<String, List<String>> cars = {
@@ -39,6 +42,17 @@ class _AddVehicleFromBookingPageState extends State<AddVehicleFromBookingPage> {
 
   @override
   Widget build(BuildContext context) {
+    final userState = context.watch<UserBloc>().state;
+
+    if (userState is! UserLoaded) {
+      return const Scaffold(
+        backgroundColor: Colors.white,
+        body: Center(child: CircularProgressIndicator()),
+      );
+    }
+
+    userId = userState.user.uid;
+
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(

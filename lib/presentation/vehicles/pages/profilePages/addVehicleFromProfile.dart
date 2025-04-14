@@ -8,6 +8,8 @@ import 'package:uuid/uuid.dart';
 import '../../../../common/widgets/bottomBar/bottomBar.dart';
 import '../../../../core/configs/theme/app_colors.dart';
 import '../../../../domain/entities/vehicle_entity.dart';
+import '../../../home/bloc/user/user_bloc.dart';
+import '../../../home/bloc/user/user_state.dart';
 import '../../bloc/vehicle_bloc.dart';
 import '../../bloc/vehicle_event.dart';
 import '../../bloc/vehicle_state.dart';
@@ -16,12 +18,12 @@ class AddVehicleFromProfilePage extends StatefulWidget {
   const AddVehicleFromProfilePage({super.key});
 
   @override
-  _AddVehicleFromProfilePageState createState() => _AddVehicleFromProfilePageState();
+  _AddVehicleFromProfilePageState createState() =>
+      _AddVehicleFromProfilePageState();
 }
 
 class _AddVehicleFromProfilePageState extends State<AddVehicleFromProfilePage> {
   final TextEditingController numberPlateController = TextEditingController();
-  final String? userId = FirebaseAuth.instance.currentUser?.uid;
 
   String? selectedBrand;
   String? selectedCar;
@@ -126,11 +128,12 @@ class _AddVehicleFromProfilePageState extends State<AddVehicleFromProfilePage> {
   }
 
   void _onSaveVehicle() {
+    final currentUser = (context.read<UserBloc>().state as UserLoaded).user;
+
     if (selectedBrand != null &&
         selectedCar != null &&
         selectedType != null &&
         selectedFuel != null &&
-        userId != null &&
         numberPlateController.text.isNotEmpty) {
       final id = const Uuid().v4();
 
@@ -141,7 +144,7 @@ class _AddVehicleFromProfilePageState extends State<AddVehicleFromProfilePage> {
         type: selectedType!,
         fuelType: selectedFuel!,
         registrationNumber: numberPlateController.text,
-        userId: userId!,
+        userId: currentUser.uid,
       );
 
       context.read<VehicleBloc>().add(AddVehicle(vehicle));

@@ -1,8 +1,16 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+import 'package:ridecare/domain/entities/booking_entity.dart';
 
 import '../../../core/configs/theme/app_colors.dart';
-import '../widgets/booking.dart';
+import '../../home/bloc/user/user_bloc.dart';
+import '../../home/bloc/user/user_state.dart';
+import '../bloc/booking_bloc.dart';
+import '../bloc/booking_event.dart';
+import '../bloc/booking_state.dart';
+import 'package:intl/intl.dart';
 
 class MyBookingsPage extends StatefulWidget {
   const MyBookingsPage({super.key});
@@ -19,6 +27,9 @@ class _MyBookingsPageState extends State<MyBookingsPage>
   void initState() {
     super.initState();
     _tabController = TabController(length: 3, vsync: this);
+    final currentUser = (context.read<UserBloc>().state as UserLoaded).user;
+    print("user now: ${currentUser.uid}");
+    context.read<BookingBloc>().add(GetAllBookings(userId: currentUser.uid));
   }
 
   @override
@@ -59,13 +70,42 @@ class _MyBookingsPageState extends State<MyBookingsPage>
             ],
           ),
           Expanded(
-            child: TabBarView(
-              controller: _tabController,
-              children: [
-                _buildBookingsList(activeBookings),
-                _buildBookingsList(completedBookings),
-                _buildBookingsList(cancelledBookings),
-              ],
+            child: BlocBuilder<BookingBloc, BookingState>(
+              builder: (context, state) {
+                if (state is BookingLoading) {
+                  return const Center(child: CircularProgressIndicator());
+                } else if (state is BookingError) {
+                  return Center(child: Text("Error: ${state.message}"));
+                } else if (state is BookingsLoaded) {
+                  final activeBookings =
+                      state.bookings
+                          .where(
+                            (b) =>
+                                b.status == "Order Pending" ||
+                                b.status == "Order Confirmed",
+                          )
+                          .toList();
+                  final completedBookings =
+                      state.bookings
+                          .where((b) => b.status == "Order Completed")
+                          .toList();
+                  final cancelledBookings =
+                      state.bookings
+                          .where((b) => b.status == "Order Cancelled")
+                          .toList();
+
+                  return TabBarView(
+                    controller: _tabController,
+                    children: [
+                      _buildBookingsList(activeBookings, "Active"),
+                      _buildBookingsList(completedBookings, "Completed"),
+                      _buildBookingsList(cancelledBookings, "Cancelled"),
+                    ],
+                  );
+                } else {
+                  return const Center(child: Text("No bookings available"));
+                }
+              },
             ),
           ),
         ],
@@ -73,19 +113,44 @@ class _MyBookingsPageState extends State<MyBookingsPage>
     );
   }
 
-  Widget _buildBookingsList(List<Booking> bookings) {
+  Widget _buildBookingsList(List<BookingEntity> bookings, String tabName) {
+    if (bookings.isEmpty) {
+      return const Center(child: Text("No bookings found."));
+    }
+
     return ListView.builder(
       padding: const EdgeInsets.all(16),
       itemCount: bookings.length,
       itemBuilder: (context, index) {
         final booking = bookings[index];
-        return _buildBookingCard(booking);
+        return _buildBookingCard(booking, tabName);
       },
     );
   }
 
-  Widget _buildBookingCard(Booking booking) {
-    bool isCancelled = booking.status == "Cancelled";
+  Widget _buildBookingCard(BookingEntity booking, String tabName) {
+    bool isCancelled = booking.status == "Order Cancelled";
+    final Color statusColor = _getStatusColor(
+      tabName,
+      booking.status ?? "No Status",
+    );
+
+    final Map<String, dynamic> buttonsInfo = {
+      "btn1": {
+        "btnText": tabName == "Active" ? "Cancel" : "Leave Review",
+        "btnRoute":
+            tabName == "Active"
+                ? "/cancel-booking"
+                : "/add-review/${booking.serviceProviderId}",
+      },
+      "btn2": {
+        "btnText": tabName == "Active" ? "Track Order" : "E-Receipt",
+        "btnRoute":
+            tabName == "Active"
+                ? "/track-order/${booking.trackingId}"
+                : "/e-receipt/${booking.bookingId}",
+      },
+    };
 
     return Card(
       margin: const EdgeInsets.only(bottom: 15),
@@ -100,16 +165,16 @@ class _MyBookingsPageState extends State<MyBookingsPage>
             // Status Tag
             Container(
               decoration: BoxDecoration(
-                color: booking.statusColor.withOpacity(0.2),
+                color: statusColor.withOpacity(0.2),
                 borderRadius: BorderRadius.circular(8),
               ),
               padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
               child: Text(
-                booking.status,
+                booking.status ?? "No Status",
                 style: TextStyle(
                   fontSize: 12,
                   fontWeight: FontWeight.w500,
-                  color: booking.statusColor,
+                  color: statusColor,
                 ),
               ),
             ),
@@ -122,11 +187,27 @@ class _MyBookingsPageState extends State<MyBookingsPage>
               children: [
                 ClipRRect(
                   borderRadius: BorderRadius.circular(10),
-                  child: Image.asset(
-                    booking.imageUrl,
+                  child: CachedNetworkImage(
+                    imageUrl: booking.serviceProvider!.workImageUrl,
                     width: 120,
                     height: 80,
                     fit: BoxFit.cover,
+                    placeholder:
+                        (context, url) => Container(
+                          width: 120,
+                          height: 80,
+                          color: Colors.grey[300],
+                          child: const Center(
+                            child: CircularProgressIndicator(strokeWidth: 2),
+                          ),
+                        ),
+                    errorWidget:
+                        (context, url, error) => Container(
+                          width: 120,
+                          height: 80,
+                          color: Colors.grey[300],
+                          child: const Icon(Icons.error, color: Colors.red),
+                        ),
                   ),
                 ),
                 const SizedBox(width: 10),
@@ -154,14 +235,13 @@ class _MyBookingsPageState extends State<MyBookingsPage>
                       ),
                       const SizedBox(height: 5),
                       Text(
-                        booking.serviceCenter,
+                        booking.serviceProvider?.name ?? 'No Name',
                         style: const TextStyle(
                           fontSize: 14,
                           fontWeight: FontWeight.w500,
                           color: Colors.black,
                         ),
                       ),
-
                       Row(
                         children: [
                           const Icon(
@@ -170,7 +250,7 @@ class _MyBookingsPageState extends State<MyBookingsPage>
                             color: AppColors.primary,
                           ),
                           const SizedBox(width: 5),
-                          Text("${booking.distance} km", style: _infoTextStyle),
+                          Text("${1.5} km", style: _infoTextStyle),
                           const SizedBox(width: 10),
                           const Icon(
                             Icons.timer,
@@ -178,7 +258,7 @@ class _MyBookingsPageState extends State<MyBookingsPage>
                             color: AppColors.primary,
                           ),
                           const SizedBox(width: 5),
-                          Text("${booking.time} mins", style: _infoTextStyle),
+                          Text("${10} mins", style: _infoTextStyle),
                         ],
                       ),
                     ],
@@ -199,7 +279,7 @@ class _MyBookingsPageState extends State<MyBookingsPage>
                       style: _infoTextStyle,
                       children: [
                         TextSpan(
-                          text: "#${booking.orderId}",
+                          text: "#TR4365HGJKL",
                           style: _infoTextStyle.copyWith(
                             fontWeight: FontWeight.bold,
                             color: AppColors.black,
@@ -217,7 +297,13 @@ class _MyBookingsPageState extends State<MyBookingsPage>
                       style: _infoTextStyle,
                       children: [
                         TextSpan(
-                          text: booking.orderDate,
+                          text:
+                              booking.scheduledAt != null
+                                  ? DateFormat(
+                                    'd MMMM yy',
+                                  ).format(booking.scheduledAt!)
+                                  : '',
+
                           style: _infoTextStyle.copyWith(
                             fontWeight: FontWeight.bold,
                             color: AppColors.black,
@@ -235,7 +321,7 @@ class _MyBookingsPageState extends State<MyBookingsPage>
                       style: _infoTextStyle,
                       children: [
                         TextSpan(
-                          text: "Rs. ${booking.payment}",
+                          text: "Rs. ${booking.totalCharges}",
                           style: _infoTextStyle.copyWith(
                             fontWeight: FontWeight.bold,
                             color: AppColors.black,
@@ -254,7 +340,8 @@ class _MyBookingsPageState extends State<MyBookingsPage>
             // Action Buttons
             Row(
               children: [
-                if (!isCancelled && booking.btn1OnPressed != null) ...[
+                if (!isCancelled &&
+                    buttonsInfo['btn1']['btnRoute'] != null) ...[
                   Expanded(
                     child: TextButton(
                       style: TextButton.styleFrom(
@@ -263,16 +350,21 @@ class _MyBookingsPageState extends State<MyBookingsPage>
                           borderRadius: BorderRadius.circular(8),
                         ),
                       ),
-                      onPressed: () => booking.btn1OnPressed!(context),
+                      onPressed:
+                          () => context.push(buttonsInfo['btn1']['btnRoute']),
                       child: Text(
-                        booking.btn1,
-                        style: TextStyle(fontSize: 14, color: AppColors.black),
+                        buttonsInfo['btn1']['btnText'],
+                        style: const TextStyle(
+                          fontSize: 14,
+                          color: Colors.black,
+                        ),
                       ),
                     ),
                   ),
                   const SizedBox(width: 10),
                 ],
-                if (!isCancelled && booking.btn2OnPressed != null) ...[
+                if (!isCancelled &&
+                    buttonsInfo['btn2']['btnRoute'] != null) ...[
                   Expanded(
                     child: ElevatedButton(
                       style: ElevatedButton.styleFrom(
@@ -281,9 +373,10 @@ class _MyBookingsPageState extends State<MyBookingsPage>
                           borderRadius: BorderRadius.circular(8),
                         ),
                       ),
-                      onPressed: () => booking.btn2OnPressed!(context),
+                      onPressed:
+                          () => context.push(buttonsInfo['btn2']['btnRoute']),
                       child: Text(
-                        booking.btn2,
+                        buttonsInfo['btn2']['btnText'],
                         style: const TextStyle(
                           fontSize: 14,
                           color: Colors.white,
@@ -298,6 +391,16 @@ class _MyBookingsPageState extends State<MyBookingsPage>
         ),
       ),
     );
+  }
+
+  Color _getStatusColor(String tabName, String status) {
+    if (tabName == "Completed") {
+      return Colors.green;
+    } else if (tabName == "Cancelled" || status == "Order Pending") {
+      return AppColors.orange;
+    } else {
+      return Colors.green;
+    }
   }
 
   Widget buildLeadingIconButton(VoidCallback onPressed) => Padding(

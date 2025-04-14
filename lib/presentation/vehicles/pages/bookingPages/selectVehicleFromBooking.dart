@@ -9,19 +9,19 @@ import '../../../../core/configs/theme/app_colors.dart';
 import '../../../../domain/entities/vehicle_entity.dart';
 import '../../../booking/bloc/booking_bloc.dart';
 import '../../bloc/vehicle_bloc.dart';
-import '../../bloc/vehicle_event.dart';
 import '../../bloc/vehicle_state.dart';
 
 class SelectVehicleFromBookingPage extends StatefulWidget {
   const SelectVehicleFromBookingPage({super.key});
 
   @override
-  _SelectVehicleFromBookingPageState createState() => _SelectVehicleFromBookingPageState();
+  _SelectVehicleFromBookingPageState createState() =>
+      _SelectVehicleFromBookingPageState();
 }
 
-class _SelectVehicleFromBookingPageState extends State<SelectVehicleFromBookingPage> {
+class _SelectVehicleFromBookingPageState
+    extends State<SelectVehicleFromBookingPage> {
   String? selectedVehicle;
-  late final String? userId = FirebaseAuth.instance.currentUser?.uid;
 
   @override
   Widget build(BuildContext context) {

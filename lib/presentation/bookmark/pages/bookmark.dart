@@ -40,26 +40,6 @@ class _BookmarkPageState extends State<BookmarkPage> {
   }
 
 
-  // final services = [
-  //   ServiceModel(
-  //     AppImages.popularServiceProvider1,
-  //     4.6,
-  //     "Bajaj Service Center",
-  //     "0.5 km",
-  //     "2 Mins",
-  //     "100-1200",
-  //   ),
-  //   ServiceModel(
-  //     AppImages.popularServiceProvider2,
-  //     4.8,
-  //     "Honda Service Center",
-  //     "1.5 km",
-  //     "8 Mins",
-  //     "200-1500",
-  //   ),
-  //
-  // ];
-
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<BookmarkBloc, BookmarkState>(

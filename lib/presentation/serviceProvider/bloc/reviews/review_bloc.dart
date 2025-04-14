@@ -9,6 +9,7 @@ class ReviewBloc extends Bloc<ReviewEvent, ReviewState> {
 
   List<ReviewEntity> _allReviews = [];
   final Set<String> _activeFilters = {};
+  String _searchQuery = '';
 
   ReviewBloc({required this.getReviewsUseCase}) : super(ReviewInitial()) {
     on<LoadReviews>(_onLoadReviews);
@@ -16,12 +17,15 @@ class ReviewBloc extends Bloc<ReviewEvent, ReviewState> {
     on<SortReviewsByLatest>(_onSortByLatest);
     on<FilterReviewsWithPhotos>(_onFilterWithPhotos);
     on<SearchReviews>(_onSearchReviews);
-
   }
 
-  Future<void> _onLoadReviews(LoadReviews event, Emitter<ReviewState> emit) async {
+  Future<void> _onLoadReviews(
+    LoadReviews event,
+    Emitter<ReviewState> emit,
+  ) async {
     emit(ReviewLoading());
     _activeFilters.clear(); // Reset filters on reload
+    _searchQuery = '';
     try {
       _allReviews = await getReviewsUseCase(event.serviceProviderId);
       emit(ReviewLoaded(_allReviews, activeFilters: _activeFilters));
@@ -30,7 +34,10 @@ class ReviewBloc extends Bloc<ReviewEvent, ReviewState> {
     }
   }
 
-  void _onFilterVerified(FilterReviewsByVerified event, Emitter<ReviewState> emit) {
+  void _onFilterVerified(
+    FilterReviewsByVerified event,
+    Emitter<ReviewState> emit,
+  ) {
     if (_activeFilters.contains("Verified")) {
       _activeFilters.remove("Verified");
     } else {
@@ -39,7 +46,10 @@ class ReviewBloc extends Bloc<ReviewEvent, ReviewState> {
     emit(ReviewLoaded(_applyActiveFilters(), activeFilters: _activeFilters));
   }
 
-  void _onFilterWithPhotos(FilterReviewsWithPhotos event, Emitter<ReviewState> emit) {
+  void _onFilterWithPhotos(
+    FilterReviewsWithPhotos event,
+    Emitter<ReviewState> emit,
+  ) {
     if (_activeFilters.contains("With Photos")) {
       _activeFilters.remove("With Photos");
     } else {
@@ -58,15 +68,9 @@ class ReviewBloc extends Bloc<ReviewEvent, ReviewState> {
   }
 
   void _onSearchReviews(SearchReviews event, Emitter<ReviewState> emit) {
-    final query = event.query.toLowerCase();
-    final filtered = _applyActiveFilters().where((review) {
-      return review.reviewText.toLowerCase().contains(query) ||
-          review.userName.toLowerCase().contains(query); // Customize fields
-    }).toList();
-
-    emit(ReviewLoaded(filtered, activeFilters: _activeFilters));
+    _searchQuery = event.query.toLowerCase(); // ✅ Update search query
+    emit(ReviewLoaded(_applyActiveFilters(), activeFilters: _activeFilters));
   }
-
 
   /// 🔁 Combines all active filters
   List<ReviewEntity> _applyActiveFilters() {
@@ -82,6 +86,14 @@ class ReviewBloc extends Bloc<ReviewEvent, ReviewState> {
 
     if (_activeFilters.contains("Latest")) {
       filtered.sort((a, b) => b.createdAt.compareTo(a.createdAt));
+    }
+
+    if (_searchQuery.isNotEmpty) {
+      filtered =
+          filtered.where((review) {
+            return review.reviewText.toLowerCase().contains(_searchQuery) ||
+                review.userName.toLowerCase().contains(_searchQuery);
+          }).toList();
     }
 
     return filtered;

@@ -9,6 +9,8 @@ import 'package:ridecare/presentation/booking/bloc/booking_event.dart';
 
 import '../../../../common/widgets/bottomBar/bottomBar.dart';
 import '../../../../core/configs/theme/app_colors.dart';
+import '../../../home/bloc/user/user_bloc.dart';
+import '../../../home/bloc/user/user_state.dart';
 import '../../bloc/address_bloc.dart';
 import '../../bloc/address_event.dart';
 import '../../bloc/address_state.dart';
@@ -17,19 +19,20 @@ class SelectLocationFromProfilePage extends StatefulWidget {
   const SelectLocationFromProfilePage({super.key});
 
   @override
-  _SelectLocationFromProfilePageState createState() => _SelectLocationFromProfilePageState();
+  _SelectLocationFromProfilePageState createState() =>
+      _SelectLocationFromProfilePageState();
 }
 
-class _SelectLocationFromProfilePageState extends State<SelectLocationFromProfilePage> {
+class _SelectLocationFromProfilePageState
+    extends State<SelectLocationFromProfilePage> {
   String? selectedAddress;
 
   @override
   void initState() {
     super.initState();
-    final String? uid = FirebaseAuth.instance.currentUser?.uid;
-    if (uid != null) {
-      context.read<AddressBloc>().add(LoadAddresses(uid));
-    }
+
+    final currentUser = (context.read<UserBloc>().state as UserLoaded).user;
+    context.read<AddressBloc>().add(LoadAddresses(currentUser.uid));
   }
 
   @override

@@ -136,7 +136,7 @@ class _PaymentDonePageState extends State<PaymentDonePage> {
 
                 TextButton(
                   onPressed: () {
-                    context.go("/my-bookings");
+                    context.push("/my-bookings");
                   },
                   child: const Text(
                     "View My Bookings",

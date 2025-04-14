@@ -9,6 +9,8 @@ import 'package:ridecare/presentation/booking/bloc/booking_event.dart';
 
 import '../../../../common/widgets/bottomBar/bottomBar.dart';
 import '../../../../core/configs/theme/app_colors.dart';
+import '../../../home/bloc/user/user_bloc.dart';
+import '../../../home/bloc/user/user_state.dart';
 import '../../bloc/address_bloc.dart';
 import '../../bloc/address_event.dart';
 import '../../bloc/address_state.dart';
@@ -17,18 +19,26 @@ class SelectLocationFromBookingPage extends StatefulWidget {
   const SelectLocationFromBookingPage({super.key});
 
   @override
-  _SelectLocationFromBookingPageState createState() => _SelectLocationFromBookingPageState();
+  _SelectLocationFromBookingPageState createState() =>
+      _SelectLocationFromBookingPageState();
 }
 
-class _SelectLocationFromBookingPageState extends State<SelectLocationFromBookingPage> {
+class _SelectLocationFromBookingPageState
+    extends State<SelectLocationFromBookingPage> {
   String? selectedAddress;
 
   @override
   void initState() {
     super.initState();
-    final String? uid = FirebaseAuth.instance.currentUser?.uid;
-    if (uid != null) {
+    final userState = context.read<UserBloc>().state;
+
+    if (userState is UserLoaded) {
+      final String uid = userState.user.uid;
       context.read<AddressBloc>().add(LoadAddresses(uid));
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("User not loaded or no user data found.")),
+      );
     }
   }
 

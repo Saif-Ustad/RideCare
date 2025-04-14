@@ -61,7 +61,7 @@ class HomeAppBar extends StatelessWidget {
         ),
         GestureDetector(
           onTap: () {
-            context.push("/select-location");
+            context.push("/select-location-profile");
           },
           child: Row(
             children: [

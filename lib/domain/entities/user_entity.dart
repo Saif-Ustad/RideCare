@@ -3,7 +3,9 @@ class UserEntity {
   final String? email;
   final String? phoneNumber;
   final String? displayName;
-  final String? photoURL;
+  final String? userProfileImageUrl;
+  final String? firstName;
+  final String? lastName;
   final List<String>? bookmarkIds;
 
   UserEntity({
@@ -11,7 +13,9 @@ class UserEntity {
     this.email,
     this.phoneNumber,
     this.displayName,
-    this.photoURL,
+    this.firstName,
+    this.lastName,
+    this.userProfileImageUrl,
     this.bookmarkIds,
   });
 
@@ -20,7 +24,9 @@ class UserEntity {
     String? email,
     String? phoneNumber,
     String? displayName,
-    String? photoURL,
+    String? firstName,
+    String? lastName,
+    String? userProfileImageUrl,
     List<String>? bookmarkIds,
   }) {
     return UserEntity(
@@ -28,7 +34,9 @@ class UserEntity {
       email: email ?? this.email,
       phoneNumber: phoneNumber ?? this.phoneNumber,
       displayName: displayName ?? this.displayName,
-      photoURL: photoURL ?? this.photoURL,
+      firstName: firstName ?? this.firstName,
+      lastName: lastName ?? this.lastName,
+      userProfileImageUrl: userProfileImageUrl ?? this.userProfileImageUrl,
       bookmarkIds: bookmarkIds ?? this.bookmarkIds,
     );
   }

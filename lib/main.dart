@@ -14,6 +14,7 @@ import 'package:ridecare/presentation/booking/bloc/booking_bloc.dart';
 import 'package:ridecare/presentation/bookmark/bloc/bookmark_bloc.dart';
 import 'package:ridecare/presentation/home/bloc/serviceProvider/service_provider_bloc.dart';
 import 'package:ridecare/presentation/home/bloc/specialOffers/special_offer_bloc.dart';
+import 'package:ridecare/presentation/home/bloc/user/user_bloc.dart';
 import 'package:ridecare/presentation/location/bloc/address_bloc.dart';
 import 'package:ridecare/presentation/onboarding/bloc/onboarding_bloc.dart';
 import 'package:ridecare/presentation/serviceProvider/bloc/reviews/review_bloc.dart';
@@ -59,6 +60,7 @@ class MyApp extends StatelessWidget {
         BlocProvider<AddressBloc>(create: (context) => sl<AddressBloc>()),
         BlocProvider<PromoCodeBloc>(create: (context) => sl<PromoCodeBloc>()),
         BlocProvider<PaymentBloc>(create: (context) => sl<PaymentBloc>()),
+        BlocProvider<UserBloc>(create: (context) => sl<UserBloc>()),
       ],
       child: PopScope(
         canPop: true,
