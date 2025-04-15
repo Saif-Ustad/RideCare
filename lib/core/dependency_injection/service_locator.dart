@@ -96,6 +96,7 @@ void setupServiceLocator() {
   // ✅ Register FirebaseFireStore instance
   sl.registerLazySingleton<FirebaseFirestore>(() => FirebaseFirestore.instance);
 
+
   // Services
   // sl.registerLazySingleton(() => StripeService());
   sl.registerSingleton<StripeService>(StripeService()..init());

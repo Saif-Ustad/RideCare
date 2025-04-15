@@ -1,5 +1,7 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
+import 'dart:io';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
+import '../../common/helper/uploadImageToCloudinary.dart';
 import '../models/review_model.dart';
 
 abstract class ReviewRemoteDataSource {
@@ -43,7 +45,6 @@ class ReviewRemoteDataSourceImpl implements ReviewRemoteDataSource {
           reviewModels.add(reviewModel);
         }
       } catch (e) {
-        // Optionally handle error, or skip if user data not found
         print("Error fetching user for review: $e");
       }
     }
@@ -53,23 +54,50 @@ class ReviewRemoteDataSourceImpl implements ReviewRemoteDataSource {
 
   @override
   Future<void> addReview(ReviewModel review) async {
-    final docRef = await firestore.collection('reviews').add({
+    List<String> uploadedImageUrls = [];
+
+    print("images ${review.imageUrls}");
+
+    if (review.imageUrls != null && review.imageUrls!.isNotEmpty) {
+      for (final filePath in review.imageUrls!) {
+        final file = File(filePath);
+
+        try {
+          // Upload to Cloudinary
+          final imageUrl = await uploadImageToCloudinary(file);
+          uploadedImageUrls.add(imageUrl);
+        } catch (e) {
+          print("Error uploading image to Cloudinary: $e");
+        }
+      }
+    }
+
+    print("uploaded image url : ${uploadedImageUrls}");
+
+    final reviewData = {
       'userId': review.userId,
       'userName': review.userName,
       'serviceProviderId': review.serviceProviderId,
       'reviewText': review.reviewText,
       'ratings': review.ratings,
       'isVerified': review.isVerified,
-      if (review.imageUrls != null) 'imageUrls': review.imageUrls,
       'createdAt': review.createdAt,
-    });
+    };
 
-    final reviewId = docRef.id;
+    if (uploadedImageUrls.isNotEmpty) {
+      reviewData['imageUrls'] = uploadedImageUrls;
+    }
 
-    final userRef = firestore.collection('users').doc(review.userId);
+    try {
+      final docRef = await firestore.collection('reviews').add(reviewData);
+      final reviewId = docRef.id;
 
-    await userRef.update({
-      'reviewIds': FieldValue.arrayUnion([reviewId]),
-    });
+      final userRef = firestore.collection('users').doc(review.userId);
+      await userRef.update({
+        'reviewIds': FieldValue.arrayUnion([reviewId]),
+      });
+    } catch (e) {
+      print("Error saving review to Firestore: $e");
+    }
   }
 }

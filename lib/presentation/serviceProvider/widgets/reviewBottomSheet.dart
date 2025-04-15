@@ -208,43 +208,56 @@ class _ReviewBottomSheetState extends State<ReviewBottomSheet> {
                       ),
 
                     const Spacer(),
-                    ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                        minimumSize: const Size.fromHeight(50),
-                        backgroundColor: AppColors.primary,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                      ),
-                      onPressed:
-                          userInfo == null
-                              ? null
-                              : () async {
-                                final review = ReviewEntity(
-                                  userId: userInfo!.uid,
-                                  userName:
-                                      "${userInfo!.firstName} ${userInfo!.lastName}",
-                                  serviceProviderId: widget.serviceProviderId,
-                                  reviewText: _reviewController.text.trim(),
-                                  ratings: _rating,
-                                  isVerified: false,
-                                  // imageUrls: _images.map((e) => e.path).toList(),
-                                  createdAt: DateTime.now(),
-                                );
+                    BlocBuilder<ReviewBloc, ReviewState>(
+                      builder: (context, state) {
+                        return ElevatedButton(
+                          style: ElevatedButton.styleFrom(
+                            minimumSize: const Size.fromHeight(50),
+                            backgroundColor: AppColors.primary,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                          ),
+                          onPressed:
+                              userInfo == null || state is ReviewSubmitting
+                                  ? null
+                                  : () async {
+                                    final review = ReviewEntity(
+                                      userId: userInfo!.uid,
+                                      userName:
+                                          "${userInfo!.firstName} ${userInfo!.lastName}",
+                                      serviceProviderId:
+                                          widget.serviceProviderId,
+                                      reviewText: _reviewController.text.trim(),
+                                      ratings: _rating,
+                                      isVerified: false,
+                                      imageUrls:
+                                          _images.map((e) => e.path).toList(),
+                                      createdAt: DateTime.now(),
+                                    );
 
-                                context.read<ReviewBloc>().add(
-                                  AddReview(review),
-                                );
-                              },
-
-                      child: const Text(
-                        'Submit',
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w500,
-                          color: Colors.white,
-                        ),
-                      ),
+                                    context.read<ReviewBloc>().add(
+                                      AddReview(review),
+                                    );
+                                  },
+                          child:
+                              state is ReviewSubmitting
+                                  ? Padding(
+                                    padding: const EdgeInsets.all(5),
+                                    child: const CircularProgressIndicator(
+                                      color: Colors.white,
+                                    ),
+                                  )
+                                  : const Text(
+                                    'Submit',
+                                    style: TextStyle(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.w500,
+                                      color: Colors.white,
+                                    ),
+                                  ),
+                        );
+                      },
                     ),
                   ],
                 ),
