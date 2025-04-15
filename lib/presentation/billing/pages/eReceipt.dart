@@ -6,6 +6,7 @@ import 'package:barcode_widget/barcode_widget.dart';
 import 'package:intl/intl.dart';
 import 'package:ridecare/core/configs/theme/app_colors.dart';
 
+import '../../../core/pdfGenerator/receipt_pdf_generator.dart';
 import '../../booking/bloc/booking_bloc.dart';
 import '../../booking/bloc/booking_event.dart';
 import '../../booking/bloc/booking_state.dart';
@@ -209,9 +210,15 @@ class _EReceiptPageState extends State<EReceiptPage> {
                   child: Column(
                     children: [
                       ElevatedButton(
-                        onPressed: () {
-                          // context.push("/e-receipt/${widget.bookingId}");
+                        onPressed: () async {
+                          final services = booking.services?.map((service) => {
+                            "name": service.name ?? "Service",
+                            "price": "Rs. ${service.price.toStringAsFixed(2)}"
+                          }).toList() ?? [];
+
+                          await generateAndSharePDF(receiptData, services);
                         },
+
                         style: ElevatedButton.styleFrom(
                           backgroundColor: AppColors.primary,
                           shape: RoundedRectangleBorder(
