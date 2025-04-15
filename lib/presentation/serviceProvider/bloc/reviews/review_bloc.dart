@@ -1,22 +1,26 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../../domain/entities/review_entity.dart';
+import '../../../../domain/usecases/review/add_review.dart';
 import '../../../../domain/usecases/review/get_reviews.dart';
 import 'review_event.dart';
 import 'review_state.dart';
 
 class ReviewBloc extends Bloc<ReviewEvent, ReviewState> {
-  final GetReviews getReviewsUseCase;
+  final GetReviewsUseCase getReviewsUseCase;
+  final AddReviewUseCase addReviewUseCase;
 
   List<ReviewEntity> _allReviews = [];
   final Set<String> _activeFilters = {};
   String _searchQuery = '';
 
-  ReviewBloc({required this.getReviewsUseCase}) : super(ReviewInitial()) {
+  ReviewBloc({required this.getReviewsUseCase, required this.addReviewUseCase})
+    : super(ReviewInitial()) {
     on<LoadReviews>(_onLoadReviews);
     on<FilterReviewsByVerified>(_onFilterVerified);
     on<SortReviewsByLatest>(_onSortByLatest);
     on<FilterReviewsWithPhotos>(_onFilterWithPhotos);
     on<SearchReviews>(_onSearchReviews);
+    on<AddReview>(_onAddReview);
   }
 
   Future<void> _onLoadReviews(
@@ -81,7 +85,7 @@ class ReviewBloc extends Bloc<ReviewEvent, ReviewState> {
     }
 
     if (_activeFilters.contains("With Photos")) {
-      filtered = filtered.where((r) => r.imageUrls.isNotEmpty).toList();
+      filtered = filtered.where((r) => r.imageUrls != null && r.imageUrls!.isNotEmpty).toList();
     }
 
     if (_activeFilters.contains("Latest")) {
@@ -97,5 +101,17 @@ class ReviewBloc extends Bloc<ReviewEvent, ReviewState> {
     }
 
     return filtered;
+  }
+
+  Future<void> _onAddReview(AddReview event, Emitter<ReviewState> emit) async {
+    emit(ReviewSubmitting());
+    try {
+      await addReviewUseCase(event.review);
+      emit(ReviewAddedSuccessfully());
+      add(LoadReviews(event.review.serviceProviderId));
+      emit(ReviewLoaded(_applyActiveFilters(), activeFilters: _activeFilters));
+    } catch (e) {
+      emit(ReviewError(e.toString()));
+    }
   }
 }

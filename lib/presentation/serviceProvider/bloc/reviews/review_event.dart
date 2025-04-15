@@ -1,5 +1,7 @@
 import 'package:equatable/equatable.dart';
 
+import '../../../../domain/entities/review_entity.dart';
+
 abstract class ReviewEvent extends Equatable {
   const ReviewEvent();
 
@@ -37,4 +39,8 @@ class SearchReviews extends ReviewEvent {
   List<Object?> get props => [query];
 }
 
+class AddReview extends ReviewEvent {
+  final ReviewEntity review;
 
+  const AddReview(this.review);
+}

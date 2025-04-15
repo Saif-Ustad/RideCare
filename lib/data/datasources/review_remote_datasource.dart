@@ -4,6 +4,8 @@ import '../models/review_model.dart';
 
 abstract class ReviewRemoteDataSource {
   Future<List<ReviewModel>> fetchReviews(String serviceProviderId);
+
+  Future<void> addReview(ReviewModel review);
 }
 
 class ReviewRemoteDataSourceImpl implements ReviewRemoteDataSource {
@@ -47,5 +49,27 @@ class ReviewRemoteDataSourceImpl implements ReviewRemoteDataSource {
     }
 
     return reviewModels;
+  }
+
+  @override
+  Future<void> addReview(ReviewModel review) async {
+    final docRef = await firestore.collection('reviews').add({
+      'userId': review.userId,
+      'userName': review.userName,
+      'serviceProviderId': review.serviceProviderId,
+      'reviewText': review.reviewText,
+      'ratings': review.ratings,
+      'isVerified': review.isVerified,
+      if (review.imageUrls != null) 'imageUrls': review.imageUrls,
+      'createdAt': review.createdAt,
+    });
+
+    final reviewId = docRef.id;
+
+    final userRef = firestore.collection('users').doc(review.userId);
+
+    await userRef.update({
+      'reviewIds': FieldValue.arrayUnion([reviewId]),
+    });
   }
 }

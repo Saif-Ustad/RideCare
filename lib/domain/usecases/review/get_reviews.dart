@@ -1,10 +1,10 @@
 import '../../entities/review_entity.dart';
 import '../../repositories/review_repository.dart';
 
-class GetReviews {
+class GetReviewsUseCase {
   final ReviewRepository repository;
 
-  GetReviews({required this.repository});
+  GetReviewsUseCase({required this.repository});
 
   Future<List<ReviewEntity>> call(String serviceProviderId) {
     return repository.getReviews(serviceProviderId);

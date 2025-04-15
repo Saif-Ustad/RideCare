@@ -7,6 +7,7 @@ import '../../../domain/entities/review_entity.dart';
 import '../bloc/reviews/review_bloc.dart';
 import '../bloc/reviews/review_event.dart';
 import '../bloc/reviews/review_state.dart';
+import '../widgets/reviewBottomSheet.dart';
 
 class ReviewTab extends StatefulWidget {
   final String serviceProviderId;
@@ -65,19 +66,33 @@ class _ReviewTabState extends State<ReviewTab>
                         color: AppColors.black,
                       ),
                     ),
-                    Row(
-                      children: [
-                        Icon(Icons.edit, size: 16, color: AppColors.primary),
-                        const SizedBox(width: 4),
-                        Text(
-                          "Add Review",
-                          style: TextStyle(
-                            fontSize: 14,
-                            fontWeight: FontWeight.w500,
-                            color: AppColors.primary,
+                    InkWell(
+                      onTap: () {
+                        showModalBottomSheet(
+                          context: context,
+                          shape: const RoundedRectangleBorder(
+                            borderRadius: BorderRadius.vertical(
+                              top: Radius.circular(20),
+                            ),
                           ),
-                        ),
-                      ],
+                          isScrollControlled: true,
+                          builder: (context) => ReviewBottomSheet(serviceProviderId: widget.serviceProviderId),
+                        );
+                      },
+                      child: Row(
+                        children: [
+                          Icon(Icons.edit, size: 16, color: AppColors.primary),
+                          const SizedBox(width: 4),
+                          Text(
+                            "Add Review",
+                            style: TextStyle(
+                              fontSize: 14,
+                              fontWeight: FontWeight.w500,
+                              color: AppColors.primary,
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
                   ],
                 ),
@@ -327,18 +342,18 @@ class _ReviewTabState extends State<ReviewTab>
                 ),
 
                 // Optional: Show review images or thumbs up
-                if (review.imageUrls.isNotEmpty) ...[
+                if (review.imageUrls != null && review.imageUrls!.isNotEmpty) ...[
                   const SizedBox(height: 8),
                   SizedBox(
                     height: 80,
                     child: ListView.separated(
                       scrollDirection: Axis.horizontal,
-                      itemCount: review.imageUrls.length,
+                      itemCount: review.imageUrls!.length,
                       itemBuilder: (context, index) {
                         return ClipRRect(
                           borderRadius: BorderRadius.circular(8),
                           child: CachedNetworkImage(
-                            imageUrl: review.imageUrls[index],
+                            imageUrl: review.imageUrls![index],
                             width: 80,
                             height: 80,
                             fit: BoxFit.cover,

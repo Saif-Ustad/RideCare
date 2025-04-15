@@ -1,5 +1,5 @@
 class ReviewEntity {
-  final String id;
+  final String? id;
   final String userId;
   final String userName;
   final String? userProfileImageUrl;
@@ -7,11 +7,11 @@ class ReviewEntity {
   final String reviewText;
   final double ratings;
   final bool isVerified;
-  final List<String> imageUrls;
+  final List<String>? imageUrls;
   final DateTime createdAt;
 
   const ReviewEntity ({
-    required this.id,
+    this.id,
     required this.userId,
     required this.userName,
     this.userProfileImageUrl,
@@ -19,7 +19,7 @@ class ReviewEntity {
     required this.reviewText,
     required this.ratings,
     required this.isVerified,
-    required this.imageUrls,
+    this.imageUrls,
     required this.createdAt,
   });
 }

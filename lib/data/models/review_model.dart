@@ -3,7 +3,7 @@ import 'package:ridecare/domain/entities/review_entity.dart';
 
 class ReviewModel extends ReviewEntity {
   ReviewModel({
-    required super.id,
+    super.id,
     required super.userId,
     required super.userName,
     super.userProfileImageUrl,
@@ -11,21 +11,29 @@ class ReviewModel extends ReviewEntity {
     required super.reviewText,
     required super.ratings,
     required super.isVerified,
-    required super.imageUrls,
+    super.imageUrls,
     required super.createdAt,
   });
 
-  factory ReviewModel.fromJson(Map<String, dynamic> reviewJson,Map<String, dynamic> userJson, String documentId) {
+  factory ReviewModel.fromJson(
+    Map<String, dynamic> reviewJson,
+    Map<String, dynamic> userJson,
+    String documentId,
+  ) {
     return ReviewModel(
       id: documentId,
       userId: reviewJson['userId'],
-      userName: '${userJson['firstName'] ?? ''} ${userJson['lastName'] ?? ''}'.trim(),
-      userProfileImageUrl: userJson['userProfileImageUrl']?? "",
+      userName:
+          '${userJson['firstName'] ?? ''} ${userJson['lastName'] ?? ''}'.trim(),
+      userProfileImageUrl: userJson['userProfileImageUrl'] ?? "",
       serviceProviderId: reviewJson['serviceProviderId'],
       reviewText: reviewJson['reviewText'],
       ratings: (reviewJson['ratings'] as num).toDouble(),
       isVerified: reviewJson['isVerified'],
-      imageUrls: List<String>.from(reviewJson['imageUrls']??  []),
+      imageUrls:
+          reviewJson['imageUrls'] != null
+              ? List<String>.from(reviewJson['imageUrls'])
+              : null,
       createdAt: (reviewJson['createdAt'] as Timestamp).toDate(),
     );
   }
@@ -39,8 +47,23 @@ class ReviewModel extends ReviewEntity {
       'reviewText': reviewText,
       'ratings': ratings,
       'isVerified': isVerified,
-      'imageUrls': imageUrls,
+      if (imageUrls != null) 'imageUrls': imageUrls,
       'createdAt': createdAt,
     };
+  }
+
+  factory ReviewModel.fromEntity(ReviewEntity entity) {
+    return ReviewModel(
+      id: entity.id,
+      userId: entity.userId,
+      userName: entity.userName,
+      userProfileImageUrl: entity.userProfileImageUrl,
+      serviceProviderId: entity.serviceProviderId,
+      reviewText: entity.reviewText,
+      ratings: entity.ratings,
+      isVerified: entity.isVerified,
+      imageUrls: entity.imageUrls,
+      createdAt: entity.createdAt,
+    );
   }
 }

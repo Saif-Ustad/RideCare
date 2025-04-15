@@ -33,6 +33,7 @@ import 'package:ridecare/domain/usecases/booking_tracking/create_booking_trackin
 import 'package:ridecare/domain/usecases/booking_tracking/get_booking_tracking_usecase.dart';
 import 'package:ridecare/domain/usecases/bookmark/toggle_bookmark_service_provider.dart';
 import 'package:ridecare/domain/usecases/promoCode/validate_promo_code.dart';
+import 'package:ridecare/domain/usecases/review/add_review.dart';
 import 'package:ridecare/domain/usecases/service/get_services_for_provider.dart';
 import 'package:ridecare/domain/usecases/serviceProvider/get_all_service_providers.dart';
 import 'package:ridecare/domain/usecases/serviceProvider/get_nearby_service_providers.dart';
@@ -219,7 +220,8 @@ void setupServiceLocator() {
     () => ToggleBookmarkedServiceProvider(repository: sl()),
   );
 
-  sl.registerLazySingleton(() => GetReviews(repository: sl()));
+  sl.registerLazySingleton(() => GetReviewsUseCase(repository: sl()));
+  sl.registerLazySingleton(() => AddReviewUseCase(repository: sl()));
 
   sl.registerLazySingleton(() => BookingUpdatedUseCase(repository: sl()));
   sl.registerLazySingleton(() => BookingCreatedUseCase(repository: sl()));
@@ -276,7 +278,9 @@ void setupServiceLocator() {
     () => BookmarkBloc(getBookmarks: sl(), toggleBookmark: sl()),
   );
 
-  sl.registerFactory(() => ReviewBloc(getReviewsUseCase: sl()));
+  sl.registerFactory(
+    () => ReviewBloc(getReviewsUseCase: sl(), addReviewUseCase: sl()),
+  );
 
   sl.registerFactory(
     () => BookingBloc(

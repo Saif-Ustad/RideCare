@@ -22,6 +22,10 @@ class ReviewLoaded extends ReviewState {
   List<Object?> get props => [reviews];
 }
 
+class ReviewSubmitting extends ReviewState {}
+
+class ReviewAddedSuccessfully extends ReviewState {}
+
 class ReviewError extends ReviewState {
   final String message;
 
