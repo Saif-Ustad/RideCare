@@ -27,8 +27,8 @@ class ProfileSection extends StatelessWidget {
                   (user.userProfileImageUrl == null ||
                           user.userProfileImageUrl!.isEmpty)
                       ? Text(
-                        user.firstName != null && user.firstName!.isNotEmpty
-                            ? user.firstName![0].toUpperCase()
+                        user.displayName != null && user.displayName!.isNotEmpty
+                            ? user.displayName![0].toUpperCase()
                             : '?',
                         style: const TextStyle(
                           fontSize: 32,
@@ -50,7 +50,7 @@ class ProfileSection extends StatelessWidget {
         ),
         const SizedBox(height: 10),
         Text(
-          "${user.firstName} ${user.lastName}",
+          user.displayName ?? "No Display Name",
           style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
         ),
       ],

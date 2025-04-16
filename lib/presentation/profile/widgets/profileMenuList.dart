@@ -9,7 +9,7 @@ class ProfileMenuList extends StatelessWidget {
   const ProfileMenuList({super.key});
 
   final List<Map<String, dynamic>> _menuItems = const [
-    {'icon': Icons.person, 'title': "Your Profile", 'route': ""},
+    {'icon': Icons.person, 'title': "Your Profile", 'route': "/your-profile/1"},
     {
       'icon': Icons.location_on,
       'title': "Manage Address",

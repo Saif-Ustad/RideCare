@@ -56,8 +56,6 @@ class ReviewRemoteDataSourceImpl implements ReviewRemoteDataSource {
   Future<void> addReview(ReviewModel review) async {
     List<String> uploadedImageUrls = [];
 
-    print("images ${review.imageUrls}");
-
     if (review.imageUrls != null && review.imageUrls!.isNotEmpty) {
       for (final filePath in review.imageUrls!) {
         final file = File(filePath);
@@ -71,8 +69,6 @@ class ReviewRemoteDataSourceImpl implements ReviewRemoteDataSource {
         }
       }
     }
-
-    print("uploaded image url : ${uploadedImageUrls}");
 
     final reviewData = {
       'userId': review.userId,

@@ -10,6 +10,7 @@ class UserModel extends UserEntity {
     super.lastName,
     super.userProfileImageUrl,
     super.bookmarkIds,
+    super.gender
   });
 
   // Factory method to create UserModel from Firestore JSON
@@ -22,9 +23,11 @@ class UserModel extends UserEntity {
       firstName: json['firstName'],
       lastName: json['lastName'],
       userProfileImageUrl: json['userProfileImageUrl'],
-      bookmarkIds: json['bookmarkIds'] != null
-          ? List<String>.from(json['bookmarkIds'])
-          : [],
+      gender: json['gender'],
+      bookmarkIds:
+          json['bookmarkIds'] != null
+              ? List<String>.from(json['bookmarkIds'])
+              : [],
     );
   }
 
@@ -39,6 +42,7 @@ class UserModel extends UserEntity {
       'lastName': lastName,
       'userProfileImageUrl': userProfileImageUrl,
       'bookmarkIds': bookmarkIds ?? [],
+      'gender': gender,
     };
   }
 
@@ -52,7 +56,21 @@ class UserModel extends UserEntity {
       firstName: user.firstName,
       lastName: user.lastName,
       userProfileImageUrl: user.photoURL,
-      bookmarkIds: [], // Not available from FirebaseAuth directly
+      bookmarkIds: [],
+    );
+  }
+
+  factory UserModel.fromEntity(UserEntity entity) {
+    return UserModel(
+      uid: entity.uid,
+      email: entity.email,
+      phoneNumber: entity.phoneNumber,
+      displayName: entity.displayName,
+      firstName: entity.firstName,
+      lastName: entity.lastName,
+      userProfileImageUrl: entity.userProfileImageUrl,
+      bookmarkIds: entity.bookmarkIds,
+      gender: entity.gender,
     );
   }
 }

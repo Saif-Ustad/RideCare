@@ -38,6 +38,7 @@ import 'package:ridecare/domain/usecases/service/get_services_for_provider.dart'
 import 'package:ridecare/domain/usecases/serviceProvider/get_all_service_providers.dart';
 import 'package:ridecare/domain/usecases/serviceProvider/get_nearby_service_providers.dart';
 import 'package:ridecare/domain/usecases/user/get_current_user_usecase.dart';
+import 'package:ridecare/domain/usecases/user/update_user_profile_usecase.dart';
 import 'package:ridecare/domain/usecases/vehicle/addVehicleUseCase.dart';
 import 'package:ridecare/domain/usecases/vehicle/deleteVehicleUseCase.dart';
 import 'package:ridecare/domain/usecases/vehicle/getVehiclesUseCase.dart';
@@ -95,7 +96,6 @@ void setupServiceLocator() {
 
   // ✅ Register FirebaseFireStore instance
   sl.registerLazySingleton<FirebaseFirestore>(() => FirebaseFirestore.instance);
-
 
   // Services
   // sl.registerLazySingleton(() => StripeService());
@@ -249,6 +249,7 @@ void setupServiceLocator() {
   );
 
   sl.registerLazySingleton(() => GetCurrentUserUseCase(repository: sl()));
+  sl.registerLazySingleton(() => UpdateUserProfileUseCase(repository: sl()));
 
   // ✅ Register BLoCs
   sl.registerLazySingleton<OnboardingBloc>(() => OnboardingBloc());
@@ -319,7 +320,9 @@ void setupServiceLocator() {
     () => PaymentBloc(stripeService: sl(), stripeCustomer: sl()),
   );
 
-  sl.registerFactory(() => UserBloc(getCurrentUserUseCase: sl()));
+  sl.registerFactory(
+    () => UserBloc(getCurrentUserUseCase: sl(), updateUserProfile: sl()),
+  );
 
   sl.registerFactory(
     () => BookingTrackingBloc(getBookingTrackingUseCase: sl()),

@@ -40,6 +40,7 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
       await fireStore.collection('users').doc(userCredential.user!.uid).set({
         'firstName': firstName,
         'lastName': lastName,
+        'displayName': "$firstName $lastName",
         'email': email,
         'createdAt': DateTime.now(),
       });

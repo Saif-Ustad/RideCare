@@ -23,8 +23,8 @@ class ReviewModel extends ReviewEntity {
     return ReviewModel(
       id: documentId,
       userId: reviewJson['userId'],
-      userName:
-          '${userJson['firstName'] ?? ''} ${userJson['lastName'] ?? ''}'.trim(),
+      userName: userJson['displayName'] ??
+          ('${userJson['firstName'] ?? ''} ${userJson['lastName'] ?? ''}').trim(),
       userProfileImageUrl: userJson['userProfileImageUrl'] ?? "",
       serviceProviderId: reviewJson['serviceProviderId'],
       reviewText: reviewJson['reviewText'],

@@ -16,6 +16,7 @@ import 'package:ridecare/presentation/explore/pages/explore.dart';
 import 'package:ridecare/presentation/location/pages/bookingPages/addLocationFromBooking.dart';
 import 'package:ridecare/presentation/location/pages/bookingPages/selectLocationFromBooking.dart';
 import 'package:ridecare/presentation/profile/pages/profile.dart';
+import 'package:ridecare/presentation/profile/pages/yourProfile.dart';
 import 'package:ridecare/presentation/serviceProvider/pages/appointmentBooking.dart';
 import 'package:ridecare/presentation/serviceProvider/pages/serviceProviderDetails.dart';
 import 'package:ridecare/presentation/splash/pages/splash.dart';
@@ -45,7 +46,9 @@ final GoRouter router = GoRouter(
     GoRoute(path: '/home', builder: (context, state) => const HomePage()),
     GoRoute(path: '/explore', builder: (context, state) => const ExplorePage()),
     GoRoute(path: '/bookmark', builder: (context, state) => BookmarkPage()),
+
     GoRoute(path: '/profile', builder: (context, state) => const ProfilePage()),
+    GoRoute(path: '/your-profile/:id', builder: (context, state) => const YourProfilePage()),
 
     GoRoute(
       path: '/service-provider/:id',

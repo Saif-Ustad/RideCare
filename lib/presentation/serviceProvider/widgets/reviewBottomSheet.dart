@@ -225,6 +225,7 @@ class _ReviewBottomSheetState extends State<ReviewBottomSheet> {
                                     final review = ReviewEntity(
                                       userId: userInfo!.uid,
                                       userName:
+                                          userInfo!.displayName ??
                                           "${userInfo!.firstName} ${userInfo!.lastName}",
                                       serviceProviderId:
                                           widget.serviceProviderId,
