@@ -57,8 +57,8 @@ class ServiceProviderList extends StatelessWidget {
                             onBookmarkToggle: () {
                               context.read<BookmarkBloc>().add(
                                 ToggleBookmarkedServiceProviders(
-                                  currentUser.uid,
-                                  provider.id,
+                                  userId: currentUser.uid,
+                                  serviceProvider: provider,
                                 ),
                               );
                             },

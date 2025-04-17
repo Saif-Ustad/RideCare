@@ -81,7 +81,10 @@ class HeaderSection extends StatelessWidget {
                     () {
                       if (userId != null) {
                         context.read<BookmarkBloc>().add(
-                          ToggleBookmarkedServiceProviders(userId, provider.id),
+                          ToggleBookmarkedServiceProviders(
+                            userId: userId,
+                            serviceProvider: provider,
+                          ),
                         );
                       }
                     },
@@ -132,13 +135,14 @@ class HeaderSection extends StatelessWidget {
                         width: 55,
                         height: 55,
                         fit: BoxFit.cover,
-                        placeholder: (context, url) => Container(
-                          width: 55,
-                          height: 55,
-                          color: Colors.grey[300],
-                        ),
-                        errorWidget: (context, url, error) =>
-                        const Icon(Icons.error),
+                        placeholder:
+                            (context, url) => Container(
+                              width: 55,
+                              height: 55,
+                              color: Colors.grey[300],
+                            ),
+                        errorWidget:
+                            (context, url, error) => const Icon(Icons.error),
                       ),
                     ),
                     if (isLastImage)
@@ -169,7 +173,6 @@ class HeaderSection extends StatelessWidget {
       ),
     );
   }
-
 
   Widget _iconButton(IconData icon, VoidCallback onPressed) {
     return Container(

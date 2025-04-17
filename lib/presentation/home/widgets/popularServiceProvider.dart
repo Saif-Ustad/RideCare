@@ -188,7 +188,7 @@ class _ServiceProviderCard extends StatelessWidget {
             onTap: () {
               if (userId != null) {
                 context.read<BookmarkBloc>().add(
-                  ToggleBookmarkedServiceProviders(userId, provider.id),
+                  ToggleBookmarkedServiceProviders(userId: userId, serviceProvider: provider),
                 );
               }
             },

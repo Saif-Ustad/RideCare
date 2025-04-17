@@ -1,5 +1,7 @@
 import 'package:equatable/equatable.dart';
 
+import '../../../domain/entities/service_provider_entity.dart';
+
 abstract class BookmarkEvent extends Equatable {
   const BookmarkEvent();
 
@@ -15,12 +17,19 @@ class LoadBookmarks extends BookmarkEvent {
   List<Object> get props => [userId];
 }
 
+// class ToggleBookmarkedServiceProviders extends BookmarkEvent {
+//   final String userId;
+//   final String serviceProviderId;
+//
+//   const ToggleBookmarkedServiceProviders(this.userId, this.serviceProviderId);
+//
+//   @override
+//   List<Object> get props => [userId, serviceProviderId];
+// }
+
 class ToggleBookmarkedServiceProviders extends BookmarkEvent {
   final String userId;
-  final String serviceProviderId;
+  final ServiceProviderEntity serviceProvider;
 
-  const ToggleBookmarkedServiceProviders(this.userId, this.serviceProviderId);
-
-  @override
-  List<Object> get props => [userId, serviceProviderId];
+  const ToggleBookmarkedServiceProviders({required this.userId, required this.serviceProvider});
 }

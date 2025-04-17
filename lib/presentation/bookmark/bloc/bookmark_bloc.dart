@@ -1,32 +1,32 @@
-import 'package:flutter_bloc/flutter_bloc.dart';
-import '../../../domain/usecases/bookmark/get_bookmarked_service_providers.dart';
-import '../../../domain/usecases/bookmark/toggle_bookmark_service_provider.dart';
-import 'bookmark_event.dart';
-import 'bookmark_state.dart';
+// import 'package:flutter_bloc/flutter_bloc.dart';
+// import '../../../domain/usecases/bookmark/get_bookmarked_service_providers.dart';
+// import '../../../domain/usecases/bookmark/toggle_bookmark_service_provider.dart';
+// import 'bookmark_event.dart';
+// import 'bookmark_state.dart';
+//
+// class BookmarkBloc extends Bloc<BookmarkEvent, BookmarkState> {
+//   final GetBookmarkedServiceProviders getBookmarks;
+//   final ToggleBookmarkedServiceProvider toggleBookmark;
+//
+//   BookmarkBloc({
+//     required this.getBookmarks,
+//     required this.toggleBookmark,
+//   }) : super(BookmarkInitial()) {
+//     on<LoadBookmarks>((event, emit) async {
+//       emit(BookmarkLoading());
+//       final result = await getBookmarks(event.userId);
+//       emit(BookmarkLoaded(result));
+//     });
+//
+//     on<ToggleBookmarkedServiceProviders>((event, emit) async {
+//       await toggleBookmark(event.userId, event.serviceProviderId);
+//       final updated = await getBookmarks(event.userId);
+//       emit(BookmarkLoaded(updated));
+//     });
+//   }
+// }
 
-class BookmarkBloc extends Bloc<BookmarkEvent, BookmarkState> {
-  final GetBookmarkedServiceProviders getBookmarks;
-  final ToggleBookmarkedServiceProvider toggleBookmark;
-
-  BookmarkBloc({
-    required this.getBookmarks,
-    required this.toggleBookmark,
-  }) : super(BookmarkInitial()) {
-    on<LoadBookmarks>((event, emit) async {
-      emit(BookmarkLoading());
-      final result = await getBookmarks(event.userId);
-      emit(BookmarkLoaded(result));
-    });
-
-    on<ToggleBookmarkedServiceProviders>((event, emit) async {
-      await toggleBookmark(event.userId, event.serviceProviderId);
-      final updated = await getBookmarks(event.userId);
-      emit(BookmarkLoaded(updated));
-    });
-  }
-}
-
-
+//
 // import 'package:flutter_bloc/flutter_bloc.dart';
 // import '../../../domain/entities/service_provider_entity.dart';
 // import '../../../domain/usecases/bookmark/get_bookmarked_service_providers.dart';
@@ -95,3 +95,66 @@ class BookmarkBloc extends Bloc<BookmarkEvent, BookmarkState> {
 //     }
 //   }
 // }
+
+import 'package:flutter_bloc/flutter_bloc.dart';
+import '../../../domain/entities/service_provider_entity.dart';
+import '../../../domain/usecases/bookmark/get_bookmarked_service_providers.dart';
+import '../../../domain/usecases/bookmark/toggle_bookmark_service_provider.dart';
+import 'bookmark_event.dart';
+import 'bookmark_state.dart';
+
+class BookmarkBloc extends Bloc<BookmarkEvent, BookmarkState> {
+  final GetBookmarkedServiceProviders getBookmarks;
+  final ToggleBookmarkedServiceProvider toggleBookmark;
+
+  BookmarkBloc({required this.getBookmarks, required this.toggleBookmark})
+    : super(BookmarkInitial()) {
+    on<LoadBookmarks>(_onLoadBookmarks);
+    on<ToggleBookmarkedServiceProviders>(_onToggleBookmark);
+  }
+
+  Future<void> _onLoadBookmarks(
+    LoadBookmarks event,
+    Emitter<BookmarkState> emit,
+  ) async {
+    emit(BookmarkLoading());
+    try {
+      final result = await getBookmarks(event.userId);
+      emit(BookmarkLoaded(result));
+    } catch (e) {
+      emit(BookmarkError('Failed to load bookmarks: ${e.toString()}'));
+    }
+  }
+
+  Future<void> _onToggleBookmark(
+    ToggleBookmarkedServiceProviders event,
+    Emitter<BookmarkState> emit,
+  ) async {
+    if (state is! BookmarkLoaded) return;
+
+    final currentState = state as BookmarkLoaded;
+    final currentList = List<ServiceProviderEntity>.from(
+      currentState.bookmarkedServiceProviders,
+    );
+
+    final index = currentList.indexWhere(
+      (sp) => sp.id == event.serviceProvider.id,
+    );
+    final wasBookmarked = index != -1;
+
+    if (wasBookmarked) {
+      currentList.removeAt(index);
+    } else {
+      currentList.add(event.serviceProvider);
+    }
+
+    emit(BookmarkLoaded(currentList));
+
+    try {
+      await toggleBookmark(event.userId, event.serviceProvider.id);
+    } catch (e) {
+      emit(BookmarkLoaded(currentState.bookmarkedServiceProviders));
+      emit(BookmarkError('Bookmark update failed: ${e.toString()}'));
+    }
+  }
+}
