@@ -2,6 +2,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 import 'package:ridecare/core/configs/theme/app_colors.dart';
 import '../bloc/specialOffers/special_offer_bloc.dart';
 import '../bloc/specialOffers/special_offer_state.dart';
@@ -13,7 +14,7 @@ class SpecialOfferSection extends StatelessWidget {
   Widget build(BuildContext context) {
     return Column(
       children: [
-        _buildSectionHeader("#SpecialForYou"),
+        _buildSectionHeader(context, "#SpecialForYou"),
         SizedBox(height: 10),
         BlocBuilder<SpecialOfferBloc, SpecialOfferState>(
           builder: (context, state) {
@@ -169,7 +170,7 @@ class SpecialOfferSection extends StatelessWidget {
     );
   }
 
-  Widget _buildSectionHeader(String title) {
+  Widget _buildSectionHeader(BuildContext context, String title) {
     return Padding(
       padding: const EdgeInsets.only(right: 15),
       child: Row(
@@ -183,12 +184,19 @@ class SpecialOfferSection extends StatelessWidget {
               color: AppColors.black,
             ),
           ),
-          Text(
-            "See All",
-            style: TextStyle(
-              fontSize: 14,
-              fontWeight: FontWeight.w500,
-              color: AppColors.primary,
+          GestureDetector(
+            onTap: () {
+              context.push(
+                '/special-offers',
+              );
+            },
+            child: Text(
+              "See All",
+              style: TextStyle(
+                fontSize: 14,
+                fontWeight: FontWeight.w500,
+                color: AppColors.primary,
+              ),
             ),
           ),
         ],

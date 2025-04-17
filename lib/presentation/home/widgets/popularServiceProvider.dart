@@ -19,23 +19,32 @@ class PopularServiceProviderSection extends StatelessWidget {
   Widget build(BuildContext context) {
     return Column(
       children: [
-        _buildSectionHeader("Popular Services Provider"),
+        _buildSectionHeader(context, "Popular Services Provider"),
         const SizedBox(height: 10),
         _ServiceProviderList(),
       ],
     );
   }
 
-  Widget _buildSectionHeader(String title) {
+  Widget _buildSectionHeader(BuildContext context, String title) {
     return Padding(
       padding: const EdgeInsets.only(right: 15),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Text(title, style: _textStyle(16, FontWeight.w600, AppColors.black)),
-          Text(
-            "See All",
-            style: _textStyle(14, FontWeight.w500, AppColors.primary),
+          GestureDetector(
+            onTap: () {
+              context.push('/popular-service-providers');
+            },
+            child: Text(
+              "See All",
+              style: TextStyle(
+                fontSize: 14,
+                fontWeight: FontWeight.w500,
+                color: AppColors.primary,
+              ),
+            ),
           ),
         ],
       ),
@@ -61,7 +70,9 @@ class _ServiceProviderList extends StatelessWidget {
 
               if (bookmarkState is BookmarkLoaded) {
                 bookmarkedIds =
-                    bookmarkState.bookmarkedServiceProviders.map((e) => e.id).toList();
+                    bookmarkState.bookmarkedServiceProviders
+                        .map((e) => e.id)
+                        .toList();
               }
 
               return CarouselSlider(
@@ -188,7 +199,10 @@ class _ServiceProviderCard extends StatelessWidget {
             onTap: () {
               if (userId != null) {
                 context.read<BookmarkBloc>().add(
-                  ToggleBookmarkedServiceProviders(userId: userId, serviceProvider: provider),
+                  ToggleBookmarkedServiceProviders(
+                    userId: userId,
+                    serviceProvider: provider,
+                  ),
                 );
               }
             },
