@@ -16,94 +16,141 @@ class BookmarkPage extends StatefulWidget {
 }
 
 class _BookmarkPageState extends State<BookmarkPage> {
-
   final ScrollController _scrollController = ScrollController();
   bool _isNavBarVisible = true;
+  bool _isSearching = false;
+  final TextEditingController _searchController = TextEditingController();
+  String _searchQuery = '';
 
   @override
   void initState() {
     super.initState();
-
     _scrollController.addListener(() {
       if (_scrollController.position.userScrollDirection ==
           ScrollDirection.reverse) {
-        if (_isNavBarVisible) {
-          setState(() => _isNavBarVisible = false);
-        }
+        if (_isNavBarVisible) setState(() => _isNavBarVisible = false);
       } else if (_scrollController.position.userScrollDirection ==
           ScrollDirection.forward) {
-        if (!_isNavBarVisible) {
-          setState(() => _isNavBarVisible = true);
-        }
+        if (!_isNavBarVisible) setState(() => _isNavBarVisible = true);
       }
     });
   }
-
 
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<BookmarkBloc, BookmarkState>(
       builder: (context, state) {
+        final allBookmarks =
+            state is BookmarkLoaded ? state.bookmarkedServiceProviders : [];
+        final filteredBookmarks =
+            allBookmarks
+                .where(
+                  (provider) => provider.name.toLowerCase().contains(
+                    _searchQuery.toLowerCase(),
+                  ),
+                )
+                .toList();
+
         return Scaffold(
           backgroundColor: Colors.white,
           appBar: AppBar(
             backgroundColor: Colors.white,
             elevation: 0,
             leading: buildLeadingIconButton(() => context.go('/home')),
-            title: const Text(
-              "Bookmark",
-              style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.w500,
-                color: Colors.black,
-              ),
-            ),
+            title:
+                _isSearching
+                    ? _buildSearchBar()
+                    : const Text(
+                      "Bookmark",
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.w500,
+                        color: Colors.black,
+                      ),
+                    ),
             centerTitle: true,
-            actions: [buildActionIconButton(() {})],
+            actions: [
+              !_isSearching
+                  ? buildActionIconButton(() {
+                    setState(() {
+                      _isSearching = true;
+                    });
+                  })
+                  : IconButton(
+                    icon: const Icon(Icons.clear, color: Colors.black),
+                    onPressed: () {
+                      setState(() {
+                        _searchController.clear();
+                        _searchQuery = '';
+                        _isSearching = false;
+                      });
+                    },
+                  ),
+            ],
           ),
-
           body: Stack(
             children: [
               Padding(
                 padding: const EdgeInsets.all(15),
-                child: state is BookmarkLoaded
-                    ? (state.bookmarkedServiceProviders.isEmpty
-                    ? const Center(child: Text('No bookmarks found.'))
-                    : ListView.builder(
-                  controller: _scrollController,
-                  clipBehavior: Clip.none,
-                  itemCount: state.bookmarkedServiceProviders.length,
-                  itemBuilder: (context, index) => Padding(
-                    padding: const EdgeInsets.only(bottom: 12),
-                    child: ServiceCard(
-                      serviceProvider: state.bookmarkedServiceProviders[index],
-                    ),
-                  ),
-                ))
-                    : state is BookmarkLoading
-                    ? const Center(child: CircularProgressIndicator())
-                    : const Center(child: Text('Something went wrong.')),
+                child:
+                    state is BookmarkLoaded
+                        ? (filteredBookmarks.isEmpty
+                            ? const Center(child: Text('No bookmarks found.'))
+                            : ListView.builder(
+                              controller: _scrollController,
+                              clipBehavior: Clip.none,
+                              itemCount: filteredBookmarks.length,
+                              itemBuilder:
+                                  (context, index) => Padding(
+                                    padding: const EdgeInsets.only(bottom: 12),
+                                    child: ServiceCard(
+                                      serviceProvider: filteredBookmarks[index],
+                                    ),
+                                  ),
+                            ))
+                        : state is BookmarkLoading
+                        ? const Center(child: CircularProgressIndicator())
+                        : const Center(child: Text('Something went wrong.')),
               ),
             ],
           ),
-
-
-
           bottomNavigationBar: AnimatedContainer(
-            duration: Duration(milliseconds: 300),
+            duration: const Duration(milliseconds: 300),
             height: _isNavBarVisible ? kBottomNavigationBarHeight : 0,
-            // Animate height
             child: Wrap(
               children: [
                 Opacity(
-                  opacity: _isNavBarVisible ? 1.0 : 0.0, // Fade effect
-                  child: BottomNavigationBarSection(),
+                  opacity: _isNavBarVisible ? 1.0 : 0.0,
+                  child: const BottomNavigationBarSection(),
                 ),
               ],
             ),
           ),
         );
-      }
+      },
+    );
+  }
+
+  Widget _buildSearchBar() {
+    return TextField(
+      controller: _searchController,
+      autofocus: true,
+      onChanged: (value) {
+        setState(() {
+          _searchQuery = value;
+        });
+      },
+      decoration: InputDecoration(
+        hintText: 'Search bookmarks...',
+        contentPadding: const EdgeInsets.symmetric(horizontal: 15),
+        filled: true,
+        fillColor: AppColors.lightGray,
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(20),
+          borderSide: BorderSide.none,
+        ),
+      ),
+      style: const TextStyle(fontSize: 14),
     );
   }
 
