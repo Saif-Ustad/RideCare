@@ -15,7 +15,7 @@ class ChooseCategorySection extends StatelessWidget {
       padding: const EdgeInsets.only(right: 15),
       child: Column(
         children: [
-          _buildSectionHeader(context, "Choose Services"),
+          _buildSectionHeader(context, "Choose Category"),
           SizedBox(height: 10),
           BlocBuilder<CategoryBloc, CategoryState>(
             builder: (context, state) {
