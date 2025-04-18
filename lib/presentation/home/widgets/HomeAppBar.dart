@@ -101,7 +101,7 @@ class HomeAppBar extends StatelessWidget {
           ),
           child: IconButton(
             icon: Icon(Icons.notifications, color: Colors.white),
-            onPressed: () async {},
+            onPressed: () => { context.push("/notification")},
           ),
         ),
 

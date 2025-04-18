@@ -13,6 +13,7 @@ import 'package:ridecare/presentation/bookmark/pages/bookmark.dart';
 import 'package:ridecare/presentation/chooseService/pages/chooseServices.dart';
 import 'package:ridecare/presentation/home/pages/home.dart';
 import 'package:ridecare/presentation/explore/pages/explore.dart';
+import 'package:ridecare/presentation/home/pages/notification.dart';
 import 'package:ridecare/presentation/home/pages/popularServiceProvider.dart';
 import 'package:ridecare/presentation/home/pages/specialOffers.dart';
 import 'package:ridecare/presentation/location/pages/bookingPages/addLocationFromBooking.dart';
@@ -57,6 +58,7 @@ final GoRouter router = GoRouter(
         return ChooseCategoryPage(categoryId: categoryId);
       },
     ),
+    GoRoute(path: '/notification', builder: (context, state) => const NotificationPage()),
 
 
 
