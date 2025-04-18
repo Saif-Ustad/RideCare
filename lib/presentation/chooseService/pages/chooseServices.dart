@@ -5,7 +5,6 @@ import '../../../core/configs/theme/app_colors.dart';
 import '../../booking/bloc/booking_bloc.dart';
 import '../../booking/bloc/booking_event.dart';
 import '../../serviceProvider/bloc/services/service_bloc.dart';
-import '../../serviceProvider/bloc/services/service_event.dart';
 import '../../serviceProvider/bloc/services/service_state.dart';
 import '../widgets/serviceOption.dart';
 import '../../../../domain/entities/service_entity.dart';

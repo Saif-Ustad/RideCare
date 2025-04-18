@@ -4,13 +4,15 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:ridecare/common/widgets/bottomNavigationBar/bottomNavigationBar.dart';
 import 'package:ridecare/core/configs/theme/app_colors.dart';
 import 'package:ridecare/presentation/home/widgets/HomeAppBar.dart';
-import 'package:ridecare/presentation/home/widgets/chooseServices.dart';
+import 'package:ridecare/presentation/home/widgets/chooseCategory.dart';
 import 'package:ridecare/presentation/home/widgets/popularServiceProvider.dart';
 import 'package:ridecare/presentation/home/widgets/specialOfferCarousel.dart';
 import '../../bookmark/bloc/bookmark_bloc.dart';
 import '../../bookmark/bloc/bookmark_event.dart';
 import '../../vehicles/bloc/vehicle_bloc.dart';
 import '../../vehicles/bloc/vehicle_event.dart';
+import '../bloc/category/category_bloc.dart';
+import '../bloc/category/category_event.dart';
 import '../bloc/serviceProvider/service_provider_bloc.dart';
 import '../bloc/serviceProvider/service_provider_event.dart';
 import '../bloc/specialOffers/special_offer_bloc.dart';
@@ -40,6 +42,7 @@ class _HomePageState extends State<HomePage> {
     context.read<UserBloc>().add(LoadUserEvent());
     context.read<SpecialOfferBloc>().add(FetchSpecialOffers());
     context.read<ServiceProviderBloc>().add(FetchAllServiceProviders());
+    context.read<CategoryBloc>().add(FetchCategories());
 
     _scrollController.addListener(() {
       if (_scrollController.position.userScrollDirection ==
@@ -87,7 +90,7 @@ class _HomePageState extends State<HomePage> {
                       children: [
                         SpecialOfferSection(),
                         SizedBox(height: 20),
-                        ChooseServicesSection(),
+                        ChooseCategorySection(),
                         SizedBox(height: 20),
                         PopularServiceProviderSection(),
                         SizedBox(height: 20),

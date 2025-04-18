@@ -24,6 +24,7 @@ import 'package:ridecare/presentation/serviceProvider/pages/serviceProviderDetai
 import 'package:ridecare/presentation/splash/pages/splash.dart';
 import '../../../common/helper/prefService.dart';
 import '../../../presentation/auth/pages/form.dart';
+import '../../../presentation/home/pages/chooseCategory.dart';
 import '../../../presentation/location/pages/profilePages/addLocationFromProfile.dart';
 import '../../../presentation/location/pages/profilePages/selectLocationFromProfile.dart';
 import '../../../presentation/onboarding/pages/onboarding.dart';
@@ -49,6 +50,14 @@ final GoRouter router = GoRouter(
 
     GoRoute(path: '/special-offers', builder: (context, state) => const SpecialOffersPage()),
     GoRoute(path: '/popular-service-providers', builder: (context, state) => const PopularServiceProviderPage()),
+    GoRoute(
+      path: '/choose-category',
+      builder: (context, state) {
+        final categoryId = state.uri.queryParameters['category'] ?? 'repairs';
+        return ChooseCategoryPage(categoryId: categoryId);
+      },
+    ),
+
 
 
     GoRoute(path: '/explore', builder: (context, state) => const ExplorePage()),
