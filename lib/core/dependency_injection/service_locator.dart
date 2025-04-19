@@ -7,6 +7,7 @@ import 'package:ridecare/data/datasources/booking_tracking_remote_datasource.dar
 import 'package:ridecare/data/datasources/bookmark_remote_datasource.dart';
 import 'package:ridecare/data/datasources/category_remote_datasource.dart';
 import 'package:ridecare/data/datasources/user_remote_datasource.dart';
+import 'package:ridecare/data/datasources/wallet_remote_datasource.dart';
 import 'package:ridecare/data/repositories/address_repository_impl.dart';
 import 'package:ridecare/data/repositories/auth_repository_impl.dart';
 import 'package:ridecare/data/repositories/booking_repository_impl.dart';
@@ -17,12 +18,14 @@ import 'package:ridecare/data/repositories/promo_code_repository_Impl.dart';
 import 'package:ridecare/data/repositories/service_provider_repository_impl.dart';
 import 'package:ridecare/data/repositories/user_repository_impl.dart';
 import 'package:ridecare/data/repositories/vehicle_repository_impl.dart';
+import 'package:ridecare/data/repositories/wallet_repository_impl.dart';
 import 'package:ridecare/domain/repositories/auth_repository.dart';
 import 'package:ridecare/domain/repositories/booking_tracking_repository.dart';
 import 'package:ridecare/domain/repositories/bookmark_repository.dart';
 import 'package:ridecare/domain/repositories/category_repository.dart';
 import 'package:ridecare/domain/repositories/service_provider_repository.dart';
 import 'package:ridecare/domain/repositories/user_repository.dart';
+import 'package:ridecare/domain/repositories/wallet_repository.dart';
 import 'package:ridecare/domain/usecases/address/add_address.dart';
 import 'package:ridecare/domain/usecases/address/get_user_addresses.dart';
 import 'package:ridecare/domain/usecases/auth/register_with_email.dart';
@@ -47,6 +50,10 @@ import 'package:ridecare/domain/usecases/vehicle/addVehicleUseCase.dart';
 import 'package:ridecare/domain/usecases/vehicle/deleteVehicleUseCase.dart';
 import 'package:ridecare/domain/usecases/vehicle/getVehiclesUseCase.dart';
 import 'package:ridecare/domain/usecases/vehicle/updateVehicleUseCase.dart';
+import 'package:ridecare/domain/usecases/wallet/add_money_to_wallet_usecase.dart';
+import 'package:ridecare/domain/usecases/wallet/add_transaction_usecase.dart';
+import 'package:ridecare/domain/usecases/wallet/get_transactions_usecase.dart';
+import 'package:ridecare/domain/usecases/wallet/get_wallet_balance_usecase.dart';
 import 'package:ridecare/presentation/auth/bloc/auth_bloc.dart';
 import 'package:ridecare/presentation/auth/bloc/otp_bloc.dart';
 import 'package:ridecare/presentation/auth/bloc/password_toggle_bloc.dart';
@@ -60,6 +67,7 @@ import 'package:ridecare/presentation/home/bloc/user/user_bloc.dart';
 import 'package:ridecare/presentation/home/pages/home.dart';
 import 'package:ridecare/presentation/onboarding/bloc/onboarding_bloc.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:ridecare/presentation/wallet/bloc/wallet_bloc.dart';
 
 import '../../data/datasources/address_remote_datasource.dart';
 import '../../data/datasources/booking_remote_datasource.dart';
@@ -163,6 +171,10 @@ void setupServiceLocator() {
     () => CategoryRemoteDatasourceImpl(firestore: sl()),
   );
 
+  sl.registerLazySingleton<WalletRemoteDataSource>(
+    () => WalletRemoteDataSourceImpl(firestore: sl()),
+  );
+
   // ✅ Register Repository
   sl.registerLazySingleton<AuthRepository>(
     () => AuthRepositoryImpl(remoteDataSource: sl()),
@@ -216,6 +228,10 @@ void setupServiceLocator() {
     () => CategoryRepositoryImpl(remoteDataSource: sl()),
   );
 
+  sl.registerLazySingleton<WalletRepository>(
+    () => WalletRepositoryImpl(remoteDataSource: sl()),
+  );
+
   // ✅ Register Use Cases
   sl.registerLazySingleton(() => RegisterWithEmail(repository: sl()));
   sl.registerLazySingleton(() => SignInWithEmail(repository: sl()));
@@ -265,6 +281,13 @@ void setupServiceLocator() {
   sl.registerLazySingleton(() => UpdateUserProfileUseCase(repository: sl()));
 
   sl.registerLazySingleton(() => GetAllCategoriesUseCase(repository: sl()));
+
+  sl.registerLazySingleton(() => GetWalletBalanceUseCase(repository: sl()));
+  sl.registerLazySingleton(() => AddWalletTransactionUseCase(repository: sl()));
+  sl.registerLazySingleton(
+    () => GetWalletTransactionsUseCase(repository: sl()),
+  );
+  sl.registerLazySingleton(() => AddMoneyToWalletUseCase(repository: sl()));
 
   // ✅ Register BLoCs
   sl.registerLazySingleton<OnboardingBloc>(() => OnboardingBloc());
@@ -344,6 +367,15 @@ void setupServiceLocator() {
   );
 
   sl.registerFactory(() => CategoryBloc(getAllCategoriesUseCase: sl()));
+
+  sl.registerFactory(
+    () => WalletBloc(
+      getBalanceUseCase: sl(),
+      getTransactionsUseCase: sl(),
+      addTransactionUseCase: sl(),
+      addMoneyToWalletUseCase: sl(),
+    ),
+  );
 
   sl.registerLazySingleton<GoRouter>(
     () => GoRouter(

@@ -22,6 +22,7 @@ import 'package:ridecare/presentation/onboarding/bloc/onboarding_bloc.dart';
 import 'package:ridecare/presentation/serviceProvider/bloc/reviews/review_bloc.dart';
 import 'package:ridecare/presentation/serviceProvider/bloc/services/service_bloc.dart';
 import 'package:ridecare/presentation/vehicles/bloc/vehicle_bloc.dart';
+import 'package:ridecare/presentation/wallet/bloc/wallet_bloc.dart';
 
 import 'core/stripe_service/stripe_service.dart';
 import 'firebase_options.dart';
@@ -67,6 +68,7 @@ class MyApp extends StatelessWidget {
           create: (context) => sl<BookingTrackingBloc>(),
         ),
         BlocProvider<CategoryBloc>(create: (context) => sl<CategoryBloc>()),
+        BlocProvider<WalletBloc>(create: (context) => sl<WalletBloc>()),
       ],
       child: PopScope(
         canPop: true,

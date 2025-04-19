@@ -4,11 +4,15 @@ import 'package:go_router/go_router.dart';
 
 import '../../../common/widgets/bottomBar/bottomBar.dart';
 import '../../../core/configs/theme/app_colors.dart';
+import '../../../domain/entities/wallet_transaction_entity.dart';
 import '../../booking/bloc/booking_bloc.dart';
 import '../../booking/bloc/booking_event.dart';
 import '../../booking/bloc/booking_state.dart';
 import '../../home/bloc/user/user_bloc.dart';
 import '../../home/bloc/user/user_state.dart';
+import '../../wallet/bloc/wallet_bloc.dart';
+import '../../wallet/bloc/wallet_event.dart';
+import '../../wallet/bloc/wallet_state.dart';
 import '../bloc/payment/payment_bloc.dart';
 import '../bloc/payment/payment_event.dart';
 import '../bloc/payment/payment_state.dart';
@@ -24,6 +28,17 @@ class PaymentGatewayPage extends StatefulWidget {
 
 class _PaymentGatewayPageState extends State<PaymentGatewayPage> {
   String _selectedPayment = "Cash";
+  double walletBalance = 0;
+
+  @override
+  void initState() {
+    super.initState();
+
+    final userState = context.read<UserBloc>().state;
+    if (userState is UserLoaded) {
+      context.read<WalletBloc>().add(LoadWalletBalance(userState.user.uid));
+    }
+  }
 
   void _onPaymentSelected(String paymentMethod) {
     setState(() {
@@ -35,10 +50,26 @@ class _PaymentGatewayPageState extends State<PaymentGatewayPage> {
   Widget build(BuildContext context) {
     return MultiBlocListener(
       listeners: [
+        BlocListener<WalletBloc, WalletState>(
+          listener: (context, state) {
+            if (state is WalletLoaded) {
+              setState(() {
+                walletBalance = state.balance;
+              });
+            } else if (state is WalletError) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(content: Text("Error: ${state.message}")),
+              );
+            }
+          },
+        ),
+
         BlocListener<PaymentBloc, PaymentState>(
           listener: (context, state) {
             if (state is PaymentSuccess) {
-              context.read<BookingBloc>().add(SubmitBooking(paymentMode: "Card"));
+              context.read<BookingBloc>().add(
+                SubmitBooking(paymentMode: "Card"),
+              );
 
               ScaffoldMessenger.of(context).showSnackBar(
                 const SnackBar(content: Text("Payment Successful")),
@@ -84,16 +115,32 @@ class _PaymentGatewayPageState extends State<PaymentGatewayPage> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Text("Cash", style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500)),
+              const Text(
+                "Cash",
+                style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+              ),
               _buildPaymentOption("Cash", Icons.account_balance_wallet, "Cash"),
               const SizedBox(height: 10),
-              const Text("Wallet", style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500)),
-              _buildPaymentOption("Wallet", Icons.wallet, "Wallet"),
+              const Text(
+                "Wallet",
+                style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+              ),
+              _buildWalletPaymentOption(),
               const SizedBox(height: 10),
-              const Text("Credit & Debit Card", style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500)),
-              _buildCardPaymentOption("Credit & Debit Card", Icons.credit_card, "Add Card"),
+              const Text(
+                "Credit & Debit Card",
+                style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+              ),
+              _buildCardPaymentOption(
+                "Credit & Debit Card",
+                Icons.credit_card,
+                "Add Card",
+              ),
               const SizedBox(height: 10),
-              const Text("More Payment Options", style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500)),
+              const Text(
+                "More Payment Options",
+                style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+              ),
               _buildPaymentOption("Paypal", Icons.paypal, "Paypal"),
               _buildPaymentOption("Apple Pay", Icons.apple, "Apple Pay"),
               _buildPaymentOption("Google Pay", Icons.payment, "Google Pay"),
@@ -103,7 +150,9 @@ class _PaymentGatewayPageState extends State<PaymentGatewayPage> {
         bottomNavigationBar: CustomBottomBar(
           text: "Continue",
           onPressed: () {
-            context.read<BookingBloc>().add(SubmitBooking(paymentMode: _selectedPayment));
+            context.read<BookingBloc>().add(
+              SubmitBooking(paymentMode: _selectedPayment),
+            );
           },
         ),
       ),
@@ -161,7 +210,8 @@ class _PaymentGatewayPageState extends State<PaymentGatewayPage> {
                 Radio<String>(
                   value: value,
                   groupValue: _selectedPayment,
-                  onChanged: (String? newValue) => _onPaymentSelected(newValue!),
+                  onChanged:
+                      (String? newValue) => _onPaymentSelected(newValue!),
                   activeColor: AppColors.primary,
                   visualDensity: VisualDensity.compact,
                 ),
@@ -196,7 +246,9 @@ class _PaymentGatewayPageState extends State<PaymentGatewayPage> {
               );
             } else {
               ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('User not loaded. Please log in.')),
+                const SnackBar(
+                  content: Text('User not loaded. Please log in.'),
+                ),
               );
             }
           },
@@ -216,12 +268,116 @@ class _PaymentGatewayPageState extends State<PaymentGatewayPage> {
                     Text(title, style: const TextStyle(fontSize: 14)),
                   ],
                 ),
-                const Icon(Icons.arrow_forward_ios, color: AppColors.darkGrey, size: 14),
+                const Icon(
+                  Icons.arrow_forward_ios,
+                  color: AppColors.darkGrey,
+                  size: 14,
+                ),
               ],
             ),
           ),
         ),
       ),
+    );
+  }
+
+  Widget _buildWalletPaymentOption() {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 4.0),
+      child: Material(
+        color:
+            _selectedPayment == "Wallet" ? AppColors.lightGray : Colors.white,
+        borderRadius: BorderRadius.circular(6),
+        child: InkWell(
+          borderRadius: BorderRadius.circular(6),
+          splashColor: AppColors.primary.withOpacity(0.2),
+          onTap: () {
+            if (walletBalance >= widget.amount) {
+              _showConfirmationDialog();
+            } else {
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(content: Text("Insufficient wallet balance")),
+              );
+            }
+          },
+          child: Container(
+            height: 50,
+            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 12),
+            decoration: BoxDecoration(
+              border: Border.all(
+                color:
+                    _selectedPayment == "Wallet"
+                        ? AppColors.primary
+                        : Colors.grey.shade300,
+                width: _selectedPayment == "Wallet" ? 1.5 : 1,
+              ),
+              borderRadius: BorderRadius.circular(6),
+            ),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Row(
+                  children: [
+                    Icon(Icons.wallet, color: AppColors.primary, size: 20),
+                    const SizedBox(width: 8),
+                    Text("Wallet", style: const TextStyle(fontSize: 14)),
+                  ],
+                ),
+                Text("₹$walletBalance", style: const TextStyle(fontSize: 14)),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  void _showConfirmationDialog() {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          backgroundColor: Colors.white,
+          title: const Text("Confirm Payment"),
+          content: Text(
+            "Are you sure you want to proceed with the payment of ₹${widget.amount} using your wallet balance?",
+          ),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () {
+                context.pop();
+              },
+              child: const Text("Cancel"),
+            ),
+            TextButton(
+              onPressed: () {
+                final userState = context.read<UserBloc>().state;
+                if (userState is UserLoaded) {
+                  final uid = userState.user.uid;
+                  final transaction = WalletTransactionEntity(
+                    title: "Payment for Booking",
+                    amount: widget.amount,
+                    timestamp: DateTime.now(),
+                    balanceAfter: walletBalance - widget.amount,
+                    isCredit: false,
+                  );
+
+                  context.read<WalletBloc>().add(
+                    AddWalletTransaction(uid, transaction),
+                  );
+                }
+
+                context.read<BookingBloc>().add(
+                  SubmitBooking(paymentMode: "Wallet"),
+                );
+
+                context.pop();
+              },
+              child: const Text("Confirm"),
+            ),
+          ],
+        );
+      },
     );
   }
 }

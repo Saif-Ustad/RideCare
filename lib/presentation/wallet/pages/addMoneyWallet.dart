@@ -1,4 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
+
+import '../../../core/configs/theme/app_colors.dart';
+import '../../home/bloc/user/user_bloc.dart';
+import '../../home/bloc/user/user_state.dart';
+import '../bloc/wallet_bloc.dart';
+import '../bloc/wallet_event.dart';
+import '../bloc/wallet_state.dart';
 
 class AddMoneyWalletPage extends StatefulWidget {
   const AddMoneyWalletPage({super.key});
@@ -39,105 +48,172 @@ class _AddMoneyWalletPageState extends State<AddMoneyWalletPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-      resizeToAvoidBottomInset: false,
       appBar: AppBar(
         backgroundColor: Colors.white,
         elevation: 0,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.black),
-          onPressed: () => Navigator.pop(context),
-        ),
+        leading: _buildLeadingIconButton(() => context.pop()),
         title: const Text(
           "Add Money",
-          style: TextStyle(color: Colors.black, fontWeight: FontWeight.w600),
+          style: TextStyle(
+            fontSize: 18,
+            fontWeight: FontWeight.w500,
+            color: Colors.black,
+          ),
         ),
         centerTitle: true,
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
-        child: Column(
-          children: [
-            _buildWalletCard(),
-            const SizedBox(height: 20),
-            _buildAmountButtons(),
-            const SizedBox(height: 16),
-            _buildTextField(),
-            const SizedBox(height: 20),
-            _buildAddMoneyButton(),
-          ],
+        child: BlocConsumer<WalletBloc, WalletState>(
+          listener: (context, state) {
+            if (state is WalletError) {
+              ScaffoldMessenger.of(
+                context,
+              ).showSnackBar(SnackBar(content: Text(state.message)));
+            }
+            if (state is WalletLoaded) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text("Added \₹${_amountController.text} to wallet!"),
+                ),
+              );
+            }
+          },
+          builder: (context, state) {
+            if (state is WalletLoading) {
+              return const Center(child: CircularProgressIndicator());
+            }
+
+            return Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                _buildWalletCard(state),
+                const SizedBox(height: 24),
+                const Text(
+                  "Select Amount",
+                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+                ),
+                const SizedBox(height: 12),
+                _buildAmountButtons(),
+                const SizedBox(height: 20),
+                _buildTextField(),
+                const SizedBox(height: 24),
+                _buildAddMoneyButton(),
+              ],
+            );
+          },
         ),
       ),
     );
   }
 
-  Widget _buildWalletCard() {
+  Widget _buildWalletCard(WalletState state) {
+    String balance = '0.00';
+    if (state is WalletLoaded) {
+      balance = state.balance.toStringAsFixed(2);
+    }
+
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
       decoration: BoxDecoration(
-        color: const Color(0xFFEDEAFF),
-        borderRadius: BorderRadius.circular(16),
+        gradient: const LinearGradient(
+          colors: [Color(0xFF6D5DF6), Color(0xFF9E79F2)],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+        borderRadius: BorderRadius.circular(20),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.1),
+            blurRadius: 10,
+            offset: const Offset(0, 5),
+          ),
+        ],
       ),
-      child: const Row(
+      child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(
+              const Text(
                 "Wallet Balance",
-                style: TextStyle(color: Colors.black54, fontSize: 14),
+                style: TextStyle(color: Colors.white70, fontSize: 14),
               ),
-              SizedBox(height: 8),
+              const SizedBox(height: 8),
               Text(
-                "\$ 12000.00",
-                style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+                "\₹ $balance",
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 24,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
             ],
           ),
-          Icon(Icons.account_balance_wallet_outlined, color: Colors.deepPurple),
+          const Icon(
+            Icons.account_balance_wallet_outlined,
+            color: Colors.white,
+            size: 32,
+          ),
         ],
       ),
     );
   }
 
   Widget _buildAmountButtons() {
-    return GridView.count(
-      crossAxisCount: 4,
+    return GridView.builder(
+      itemCount: _presetAmounts.length,
       shrinkWrap: true,
-      mainAxisSpacing: 10,
-      crossAxisSpacing: 10,
       physics: const NeverScrollableScrollPhysics(),
-      children:
-          _presetAmounts.map((amount) {
-            return GestureDetector(
-              onTap: () => _appendAmount(amount),
-              child: Container(
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(8),
-                  color: const Color(0xFFF3F3F3),
-                ),
-                alignment: Alignment.center,
-                child: Text(
-                  "+\$$amount",
-                  style: const TextStyle(fontWeight: FontWeight.w600),
-                ),
-              ),
-            );
-          }).toList(),
+      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: 4,
+        mainAxisSpacing: 12,
+        crossAxisSpacing: 12,
+        childAspectRatio: 2.3,
+      ),
+      itemBuilder: (context, index) {
+        final amount = _presetAmounts[index];
+        return GestureDetector(
+          onTap: () => _appendAmount(amount),
+          child: Container(
+            decoration: BoxDecoration(
+              color: const Color(0xFFE0E0E0),
+              borderRadius: BorderRadius.circular(8),
+              boxShadow: [
+                BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 4),
+              ],
+            ),
+            alignment: Alignment.center,
+            child: Text(
+              "+\₹$amount",
+              style: const TextStyle(fontWeight: FontWeight.w600),
+            ),
+          ),
+        );
+      },
     );
   }
 
   Widget _buildTextField() {
     return TextField(
       controller: _amountController,
-      keyboardType: TextInputType.numberWithOptions(decimal: true),
+      keyboardType: const TextInputType.numberWithOptions(decimal: true),
+      style: const TextStyle(fontSize: 16),
       decoration: InputDecoration(
-        prefixText: "\$ ",
-        hintText: "Enter Amount",
-        border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
+        prefixText: "\₹ ",
+        hintText: "Enter Custom Amount",
+        contentPadding: const EdgeInsets.symmetric(
+          horizontal: 14,
+          vertical: 12,
+        ),
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: BorderSide.none,
+        ),
         filled: true,
-        fillColor: const Color(0xFFF5F5F5),
+        fillColor: const Color(0xFFF0F0F0),
       ),
     );
   }
@@ -148,19 +224,33 @@ class _AddMoneyWalletPageState extends State<AddMoneyWalletPage> {
       height: 50,
       child: ElevatedButton(
         onPressed: () {
-          // Add money logic
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text("Added \$${_amountController.text} to wallet!"),
-              duration: const Duration(seconds: 2),
-            ),
-          );
+          final amount = double.tryParse(_amountController.text) ?? 0;
+          final userState = context.read<UserBloc>().state;
+
+          if (amount > 0) {
+            final uid = (userState is UserLoaded) ? userState.user.uid : null;
+
+            if (uid != null) {
+              context.read<WalletBloc>().add(
+                AddMoneyToWallet(uid: uid, amount: amount),
+              );
+            } else {
+              ScaffoldMessenger.of(
+                context,
+              ).showSnackBar(const SnackBar(content: Text("User not found")));
+            }
+          } else {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(content: Text("Please enter a valid amount")),
+            );
+          }
         },
         style: ElevatedButton.styleFrom(
-          backgroundColor: Colors.deepPurple,
+          backgroundColor: AppColors.primary,
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
+            borderRadius: BorderRadius.circular(14),
           ),
+          elevation: 6,
         ),
         child: const Text(
           "Add Money",
@@ -169,4 +259,23 @@ class _AddMoneyWalletPageState extends State<AddMoneyWalletPage> {
       ),
     );
   }
+
+  Widget _buildLeadingIconButton(VoidCallback onPressed) => Padding(
+    padding: const EdgeInsets.only(left: 15),
+    child: Container(
+      height: 40,
+      width: 40,
+      decoration: BoxDecoration(
+        shape: BoxShape.circle,
+        border: Border.all(color: AppColors.darkGrey, width: 1),
+        color: Colors.white,
+      ),
+      child: IconButton(
+        icon: const Icon(Icons.arrow_back, color: Colors.black, size: 20),
+        onPressed: onPressed,
+        constraints: const BoxConstraints(),
+        padding: EdgeInsets.zero,
+      ),
+    ),
+  );
 }

@@ -7,6 +7,7 @@ import '../../../core/configs/theme/app_colors.dart';
 
 class PaymentDonePage extends StatefulWidget {
   final String bookingId;
+
   const PaymentDonePage({super.key, required this.bookingId});
 
   @override
@@ -49,7 +50,7 @@ class _PaymentDonePageState extends State<PaymentDonePage> {
       appBar: AppBar(
         backgroundColor: Colors.white,
         elevation: 0,
-        leading: _buildLeadingIconButton(() => context.pop()),
+        leading: _buildLeadingIconButton(() => context.go("/home")),
         title: const Text(
           "Review Summary",
           style: TextStyle(
