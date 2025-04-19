@@ -11,8 +11,9 @@ import '../bloc/bookmark_state.dart';
 
 class ServiceCard extends StatelessWidget {
   final ServiceProviderEntity serviceProvider;
+  final VoidCallback? onRemove;
 
-  const ServiceCard({super.key, required this.serviceProvider});
+  const ServiceCard({super.key, required this.serviceProvider, this.onRemove});
 
   @override
   Widget build(BuildContext context) {
@@ -109,16 +110,18 @@ class ServiceCard extends StatelessWidget {
             right: -5,
             top: -10,
             child: GestureDetector(
-              onTap: () {
-                if (userId != null) {
-                  context.read<BookmarkBloc>().add(
-                    ToggleBookmarkedServiceProviders(
-                      userId: userId,
-                      serviceProvider: serviceProvider,
-                    ),
-                  );
-                }
-              },
+              onTap:
+                  onRemove ??
+                  () {
+                    if (userId != null) {
+                      context.read<BookmarkBloc>().add(
+                        ToggleBookmarkedServiceProviders(
+                          userId: userId,
+                          serviceProvider: serviceProvider,
+                        ),
+                      );
+                    }
+                  },
               child: BlocBuilder<BookmarkBloc, BookmarkState>(
                 builder: (context, state) {
                   bool isBookmarked = false;

@@ -1,12 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:ridecare/presentation/profile/widgets/profileMenuItem.dart';
 
-import '../../auth/bloc/auth_bloc.dart';
-import '../../auth/bloc/auth_event.dart';
-
 class ProfileMenuList extends StatelessWidget {
-  const ProfileMenuList({super.key});
+  final VoidCallback onLogoutPressed;
+
+  const ProfileMenuList({super.key, required this.onLogoutPressed});
 
   final List<Map<String, dynamic>> _menuItems = const [
     {'icon': Icons.person, 'title': "Your Profile", 'route': "/your-profile/1"},
@@ -25,9 +23,17 @@ class ProfileMenuList extends StatelessWidget {
       'title': "My Bookings",
       'route': "/my-bookings",
     },
-    {'icon': Icons.account_balance_wallet, 'title': "Wallet", 'route': ""},
+    {
+      'icon': Icons.account_balance_wallet,
+      'title': "Wallet",
+      'route': "/wallet",
+    },
     {'icon': Icons.settings, 'title': "Settings", 'route': ""},
-    {'icon': Icons.headset_mic, 'title': "Help Center", 'route': ""},
+    {
+      'icon': Icons.headset_mic,
+      'title': "Help Center",
+      'route': "/help-center",
+    },
     {'icon': Icons.privacy_tip, 'title': "Privacy Policy", 'route': ""},
     {'icon': Icons.logout, 'title': "Logout", 'route': "", 'isLogout': true},
   ];
@@ -37,16 +43,14 @@ class ProfileMenuList extends StatelessWidget {
     return ListView.builder(
       itemCount: _menuItems.length,
       itemBuilder: (context, index) {
+        final item = _menuItems[index];
+        final isLogout = item['isLogout'] == true;
+
         return ProfileMenuItem(
-          icon: _menuItems[index]['icon'],
-          title: _menuItems[index]['title'],
-          route: _menuItems[index]['route'],
-          onTap:
-              _menuItems[index]['isLogout'] == true
-                  ? () {
-                    context.read<AuthBloc>().add(LogoutEvent());
-                  }
-                  : null,
+          icon: item['icon'],
+          title: item['title'],
+          route: item['route'],
+          onTap: isLogout ? onLogoutPressed : null,
         );
       },
     );

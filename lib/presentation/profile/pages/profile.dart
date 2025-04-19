@@ -4,6 +4,8 @@ import 'package:go_router/go_router.dart';
 import '../../../common/widgets/bottomNavigationBar/bottomNavigationBar.dart';
 import '../../../core/configs/theme/app_colors.dart';
 import '../../../domain/entities/user_entity.dart';
+import '../../auth/bloc/auth_bloc.dart';
+import '../../auth/bloc/auth_event.dart';
 import '../../home/bloc/user/user_bloc.dart';
 import '../../home/bloc/user/user_event.dart';
 import '../../home/bloc/user/user_state.dart';
@@ -56,7 +58,11 @@ class _ProfilePageState extends State<ProfilePage> {
                     SizedBox(height: 10),
                     ProfileSection(user: user),
                     SizedBox(height: 10),
-                    Expanded(child: ProfileMenuList()),
+                    Expanded(
+                      child: ProfileMenuList(
+                        onLogoutPressed: () => _showLogoutConfirmation(context),
+                      ),
+                    ),
                     SizedBox(height: 60),
                   ],
                 );
@@ -69,6 +75,61 @@ class _ProfilePageState extends State<ProfilePage> {
           const BottomNavigationBarSection(),
         ],
       ),
+    );
+  }
+
+  void _showLogoutConfirmation(BuildContext context) {
+    showModalBottomSheet(
+      backgroundColor: Colors.white,
+      context: context,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (context) {
+        return Padding(
+          padding: const EdgeInsets.all(20),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Text(
+                'Logout',
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              ),
+              const SizedBox(height: 10),
+              const Text('Are you sure you want to log out?'),
+              const SizedBox(height: 20),
+              Row(
+                children: [
+                  Expanded(
+                    child: OutlinedButton(
+                      onPressed: () => context.pop(context),
+                      style: OutlinedButton.styleFrom(
+                        side: const BorderSide(color: AppColors.primary),
+                        foregroundColor: AppColors.primary,
+                      ),
+                      child: const Text('Cancel'),
+                    ),
+                  ),
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: ElevatedButton(
+                      onPressed: () {
+                        Navigator.pop(context);
+                        context.read<AuthBloc>().add(LogoutEvent());
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: AppColors.primary,
+                        foregroundColor: Colors.white,
+                      ),
+                      child: const Text('Yes, Logout'),
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        );
+      },
     );
   }
 

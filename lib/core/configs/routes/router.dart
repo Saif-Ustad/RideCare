@@ -11,6 +11,7 @@ import 'package:ridecare/presentation/booking/pages/myBookings.dart';
 import 'package:ridecare/presentation/booking/pages/trackOrder.dart';
 import 'package:ridecare/presentation/bookmark/pages/bookmark.dart';
 import 'package:ridecare/presentation/chooseService/pages/chooseServices.dart';
+import 'package:ridecare/presentation/helpCenter/pages/helpCenter.dart';
 import 'package:ridecare/presentation/home/pages/home.dart';
 import 'package:ridecare/presentation/explore/pages/explore.dart';
 import 'package:ridecare/presentation/home/pages/notification.dart';
@@ -23,6 +24,7 @@ import 'package:ridecare/presentation/profile/pages/yourProfile.dart';
 import 'package:ridecare/presentation/serviceProvider/pages/appointmentBooking.dart';
 import 'package:ridecare/presentation/serviceProvider/pages/serviceProviderDetails.dart';
 import 'package:ridecare/presentation/splash/pages/splash.dart';
+import 'package:ridecare/presentation/wallet/pages/addMoneyWallet.dart';
 import '../../../common/helper/prefService.dart';
 import '../../../presentation/auth/pages/form.dart';
 import '../../../presentation/home/pages/chooseCategory.dart';
@@ -33,6 +35,7 @@ import '../../../presentation/vehicles/pages/bookingPages/addVehicleFromBooking.
 import '../../../presentation/vehicles/pages/bookingPages/selectVehicleFromBooking.dart';
 import '../../../presentation/vehicles/pages/profilePages/addVehicleFromProfile.dart';
 import '../../../presentation/vehicles/pages/profilePages/selectVehicleFromProfile.dart';
+import '../../../presentation/wallet/pages/wallet.dart';
 
 final GoRouter router = GoRouter(
   initialLocation: '/splash',
@@ -67,6 +70,10 @@ final GoRouter router = GoRouter(
 
     GoRoute(path: '/profile', builder: (context, state) => const ProfilePage()),
     GoRoute(path: '/your-profile/:id', builder: (context, state) => const YourProfilePage()),
+    GoRoute(path: '/wallet', builder: (context, state) => const WalletPage()),
+    GoRoute(path: '/add-money-wallet', builder: (context, state) => const AddMoneyWalletPage()),
+    GoRoute(path: '/help-center', builder: (context, state) => const HelpCenterPage()),
+
 
     GoRoute(
       path: '/service-provider/:id',
