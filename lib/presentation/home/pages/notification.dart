@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:ridecare/presentation/home/bloc/user/user_state.dart';
 import '../../../core/configs/theme/app_colors.dart';
 import '../../../domain/entities/notification_entity.dart';
 import '../bloc/notification/notification_bloc.dart';
+import '../bloc/notification/notification_event.dart';
 import '../bloc/notification/notification_state.dart';
+import '../bloc/user/user_bloc.dart';
 
 class NotificationPage extends StatelessWidget {
   const NotificationPage({super.key});
@@ -42,7 +45,8 @@ class NotificationPage extends StatelessWidget {
                 state.notifications
                     .where(
                       (n) =>
-                          !_isToday(n.timestamp!) && !_isYesterday(n.timestamp!),
+                          !_isToday(n.timestamp!) &&
+                          !_isYesterday(n.timestamp!),
                     )
                     .toList();
 
@@ -61,19 +65,19 @@ class NotificationPage extends StatelessWidget {
                 const SizedBox(height: 16),
                 if (today.isNotEmpty) ...[
                   _buildSectionHeader("Today", "Mark all as read"),
-                  ...today.map((n) => _buildNotificationTile(n)),
+                  ...today.map((n) => _buildNotificationTile(context, n)),
                   const SizedBox(height: 24),
                 ],
 
                 if (yesterday.isNotEmpty) ...[
                   _buildSectionHeader("Yesterday", "Mark all as read"),
-                  ...yesterday.map((n) => _buildNotificationTile(n)),
+                  ...yesterday.map((n) => _buildNotificationTile(context, n)),
                   const SizedBox(height: 24),
                 ],
 
                 if (older.isNotEmpty) ...[
                   _buildSectionHeader("Earlier", "Mark all as read"),
-                  ...older.map((n) => _buildNotificationTile(n)),
+                  ...older.map((n) => _buildNotificationTile(context, n)),
                 ],
 
                 if (today.isEmpty && yesterday.isEmpty && older.isEmpty)
@@ -167,57 +171,104 @@ class NotificationPage extends StatelessWidget {
     );
   }
 
-  Widget _buildNotificationTile(NotificationEntity notification) {
-    return Container(
-      padding: const EdgeInsets.symmetric(vertical: 12),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Container(
-            padding: const EdgeInsets.all(8),
-            decoration: const BoxDecoration(
-              color: AppColors.lightGray,
-              shape: BoxShape.circle,
-            ),
-            child: Icon(
-              _mapTypeToIcon(notification.type),
-              color: AppColors.primary,
-              size: 20,
-            ),
-          ),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  notification.title,
-                  style: const TextStyle(
-                    fontSize: 15,
-                    fontWeight: FontWeight.w600,
-                  ),
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
+  Widget _buildNotificationTile(
+    BuildContext context,
+    NotificationEntity notification,
+  ) {
+    return Dismissible(
+      key: Key(notification.id!),
+      direction: DismissDirection.endToStart,
+      background: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 20),
+        alignment: Alignment.centerRight,
+        color: Colors.red,
+        child: const Icon(Icons.delete, color: Colors.white),
+      ),
+      confirmDismiss: (direction) async {
+        return await showDialog(
+          context: context,
+          builder:
+              (context) => AlertDialog(
+                title: const Text("Delete Notification"),
+                content: const Text(
+                  "Are you sure you want to delete this notification?",
                 ),
-                const SizedBox(height: 4),
-                Text(
-                  notification.body,
-                  style: const TextStyle(
-                    fontSize: 13,
-                    color: AppColors.darkGrey,
+                actions: [
+                  TextButton(
+                    onPressed: () => Navigator.of(context).pop(false),
+                    child: const Text("Cancel"),
                   ),
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
-                ),
-              ],
+                  TextButton(
+                    onPressed: () => Navigator.of(context).pop(true),
+                    child: const Text("Delete"),
+                  ),
+                ],
+              ),
+        );
+      },
+      onDismissed: (_) {
+        final userState = context.read<UserBloc>().state;
+        if (userState is UserLoaded) {
+          final userId = userState.user.uid;
+          context.read<NotificationBloc>().add(
+            DeleteNotificationEvent(
+              userId: userId,
+              notificationId: notification.id!,
             ),
-          ),
-          const SizedBox(width: 8),
-          Text(
-            _formatTime(notification.timestamp!),
-            style: const TextStyle(fontSize: 12, color: AppColors.darkGrey),
-          ),
-        ],
+          );
+        }
+      },
+      child: Container(
+        padding: const EdgeInsets.symmetric(vertical: 12),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Container(
+              padding: const EdgeInsets.all(8),
+              decoration: const BoxDecoration(
+                color: AppColors.lightGray,
+                shape: BoxShape.circle,
+              ),
+              child: Icon(
+                _mapTypeToIcon(notification.type),
+                color: AppColors.primary,
+                size: 20,
+              ),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    notification.title,
+                    style: const TextStyle(
+                      fontSize: 15,
+                      fontWeight: FontWeight.w600,
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    notification.body,
+                    style: const TextStyle(
+                      fontSize: 13,
+                      color: AppColors.darkGrey,
+                    ),
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(width: 8),
+            Text(
+              _formatTime(notification.timestamp!),
+              style: const TextStyle(fontSize: 12, color: AppColors.darkGrey),
+            ),
+          ],
+        ),
       ),
     );
   }

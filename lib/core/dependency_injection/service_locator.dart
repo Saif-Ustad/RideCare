@@ -42,6 +42,7 @@ import 'package:ridecare/domain/usecases/booking_tracking/get_booking_tracking_u
 import 'package:ridecare/domain/usecases/bookmark/toggle_bookmark_service_provider.dart';
 import 'package:ridecare/domain/usecases/category/get_all_categories_usecase.dart';
 import 'package:ridecare/domain/usecases/notification/add_notification_usecase.dart';
+import 'package:ridecare/domain/usecases/notification/delete_notification_usecase.dart';
 import 'package:ridecare/domain/usecases/notification/get_notifications_usecase.dart';
 import 'package:ridecare/domain/usecases/promoCode/validate_promo_code.dart';
 import 'package:ridecare/domain/usecases/review/add_review.dart';
@@ -305,6 +306,7 @@ void setupServiceLocator() {
 
   sl.registerLazySingleton(() => GetNotificationsUseCase(repository: sl()));
   sl.registerLazySingleton(() => AddNotificationUseCase(repository: sl()));
+  sl.registerLazySingleton(() => DeleteNotificationUseCase(repository: sl()));
 
   // ✅ Register BLoCs
   sl.registerLazySingleton<OnboardingBloc>(() => OnboardingBloc());
@@ -398,6 +400,7 @@ void setupServiceLocator() {
     () => NotificationBloc(
       addNotificationUseCase: sl(),
       getNotificationsUseCase: sl(),
+      deleteNotificationUseCase: sl(),
     ),
   );
 

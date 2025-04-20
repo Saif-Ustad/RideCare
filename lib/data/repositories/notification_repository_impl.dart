@@ -20,4 +20,9 @@ class NotificationRepositoryImpl implements NotificationRepository {
   Stream<List<NotificationEntity>> getNotifications(String userId) {
     return remoteDataSource.getNotifications(userId);
   }
+
+  @override
+  Future<void> deleteNotification(String userId, String notificationId) {
+    return remoteDataSource.deleteNotification(userId, notificationId);
+  }
 }

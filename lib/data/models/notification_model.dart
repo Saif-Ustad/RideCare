@@ -4,6 +4,7 @@ import '../../domain/entities/notification_entity.dart';
 
 class NotificationModel extends NotificationEntity {
   NotificationModel({
+    super.id,
     required super.title,
     required super.body,
     super.timestamp,
@@ -12,8 +13,9 @@ class NotificationModel extends NotificationEntity {
   });
 
   // Convert from JSON to Model
-  factory NotificationModel.fromJson(Map<String, dynamic> json) {
+  factory NotificationModel.fromJson(Map<String, dynamic> json, String notificationId) {
     return NotificationModel(
+      id: notificationId,
       title: json['title'] ?? '',
       body: json['body'] ?? '',
       timestamp:
@@ -40,6 +42,7 @@ class NotificationModel extends NotificationEntity {
   // Convert from Entity to Model
   factory NotificationModel.fromEntity(NotificationEntity entity) {
     return NotificationModel(
+      id: entity.id,
       title: entity.title,
       body: entity.body,
       timestamp: entity.timestamp,

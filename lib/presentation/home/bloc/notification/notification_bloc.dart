@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:ridecare/domain/usecases/notification/delete_notification_usecase.dart';
 import '../../../../domain/entities/notification_entity.dart';
 import '../../../../domain/usecases/notification/add_notification_usecase.dart';
 import '../../../../domain/usecases/notification/get_notifications_usecase.dart';
@@ -9,16 +10,19 @@ import 'notification_state.dart';
 class NotificationBloc extends Bloc<NotificationEvent, NotificationState> {
   final AddNotificationUseCase addNotificationUseCase;
   final GetNotificationsUseCase getNotificationsUseCase;
+  final DeleteNotificationUseCase deleteNotificationUseCase;
 
   StreamSubscription<List<NotificationEntity>>? _notificationSubscription;
 
   NotificationBloc({
     required this.addNotificationUseCase,
     required this.getNotificationsUseCase,
+    required this.deleteNotificationUseCase,
   }) : super(NotificationInitial()) {
     on<AddNotificationEvent>(_handleAddNotification);
     on<StartListeningNotificationsEvent>(_handleGetNotifications);
     on<NotificationsUpdatedEvent>(_handleNotificationsUpdated);
+    on<DeleteNotificationEvent>(_handleDeleteNotificationEvent);
   }
 
   Future<void> _handleAddNotification(
@@ -53,6 +57,17 @@ class NotificationBloc extends Bloc<NotificationEvent, NotificationState> {
     Emitter<NotificationState> emit,
   ) async {
     emit(NotificationLoaded(notifications: event.notifications));
+  }
+
+  Future<void> _handleDeleteNotificationEvent(
+    DeleteNotificationEvent event,
+    Emitter<NotificationState> emit,
+  ) async {
+    try {
+      await deleteNotificationUseCase(event.userId, event.notificationId);
+    } catch (e) {
+      emit(NotificationError(message: 'Failed to delete notification: $e'));
+    }
   }
 
   @override

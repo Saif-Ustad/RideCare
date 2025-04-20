@@ -7,6 +7,8 @@ abstract class NotificationRemoteDataSource {
   Future<void> addNotification(String userId, NotificationModel notification);
 
   Stream<List<NotificationModel>> getNotifications(String userId);
+
+  Future<void> deleteNotification(String userId, String notificationId);
 }
 
 class NotificationRemoteDataSourceImpl implements NotificationRemoteDataSource {
@@ -48,11 +50,26 @@ class NotificationRemoteDataSourceImpl implements NotificationRemoteDataSource {
           .snapshots()
           .map((snapshot) {
             return snapshot.docs.map((doc) {
-              return NotificationModel.fromJson(doc.data());
+              return NotificationModel.fromJson(doc.data(), doc.id);
             }).toList();
           });
     } catch (e) {
       debugPrint("Error getting notifications: $e");
+      rethrow;
+    }
+  }
+
+  @override
+  Future<void> deleteNotification(String userId, String notificationId) async {
+    try {
+      await firestore
+          .collection('users')
+          .doc(userId)
+          .collection('notifications')
+          .doc(notificationId)
+          .delete();
+    } catch (e) {
+      debugPrint("Error deleting notification: $e");
       rethrow;
     }
   }

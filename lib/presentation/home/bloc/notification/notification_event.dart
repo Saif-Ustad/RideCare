@@ -34,8 +34,21 @@ class StartListeningNotificationsEvent extends NotificationEvent {
 class NotificationsUpdatedEvent extends NotificationEvent {
   final List<NotificationEntity> notifications;
 
-  const NotificationsUpdatedEvent({ required this.notifications} );
+  const NotificationsUpdatedEvent({required this.notifications});
 
   @override
   List<Object?> get props => [notifications];
+}
+
+class DeleteNotificationEvent extends NotificationEvent {
+  final String userId;
+  final String notificationId;
+
+  const DeleteNotificationEvent({
+    required this.userId,
+    required this.notificationId,
+  });
+
+  @override
+  List<Object?> get props => [userId, notificationId];
 }
