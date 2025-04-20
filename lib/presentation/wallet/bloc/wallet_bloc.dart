@@ -1,10 +1,14 @@
 import 'dart:async';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:get_it/get_it.dart';
+import '../../../domain/entities/notification_entity.dart';
 import '../../../domain/entities/wallet_transaction_entity.dart';
 import '../../../domain/usecases/wallet/add_money_to_wallet_usecase.dart';
 import '../../../domain/usecases/wallet/add_transaction_usecase.dart';
 import '../../../domain/usecases/wallet/get_transactions_usecase.dart';
 import '../../../domain/usecases/wallet/get_wallet_balance_usecase.dart';
+import '../../home/bloc/notification/notification_bloc.dart';
+import '../../home/bloc/notification/notification_event.dart';
 import 'wallet_event.dart';
 import 'wallet_state.dart';
 
@@ -15,6 +19,7 @@ class WalletBloc extends Bloc<WalletEvent, WalletState> {
   final AddMoneyToWalletUseCase addMoneyToWalletUseCase;
 
   StreamSubscription<List<WalletTransactionEntity>>? _transactionSub;
+  final NotificationBloc notificationBloc = GetIt.I<NotificationBloc>();
 
   WalletBloc({
     required this.getBalanceUseCase,
@@ -75,6 +80,17 @@ class WalletBloc extends Bloc<WalletEvent, WalletState> {
   ) async {
     try {
       await addTransactionUseCase(event.uid, event.transaction);
+
+      final NotificationEntity notification = NotificationEntity(
+        title: "Wallet Transaction",
+        body:
+            'You spend ₹${event.transaction.amount} from your wallet for ${event.transaction.title}',
+        type: "Money Spend",
+      );
+
+      notificationBloc.add(
+        AddNotificationEvent(userId: event.uid, notification: notification),
+      );
     } catch (e) {
       emit(WalletError('Failed to add transaction'));
     }
@@ -89,6 +105,16 @@ class WalletBloc extends Bloc<WalletEvent, WalletState> {
       await addMoneyToWalletUseCase(event.uid, event.amount);
       final newBalance = await getBalanceUseCase(event.uid);
       emit(WalletLoaded(balance: newBalance, transactions: []));
+
+      final NotificationEntity notification = NotificationEntity(
+        title: "Money Added to Wallet",
+        body: 'You successfully added ₹${event.amount} into you wallet',
+        type: "Money Add",
+      );
+
+      notificationBloc.add(
+        AddNotificationEvent(userId: event.uid, notification: notification),
+      );
     } catch (e) {
       emit(WalletError('Failed to add money to wallet'));
     }

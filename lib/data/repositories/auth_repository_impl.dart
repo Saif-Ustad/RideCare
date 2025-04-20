@@ -1,6 +1,5 @@
 import '../../domain/entities/user_entity.dart';
 import '../../domain/repositories/auth_repository.dart';
-import '../models/user_model.dart';
 import '../datasources/auth_remote_datasource.dart';
 
 class AuthRepositoryImpl implements AuthRepository {
@@ -9,7 +8,7 @@ class AuthRepositoryImpl implements AuthRepository {
   AuthRepositoryImpl({required this.remoteDataSource});
 
   @override
-  Future<void> registerWithEmailAndPassword(
+  Future<String> registerWithEmailAndPassword(
     String firstName,
     String lastName,
     String email,

@@ -4,7 +4,7 @@ import 'package:ridecare/data/models/user_model.dart';
 import 'package:ridecare/domain/entities/user_entity.dart';
 
 abstract class AuthRemoteDataSource {
-  Future<void> registerWithEmailAndPassword(
+  Future<String> registerWithEmailAndPassword(
     String firstName,
     String lastName,
     String email,
@@ -23,7 +23,7 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
   AuthRemoteDataSourceImpl({required this.auth, required this.fireStore});
 
   @override
-  Future<void> registerWithEmailAndPassword(
+  Future<String> registerWithEmailAndPassword(
     String firstName,
     String lastName,
     String email,
@@ -36,14 +36,17 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
         password: password,
       );
 
+      final String userId = userCredential.user!.uid;
+
       // Store user data in FireStore
-      await fireStore.collection('users').doc(userCredential.user!.uid).set({
+      await fireStore.collection('users').doc(userId).set({
         'firstName': firstName,
         'lastName': lastName,
         'displayName': "$firstName $lastName",
         'email': email,
         'createdAt': DateTime.now(),
       });
+      return userId;
     } catch (e) {
       rethrow;
     }

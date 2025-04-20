@@ -13,6 +13,8 @@ import '../../vehicles/bloc/vehicle_bloc.dart';
 import '../../vehicles/bloc/vehicle_event.dart';
 import '../bloc/category/category_bloc.dart';
 import '../bloc/category/category_event.dart';
+import '../bloc/notification/notification_bloc.dart';
+import '../bloc/notification/notification_event.dart';
 import '../bloc/serviceProvider/service_provider_bloc.dart';
 import '../bloc/serviceProvider/service_provider_event.dart';
 import '../bloc/specialOffers/special_offer_bloc.dart';
@@ -67,6 +69,9 @@ class _HomePageState extends State<HomePage> {
           final currentUser = state.user;
           context.read<BookmarkBloc>().add(LoadBookmarks(currentUser.uid));
           context.read<VehicleBloc>().add(LoadVehicles(currentUser.uid));
+          context.read<NotificationBloc>().add(
+            StartListeningNotificationsEvent(userId: currentUser.uid),
+          );
         }
       },
       child: Container(

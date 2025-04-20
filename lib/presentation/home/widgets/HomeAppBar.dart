@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:get_it/get_it.dart';
 import 'package:go_router/go_router.dart';
 import 'package:ridecare/domain/usecases/auth/sign_out.dart';
 
 import '../../../core/configs/theme/app_colors.dart';
+import '../bloc/notification/notification_bloc.dart';
+import '../bloc/notification/notification_state.dart';
 
 class HomeAppBar extends StatelessWidget {
   const HomeAppBar({super.key});
@@ -86,40 +89,47 @@ class HomeAppBar extends StatelessWidget {
     );
   }
 
-  Widget _buildNotificationIcon(
-    BuildContext context, {
-    bool hasNotification = true,
-  }) {
-    return Stack(
-      children: [
-        Container(
-          height: 40,
-          width: 40,
-          decoration: BoxDecoration(
-            color: Color(0xFF8A6CFF),
-            borderRadius: BorderRadius.circular(10),
-          ),
-          child: IconButton(
-            icon: Icon(Icons.notifications, color: Colors.white),
-            onPressed: () => { context.push("/notification")},
-          ),
-        ),
+  Widget _buildNotificationIcon(BuildContext context) {
+    return BlocBuilder<NotificationBloc, NotificationState>(
+      builder: (context, state) {
+        int unreadCount = 0;
 
-        // Red Dot (Badge)
-        if (hasNotification)
-          Positioned(
-            top: 10,
-            right: 10,
-            child: Container(
-              height: 8,
-              width: 8,
+        if (state is NotificationLoaded) {
+          unreadCount =
+              state.notifications.where((n) => n.isRead == false).length;
+        }
+
+        return Stack(
+          children: [
+            Container(
+              height: 40,
+              width: 40,
               decoration: BoxDecoration(
-                color: Colors.red,
-                shape: BoxShape.circle,
+                color: Color(0xFF8A6CFF),
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: IconButton(
+                icon: Icon(Icons.notifications, color: Colors.white),
+                onPressed: () => context.push("/notification"),
               ),
             ),
-          ),
-      ],
+
+            if (unreadCount > 0)
+              Positioned(
+                top: 10,
+                right: 10,
+                child: Container(
+                  height: 8,
+                  width: 8,
+                  decoration: BoxDecoration(
+                    color: Colors.red,
+                    shape: BoxShape.circle,
+                  ),
+                ),
+              ),
+          ],
+        );
+      },
     );
   }
 

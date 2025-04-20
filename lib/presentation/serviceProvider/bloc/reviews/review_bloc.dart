@@ -1,13 +1,19 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:get_it/get_it.dart';
+import '../../../../domain/entities/notification_entity.dart';
 import '../../../../domain/entities/review_entity.dart';
 import '../../../../domain/usecases/review/add_review.dart';
 import '../../../../domain/usecases/review/get_reviews.dart';
+import '../../../home/bloc/notification/notification_bloc.dart';
+import '../../../home/bloc/notification/notification_event.dart';
 import 'review_event.dart';
 import 'review_state.dart';
 
 class ReviewBloc extends Bloc<ReviewEvent, ReviewState> {
   final GetReviewsUseCase getReviewsUseCase;
   final AddReviewUseCase addReviewUseCase;
+
+  final NotificationBloc notificationBloc = GetIt.I<NotificationBloc>();
 
   List<ReviewEntity> _allReviews = [];
   final Set<String> _activeFilters = {};
@@ -85,7 +91,10 @@ class ReviewBloc extends Bloc<ReviewEvent, ReviewState> {
     }
 
     if (_activeFilters.contains("With Photos")) {
-      filtered = filtered.where((r) => r.imageUrls != null && r.imageUrls!.isNotEmpty).toList();
+      filtered =
+          filtered
+              .where((r) => r.imageUrls != null && r.imageUrls!.isNotEmpty)
+              .toList();
     }
 
     if (_activeFilters.contains("Latest")) {
@@ -110,6 +119,20 @@ class ReviewBloc extends Bloc<ReviewEvent, ReviewState> {
       emit(ReviewAddedSuccessfully());
       add(LoadReviews(event.review.serviceProviderId));
       emit(ReviewLoaded(_applyActiveFilters(), activeFilters: _activeFilters));
+
+      final NotificationEntity notification = NotificationEntity(
+        title: "Thanks for your review, ${event.review.userName}!",
+        body:
+            "We appreciate your feedback on the service. It helps us and others make better choices.",
+        type: "Review",
+      );
+
+      notificationBloc.add(
+        AddNotificationEvent(
+          userId: event.review.userId,
+          notification: notification,
+        ),
+      );
     } catch (e) {
       emit(ReviewError(e.toString()));
     }

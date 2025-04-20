@@ -187,7 +187,7 @@ class _AddMoneyWalletPageState extends State<AddMoneyWalletPage> {
             ),
             alignment: Alignment.center,
             child: Text(
-              "+\₹$amount",
+              "+₹$amount",
               style: const TextStyle(fontWeight: FontWeight.w600),
             ),
           ),

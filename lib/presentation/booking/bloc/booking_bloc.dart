@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:get_it/get_it.dart';
 import 'package:ridecare/domain/entities/user_entity.dart';
 import 'package:ridecare/domain/usecases/booking/booking_created.dart';
 import 'package:ridecare/domain/usecases/booking/booking_updated.dart';
@@ -9,6 +10,9 @@ import 'package:ridecare/domain/usecases/booking/prepare_booking_summary.dart';
 import 'package:ridecare/domain/usecases/booking_tracking/create_booking_tracking_usecase.dart';
 import '../../../domain/entities/booking_entity.dart';
 import '../../../domain/entities/booking_tracking_entity.dart';
+import '../../../domain/entities/notification_entity.dart';
+import '../../home/bloc/notification/notification_bloc.dart';
+import '../../home/bloc/notification/notification_event.dart';
 import 'booking_event.dart';
 import 'booking_state.dart';
 
@@ -20,6 +24,7 @@ class BookingBloc extends Bloc<BookingEvent, BookingState> {
   final GetAllBookingUseCase getAllBookingUseCase;
 
   BookingEntity _booking = BookingEntity();
+  final NotificationBloc notificationBloc = GetIt.I<NotificationBloc>();
 
   BookingBloc({
     required this.bookingUpdatedUseCase,
@@ -152,6 +157,19 @@ class BookingBloc extends Bloc<BookingEvent, BookingState> {
         ]);
 
         emit(BookingSubmitted(id));
+
+        final NotificationEntity notification = NotificationEntity(
+          title: "Service Booked Successfully",
+          body: 'Your vehicle service has been scheduled for ${_booking.scheduledAt}',
+          type: "Booking",
+        );
+
+        notificationBloc.add(
+          AddNotificationEvent(
+            userId: currentUser.uid,
+            notification: notification,
+          ),
+        );
         _booking = BookingEntity();
       } catch (e) {
         emit(BookingError(e.toString()));
@@ -173,7 +191,9 @@ class BookingBloc extends Bloc<BookingEvent, BookingState> {
       emit(BookingLoading());
 
       try {
-        await bookingUpdatedUseCase(event.bookingId, {'status': 'Order Cancelled'});
+        await bookingUpdatedUseCase(event.bookingId, {
+          'status': 'Order Cancelled',
+        });
 
         final bookings = await getAllBookingUseCase(event.userId);
         emit(BookingsLoaded(bookings));

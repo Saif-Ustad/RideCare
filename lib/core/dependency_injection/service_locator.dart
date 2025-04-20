@@ -6,6 +6,7 @@ import 'package:ridecare/data/datasources/auth_remote_datasource.dart';
 import 'package:ridecare/data/datasources/booking_tracking_remote_datasource.dart';
 import 'package:ridecare/data/datasources/bookmark_remote_datasource.dart';
 import 'package:ridecare/data/datasources/category_remote_datasource.dart';
+import 'package:ridecare/data/datasources/notification_remote_datasource.dart';
 import 'package:ridecare/data/datasources/user_remote_datasource.dart';
 import 'package:ridecare/data/datasources/wallet_remote_datasource.dart';
 import 'package:ridecare/data/repositories/address_repository_impl.dart';
@@ -23,6 +24,7 @@ import 'package:ridecare/domain/repositories/auth_repository.dart';
 import 'package:ridecare/domain/repositories/booking_tracking_repository.dart';
 import 'package:ridecare/domain/repositories/bookmark_repository.dart';
 import 'package:ridecare/domain/repositories/category_repository.dart';
+import 'package:ridecare/domain/repositories/notification_repository.dart';
 import 'package:ridecare/domain/repositories/service_provider_repository.dart';
 import 'package:ridecare/domain/repositories/user_repository.dart';
 import 'package:ridecare/domain/repositories/wallet_repository.dart';
@@ -39,6 +41,8 @@ import 'package:ridecare/domain/usecases/booking_tracking/create_booking_trackin
 import 'package:ridecare/domain/usecases/booking_tracking/get_booking_tracking_usecase.dart';
 import 'package:ridecare/domain/usecases/bookmark/toggle_bookmark_service_provider.dart';
 import 'package:ridecare/domain/usecases/category/get_all_categories_usecase.dart';
+import 'package:ridecare/domain/usecases/notification/add_notification_usecase.dart';
+import 'package:ridecare/domain/usecases/notification/get_notifications_usecase.dart';
 import 'package:ridecare/domain/usecases/promoCode/validate_promo_code.dart';
 import 'package:ridecare/domain/usecases/review/add_review.dart';
 import 'package:ridecare/domain/usecases/service/get_services_for_provider.dart';
@@ -77,6 +81,7 @@ import '../../data/datasources/service_provider_remote_datasource.dart';
 import '../../data/datasources/service_remote_datasource.dart';
 import '../../data/datasources/special_offer_remote_datasource.dart';
 import '../../data/datasources/vehicle_remote_datasource.dart';
+import '../../data/repositories/notification_repository_impl.dart';
 import '../../data/repositories/review_repository_impl.dart';
 import '../../data/repositories/service_repository_imp.dart';
 import '../../data/repositories/special_offer_repository_impl.dart';
@@ -94,6 +99,7 @@ import '../../domain/usecases/review/get_reviews.dart';
 import '../../domain/usecases/specialOffers/get_special_offers.dart';
 import '../../presentation/billing/bloc/payment/payment_bloc.dart';
 import '../../presentation/bookmark/bloc/bookmark_bloc.dart';
+import '../../presentation/home/bloc/notification/notification_bloc.dart';
 import '../../presentation/home/bloc/specialOffers/special_offer_bloc.dart';
 import '../../presentation/location/bloc/address_bloc.dart';
 import '../../presentation/serviceProvider/bloc/reviews/review_bloc.dart';
@@ -175,6 +181,10 @@ void setupServiceLocator() {
     () => WalletRemoteDataSourceImpl(firestore: sl()),
   );
 
+  sl.registerLazySingleton<NotificationRemoteDataSource>(
+    () => NotificationRemoteDataSourceImpl(firestore: sl()),
+  );
+
   // ✅ Register Repository
   sl.registerLazySingleton<AuthRepository>(
     () => AuthRepositoryImpl(remoteDataSource: sl()),
@@ -230,6 +240,10 @@ void setupServiceLocator() {
 
   sl.registerLazySingleton<WalletRepository>(
     () => WalletRepositoryImpl(remoteDataSource: sl()),
+  );
+
+  sl.registerLazySingleton<NotificationRepository>(
+    () => NotificationRepositoryImpl(remoteDataSource: sl()),
   );
 
   // ✅ Register Use Cases
@@ -288,6 +302,9 @@ void setupServiceLocator() {
     () => GetWalletTransactionsUseCase(repository: sl()),
   );
   sl.registerLazySingleton(() => AddMoneyToWalletUseCase(repository: sl()));
+
+  sl.registerLazySingleton(() => GetNotificationsUseCase(repository: sl()));
+  sl.registerLazySingleton(() => AddNotificationUseCase(repository: sl()));
 
   // ✅ Register BLoCs
   sl.registerLazySingleton<OnboardingBloc>(() => OnboardingBloc());
@@ -374,6 +391,13 @@ void setupServiceLocator() {
       getTransactionsUseCase: sl(),
       addTransactionUseCase: sl(),
       addMoneyToWalletUseCase: sl(),
+    ),
+  );
+
+  sl.registerFactory(
+    () => NotificationBloc(
+      addNotificationUseCase: sl(),
+      getNotificationsUseCase: sl(),
     ),
   );
 
