@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
+import 'package:intl/intl.dart';
 import 'package:ridecare/presentation/home/bloc/user/user_state.dart';
 import '../../../core/configs/theme/app_colors.dart';
 import '../../../domain/entities/notification_entity.dart';
@@ -64,20 +66,53 @@ class NotificationPage extends StatelessWidget {
               children: [
                 const SizedBox(height: 16),
                 if (today.isNotEmpty) ...[
-                  _buildSectionHeader("Today", "Mark all as read"),
-                  ...today.map((n) => _buildNotificationTile(context, n)),
+                  _buildSectionHeader(
+                    "Today",
+                    "Mark all as read",
+                    () {
+                      _markAllAsRead(context, today);
+                    },
+                    showAction: today.any((n) => !n.isRead!),
+                  ),
+                  ...today.map(
+                    (n) => _buildNotificationTile(context, n, () {
+                      _showNotificationDetail(context, n);
+                    }),
+                  ),
                   const SizedBox(height: 24),
                 ],
 
                 if (yesterday.isNotEmpty) ...[
-                  _buildSectionHeader("Yesterday", "Mark all as read"),
-                  ...yesterday.map((n) => _buildNotificationTile(context, n)),
+                  _buildSectionHeader(
+                    "Yesterday",
+                    "Mark all as read",
+                    () {
+                      _markAllAsRead(context, yesterday);
+                    },
+                    showAction: yesterday.any((n) => !n.isRead!),
+                  ),
+                  ...yesterday.map(
+                    (n) => _buildNotificationTile(context, n, () {
+                      _showNotificationDetail(context, n);
+                    }),
+                  ),
                   const SizedBox(height: 24),
                 ],
 
                 if (older.isNotEmpty) ...[
-                  _buildSectionHeader("Earlier", "Mark all as read"),
-                  ...older.map((n) => _buildNotificationTile(context, n)),
+                  _buildSectionHeader(
+                    "Earlier",
+                    "Mark all as read",
+                    () {
+                      _markAllAsRead(context, older);
+                    },
+                    showAction: older.any((n) => !n.isRead!),
+                  ),
+                  ...older.map(
+                    (n) => _buildNotificationTile(context, n, () {
+                      _showNotificationDetail(context, n);
+                    }),
+                  ),
                 ],
 
                 if (today.isEmpty && yesterday.isEmpty && older.isEmpty)
@@ -146,7 +181,12 @@ class NotificationPage extends StatelessWidget {
     );
   }
 
-  Widget _buildSectionHeader(String title, String actionText) {
+  Widget _buildSectionHeader(
+    String title,
+    String actionText,
+    VoidCallback onTap, {
+    bool showAction = true,
+  }) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 12),
       child: Row(
@@ -159,13 +199,17 @@ class NotificationPage extends StatelessWidget {
               color: AppColors.darkGrey,
             ),
           ),
-          Text(
-            actionText,
-            style: const TextStyle(
-              fontWeight: FontWeight.w500,
-              color: AppColors.primary,
+          if (showAction)
+            GestureDetector(
+              onTap: onTap,
+              child: Text(
+                actionText,
+                style: const TextStyle(
+                  fontWeight: FontWeight.w500,
+                  color: AppColors.primary,
+                ),
+              ),
             ),
-          ),
         ],
       ),
     );
@@ -174,100 +218,140 @@ class NotificationPage extends StatelessWidget {
   Widget _buildNotificationTile(
     BuildContext context,
     NotificationEntity notification,
+    VoidCallback onTap,
   ) {
-    return Dismissible(
-      key: Key(notification.id!),
-      direction: DismissDirection.endToStart,
-      background: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 20),
-        alignment: Alignment.centerRight,
-        color: Colors.red,
-        child: const Icon(Icons.delete, color: Colors.white),
-      ),
-      confirmDismiss: (direction) async {
-        return await showDialog(
-          context: context,
-          builder:
-              (context) => AlertDialog(
-                title: const Text("Delete Notification"),
-                content: const Text(
-                  "Are you sure you want to delete this notification?",
+    return GestureDetector(
+      onTap: onTap,
+      child: Dismissible(
+        key: Key(notification.id!),
+        direction: DismissDirection.endToStart,
+        background: Container(
+          margin: const EdgeInsets.symmetric(vertical: 5),
+          padding: const EdgeInsets.symmetric(horizontal: 20),
+          alignment: Alignment.centerRight,
+          color: Colors.red,
+          child: const Icon(Icons.delete, color: Colors.white),
+        ),
+        confirmDismiss: (direction) async {
+          return await showDialog(
+            context: context,
+            builder:
+                (context) => AlertDialog(
+                  title: const Text("Delete Notification"),
+                  content: const Text(
+                    "Are you sure you want to delete this notification?",
+                  ),
+                  actions: [
+                    TextButton(
+                      onPressed: () => Navigator.of(context).pop(false),
+                      child: const Text("Cancel"),
+                    ),
+                    TextButton(
+                      onPressed: () => Navigator.of(context).pop(true),
+                      child: const Text("Delete"),
+                    ),
+                  ],
                 ),
-                actions: [
-                  TextButton(
-                    onPressed: () => Navigator.of(context).pop(false),
-                    child: const Text("Cancel"),
-                  ),
-                  TextButton(
-                    onPressed: () => Navigator.of(context).pop(true),
-                    child: const Text("Delete"),
-                  ),
-                ],
-              ),
-        );
-      },
-      onDismissed: (_) {
-        final userState = context.read<UserBloc>().state;
-        if (userState is UserLoaded) {
-          final userId = userState.user.uid;
-          context.read<NotificationBloc>().add(
-            DeleteNotificationEvent(
-              userId: userId,
-              notificationId: notification.id!,
-            ),
           );
-        }
-      },
-      child: Container(
-        padding: const EdgeInsets.symmetric(vertical: 12),
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Container(
-              padding: const EdgeInsets.all(8),
-              decoration: const BoxDecoration(
-                color: AppColors.lightGray,
-                shape: BoxShape.circle,
+        },
+        onDismissed: (_) {
+          final userState = context.read<UserBloc>().state;
+          if (userState is UserLoaded) {
+            final userId = userState.user.uid;
+            context.read<NotificationBloc>().add(
+              DeleteNotificationEvent(
+                userId: userId,
+                notificationId: notification.id!,
               ),
-              child: Icon(
-                _mapTypeToIcon(notification.type),
-                color: AppColors.primary,
-                size: 20,
-              ),
-            ),
-            const SizedBox(width: 12),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+            );
+          }
+        },
+        child: Container(
+          decoration: BoxDecoration(
+            color:
+                !notification.isRead!
+                    ? const Color(0xFFF0F8FF)
+                    : Colors.transparent,
+            borderRadius: BorderRadius.circular(8),
+          ),
+          padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 10),
+          margin: const EdgeInsets.symmetric(vertical: 5),
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Stack(
                 children: [
-                  Text(
-                    notification.title,
-                    style: const TextStyle(
-                      fontSize: 15,
-                      fontWeight: FontWeight.w600,
+                  Container(
+                    padding: const EdgeInsets.all(8),
+                    decoration: BoxDecoration(
+                      color:
+                          notification.isRead!
+                              ? AppColors.lightGray
+                              : Colors.white,
+                      shape: BoxShape.circle,
                     ),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                  const SizedBox(height: 4),
-                  Text(
-                    notification.body,
-                    style: const TextStyle(
-                      fontSize: 13,
-                      color: AppColors.darkGrey,
+                    child: Icon(
+                      _mapTypeToIcon(notification.type),
+                      color: AppColors.primary,
+                      size: 20,
                     ),
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
                   ),
+                  if (!notification.isRead!)
+                    Positioned(
+                      right: 0,
+                      top: 0,
+                      child: Container(
+                        width: 8,
+                        height: 8,
+                        decoration: const BoxDecoration(
+                          color: Colors.blueAccent,
+                          shape: BoxShape.circle,
+                        ),
+                      ),
+                    ),
                 ],
               ),
-            ),
-            const SizedBox(width: 8),
-            Text(
-              _formatTime(notification.timestamp!),
-              style: const TextStyle(fontSize: 12, color: AppColors.darkGrey),
-            ),
-          ],
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      notification.title,
+                      style: TextStyle(
+                        fontSize: 14,
+                        fontWeight:
+                            !notification.isRead!
+                                ? FontWeight.bold
+                                : FontWeight.w600,
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      notification.body,
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: AppColors.darkGrey,
+                        fontWeight:
+                            notification.isRead!
+                                ? FontWeight.normal
+                                : FontWeight.w500,
+                      ),
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(width: 8),
+              Text(
+                _formatTime(notification.timestamp!),
+                style: const TextStyle(fontSize: 12, color: AppColors.darkGrey),
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -313,5 +397,162 @@ class NotificationPage extends StatelessWidget {
     } else {
       return '${difference.inDays}d';
     }
+  }
+
+  void _showNotificationDetail(
+    BuildContext context,
+    NotificationEntity notification,
+  ) {
+    final userState = context.read<UserBloc>().state;
+    if (userState is UserLoaded && !notification.isRead!) {
+      context.read<NotificationBloc>().add(
+        ReadNotificationEvent(
+          userId: userState.user.uid,
+          notificationId: notification.id!,
+        ),
+      );
+    }
+    final formattedDate = DateFormat(
+      'dd MMM yyyy • hh:mm a',
+    ).format(notification.timestamp!);
+
+    showModalBottomSheet(
+      backgroundColor: Colors.white,
+      context: context,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      isScrollControlled: true,
+      builder: (context) {
+        return Padding(
+          padding: const EdgeInsets.all(20),
+          child: Wrap(
+            children: [
+              Center(
+                child: Container(
+                  width: 40,
+                  height: 5,
+                  decoration: BoxDecoration(
+                    color: Colors.grey[300],
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 20),
+
+              /// Title & Content
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    notification.title,
+                    style: const TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    notification.body,
+                    style: const TextStyle(
+                      fontSize: 16,
+                      height: 1.5,
+                      color: Colors.black87,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+
+                  /// Timestamp Row
+                  Row(
+                    children: [
+                      const Icon(
+                        Icons.access_time,
+                        size: 16,
+                        color: AppColors.darkGrey,
+                      ),
+                      const SizedBox(width: 6),
+                      Text(
+                        formattedDate,
+                        style: const TextStyle(
+                          fontSize: 14,
+                          color: AppColors.darkGrey,
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+
+              const SizedBox(height: 28),
+
+              /// Close Button
+              Align(
+                alignment: Alignment.centerRight,
+                child: ElevatedButton.icon(
+                  onPressed: () => context.pop(context),
+                  icon: const Icon(Icons.done, color: Colors.white),
+                  label: const Text(
+                    "Close",
+                    style: TextStyle(color: Colors.white),
+                  ),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: AppColors.primary,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                    padding: const EdgeInsets.symmetric(
+                      vertical: 12,
+                      horizontal: 20,
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  void _markAllAsRead(BuildContext context, List<NotificationEntity> list) {
+    final navigator = Navigator.of(context);
+    final userBloc = context.read<UserBloc>();
+    final notificationBloc = context.read<NotificationBloc>();
+
+    showDialog<bool>(
+      context: context,
+      builder:
+          (ctx) => AlertDialog(
+            title: const Text('Mark all as read?'),
+            content: const Text(
+              'Are you sure you want to mark all unread notifications as read?',
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => navigator.pop(false),
+                child: const Text('Cancel'),
+              ),
+              TextButton(
+                onPressed: () => navigator.pop(true),
+                child: const Text('Confirm'),
+              ),
+            ],
+          ),
+    ).then((shouldMark) {
+      if (shouldMark != true) return;
+
+      final userState = userBloc.state;
+      if (userState is UserLoaded) {
+        final userId = userState.user.uid;
+        for (var notification in list.where((n) => !n.isRead!)) {
+          notificationBloc.add(
+            ReadNotificationEvent(
+              userId: userId,
+              notificationId: notification.id!,
+            ),
+          );
+        }
+      }
+    });
   }
 }

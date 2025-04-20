@@ -6,4 +6,6 @@ abstract class NotificationRepository {
   Stream<List<NotificationEntity>> getNotifications(String userId);
 
   Future<void> deleteNotification(String userId, String notificationId);
+
+  Future<void> readNotification(String userId, String notificationId);
 }

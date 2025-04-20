@@ -9,6 +9,8 @@ abstract class NotificationRemoteDataSource {
   Stream<List<NotificationModel>> getNotifications(String userId);
 
   Future<void> deleteNotification(String userId, String notificationId);
+
+  Future<void> readNotification(String userId, String notificationId);
 }
 
 class NotificationRemoteDataSourceImpl implements NotificationRemoteDataSource {
@@ -70,6 +72,21 @@ class NotificationRemoteDataSourceImpl implements NotificationRemoteDataSource {
           .delete();
     } catch (e) {
       debugPrint("Error deleting notification: $e");
+      rethrow;
+    }
+  }
+
+  @override
+  Future<void> readNotification(String userId, String notificationId) async {
+    try {
+      await firestore
+          .collection('users')
+          .doc(userId)
+          .collection('notifications')
+          .doc(notificationId)
+          .update({'isRead': true});
+    } catch (e) {
+      debugPrint("Error marking notification as read: $e");
       rethrow;
     }
   }

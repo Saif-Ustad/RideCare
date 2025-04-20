@@ -52,3 +52,13 @@ class DeleteNotificationEvent extends NotificationEvent {
   @override
   List<Object?> get props => [userId, notificationId];
 }
+
+class ReadNotificationEvent extends NotificationEvent {
+  final String userId;
+  final String notificationId;
+
+  const ReadNotificationEvent({
+    required this.userId,
+    required this.notificationId,
+  });
+}
