@@ -44,3 +44,9 @@ class AddReview extends ReviewEvent {
 
   const AddReview(this.review);
 }
+
+class DeleteReview extends ReviewEvent {
+  final String reviewId;
+
+  const DeleteReview(this.reviewId);
+}

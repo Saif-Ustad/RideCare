@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 import 'package:ridecare/core/configs/theme/app_colors.dart';
+import 'package:ridecare/presentation/home/bloc/user/user_bloc.dart';
+import 'package:ridecare/presentation/home/bloc/user/user_state.dart';
 import '../../../domain/entities/review_entity.dart';
 import '../bloc/reviews/review_bloc.dart';
 import '../bloc/reviews/review_event.dart';
@@ -76,7 +78,10 @@ class _ReviewTabState extends State<ReviewTab>
                             ),
                           ),
                           isScrollControlled: true,
-                          builder: (context) => ReviewBottomSheet(serviceProviderId: widget.serviceProviderId),
+                          builder:
+                              (context) => ReviewBottomSheet(
+                                serviceProviderId: widget.serviceProviderId,
+                              ),
                         );
                       },
                       child: Row(
@@ -248,6 +253,12 @@ class _ReviewTabState extends State<ReviewTab>
   }
 
   Widget _reviewItem(ReviewEntity review) {
+    bool isCurrentUserReview = false;
+    final userState = context.read<UserBloc>().state;
+    if (userState is UserLoaded) {
+      isCurrentUserReview = review.userId == userState.user.uid;
+    }
+
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 12.0),
       child: Row(
@@ -286,9 +297,11 @@ class _ReviewTabState extends State<ReviewTab>
               children: [
                 // Name + Stars + Local Guide
                 Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Flexible(
                       child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           Text(
                             review.userName,
@@ -297,11 +310,53 @@ class _ReviewTabState extends State<ReviewTab>
                               fontSize: 14,
                             ),
                           ),
+                          const SizedBox(width: 6),
+                          _buildStarRating(review.ratings),
                         ],
                       ),
                     ),
-                    const SizedBox(width: 6),
-                    _buildStarRating(review.ratings),
+                    const SizedBox(width: 5),
+                    if (isCurrentUserReview)
+                      SizedBox(
+                        height: 20,
+                        width: 20,
+                        child: PopupMenuTheme(
+                          data: const PopupMenuThemeData(color: Colors.white),
+                          child: PopupMenuButton<String>(
+                            padding: EdgeInsets.zero,
+                            // removes default padding
+                            icon: const Icon(
+                              Icons.more_vert,
+                              color: AppColors.darkGrey,
+                              size: 22,
+                            ),
+                            onSelected: (value) {
+                              if (value == 'delete') {
+                                context.read<ReviewBloc>().add(
+                                  DeleteReview(review.id!),
+                                );
+                              }
+                            },
+                            itemBuilder:
+                                (BuildContext context) => [
+                                  const PopupMenuItem<String>(
+                                    value: 'delete',
+                                    child: Row(
+                                      children: [
+                                        Icon(
+                                          Icons.delete_outline,
+                                          color: Colors.red,
+                                          size: 18,
+                                        ),
+                                        SizedBox(width: 8),
+                                        Text('Delete'),
+                                      ],
+                                    ),
+                                  ),
+                                ],
+                          ),
+                        ),
+                      ),
                   ],
                 ),
 
@@ -342,7 +397,8 @@ class _ReviewTabState extends State<ReviewTab>
                 ),
 
                 // Optional: Show review images or thumbs up
-                if (review.imageUrls != null && review.imageUrls!.isNotEmpty) ...[
+                if (review.imageUrls != null &&
+                    review.imageUrls!.isNotEmpty) ...[
                   const SizedBox(height: 8),
                   SizedBox(
                     height: 80,

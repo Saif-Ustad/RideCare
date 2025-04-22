@@ -34,3 +34,5 @@ class ReviewError extends ReviewState {
   @override
   List<Object?> get props => [message];
 }
+
+class ReviewDeletedSuccessfully extends ReviewState {}

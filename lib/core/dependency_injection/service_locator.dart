@@ -97,6 +97,7 @@ import '../../domain/repositories/vehicle_repository.dart';
 import '../../domain/usecases/address/delete_address.dart';
 import '../../domain/usecases/address/update_address.dart';
 import '../../domain/usecases/bookmark/get_bookmarked_service_providers.dart';
+import '../../domain/usecases/review/delete_review_usecase.dart';
 import '../../domain/usecases/review/get_reviews.dart';
 import '../../domain/usecases/specialOffers/get_special_offers.dart';
 import '../../presentation/billing/bloc/payment/payment_bloc.dart';
@@ -268,6 +269,7 @@ void setupServiceLocator() {
 
   sl.registerLazySingleton(() => GetReviewsUseCase(repository: sl()));
   sl.registerLazySingleton(() => AddReviewUseCase(repository: sl()));
+  sl.registerLazySingleton(() => DeleteReviewUseCase(repository: sl()));
 
   sl.registerLazySingleton(() => BookingUpdatedUseCase(repository: sl()));
   sl.registerLazySingleton(() => BookingCreatedUseCase(repository: sl()));
@@ -340,7 +342,11 @@ void setupServiceLocator() {
   );
 
   sl.registerFactory(
-    () => ReviewBloc(getReviewsUseCase: sl(), addReviewUseCase: sl()),
+    () => ReviewBloc(
+      getReviewsUseCase: sl(),
+      addReviewUseCase: sl(),
+      deleteReviewUseCase: sl(),
+    ),
   );
 
   sl.registerFactory(

@@ -1,5 +1,6 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:get_it/get_it.dart';
+import 'package:ridecare/domain/usecases/review/delete_review_usecase.dart';
 import '../../../../domain/entities/notification_entity.dart';
 import '../../../../domain/entities/review_entity.dart';
 import '../../../../domain/usecases/review/add_review.dart';
@@ -12,6 +13,7 @@ import 'review_state.dart';
 class ReviewBloc extends Bloc<ReviewEvent, ReviewState> {
   final GetReviewsUseCase getReviewsUseCase;
   final AddReviewUseCase addReviewUseCase;
+  final DeleteReviewUseCase deleteReviewUseCase;
 
   final NotificationBloc notificationBloc = GetIt.I<NotificationBloc>();
 
@@ -19,14 +21,18 @@ class ReviewBloc extends Bloc<ReviewEvent, ReviewState> {
   final Set<String> _activeFilters = {};
   String _searchQuery = '';
 
-  ReviewBloc({required this.getReviewsUseCase, required this.addReviewUseCase})
-    : super(ReviewInitial()) {
+  ReviewBloc({
+    required this.getReviewsUseCase,
+    required this.addReviewUseCase,
+    required this.deleteReviewUseCase,
+  }) : super(ReviewInitial()) {
     on<LoadReviews>(_onLoadReviews);
     on<FilterReviewsByVerified>(_onFilterVerified);
     on<SortReviewsByLatest>(_onSortByLatest);
     on<FilterReviewsWithPhotos>(_onFilterWithPhotos);
     on<SearchReviews>(_onSearchReviews);
     on<AddReview>(_onAddReview);
+    on<DeleteReview>(_onDeleteReview);
   }
 
   Future<void> _onLoadReviews(
@@ -135,6 +141,21 @@ class ReviewBloc extends Bloc<ReviewEvent, ReviewState> {
       );
     } catch (e) {
       emit(ReviewError(e.toString()));
+    }
+  }
+
+  Future<void> _onDeleteReview(
+    DeleteReview event,
+    Emitter<ReviewState> emit,
+  ) async {
+    emit(ReviewLoading());
+    try {
+      await deleteReviewUseCase(event.reviewId);
+      _allReviews.removeWhere((review) => review.id == event.reviewId);
+      emit(ReviewDeletedSuccessfully());
+      emit(ReviewLoaded(_applyActiveFilters(), activeFilters: _activeFilters));
+    } catch (e) {
+      emit(ReviewError("Failed to delete review: ${e.toString()}"));
     }
   }
 }

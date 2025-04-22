@@ -18,4 +18,9 @@ class ReviewRepositoryImpl implements ReviewRepository {
   Future<void> addReview(ReviewEntity review) async {
     return await remoteDataSource.addReview(ReviewModel.fromEntity(review));
   }
+
+  @override
+  Future<void> deleteReview(String reviewId) {
+    return remoteDataSource.deleteReview(reviewId);
+  }
 }

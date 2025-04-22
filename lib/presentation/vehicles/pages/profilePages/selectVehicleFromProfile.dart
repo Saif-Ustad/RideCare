@@ -22,8 +22,6 @@ class SelectVehicleFromProfilePage extends StatefulWidget {
 
 class _SelectVehicleFromProfilePageState
     extends State<SelectVehicleFromProfilePage> {
-  String? selectedVehicle;
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -33,7 +31,7 @@ class _SelectVehicleFromProfilePageState
         elevation: 0,
         leading: buildLeadingIconButton(() => context.pop()),
         title: const Text(
-          "Select Vehicle",
+          "Your Vehicles",
           style: TextStyle(
             fontSize: 18,
             fontWeight: FontWeight.w500,
@@ -109,17 +107,39 @@ class _SelectVehicleFromProfilePageState
           "${vehicle.type} • ${vehicle.registrationNumber}",
           style: const TextStyle(fontSize: 14, color: AppColors.darkGrey),
         ),
-        trailing: Radio<String>(
-          value: vehicle.id,
-          groupValue: selectedVehicle,
-          onChanged: (value) {
-            setState(() {
-              selectedVehicle = value;
-            });
-          },
-          activeColor: AppColors.primary,
+        trailing: IconButton(
+          icon: const Icon(Icons.delete, color: Colors.red),
+          onPressed: () => _confirmDelete(vehicle),
         ),
       ),
+    );
+  }
+
+  void _confirmDelete(VehicleEntity vehicle) {
+    showDialog(
+      context: context,
+      builder:
+          (context) => AlertDialog(
+            backgroundColor: Colors.white,
+            title: const Text("Delete Vehicle"),
+            content: Text(
+              "Are you sure you want to delete ${vehicle.brand} ${vehicle.model} - ${vehicle.registrationNumber}?",
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => context.pop(),
+                child: const Text("Cancel"),
+              ),
+              TextButton(
+                onPressed: () {
+                  context.read<VehicleBloc>().add(DeleteVehicle(vehicle.id));
+                  Navigator.of(context).pop();
+                },
+                style: TextButton.styleFrom(foregroundColor: Colors.red),
+                child: const Text("Delete"),
+              ),
+            ],
+          ),
     );
   }
 

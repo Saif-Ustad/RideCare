@@ -8,6 +8,8 @@ abstract class ReviewRemoteDataSource {
   Future<List<ReviewModel>> fetchReviews(String serviceProviderId);
 
   Future<void> addReview(ReviewModel review);
+
+  Future<void> deleteReview(String reviewId);
 }
 
 class ReviewRemoteDataSourceImpl implements ReviewRemoteDataSource {
@@ -94,6 +96,29 @@ class ReviewRemoteDataSourceImpl implements ReviewRemoteDataSource {
       });
     } catch (e) {
       print("Error saving review to Firestore: $e");
+    }
+  }
+
+  @override
+  Future<void> deleteReview(String reviewId) async {
+    try {
+      final reviewDoc =
+          await firestore.collection('reviews').doc(reviewId).get();
+      final reviewData = reviewDoc.data();
+
+      if (reviewData == null) {
+        throw Exception("Review not found");
+      }
+
+      final userId = reviewData['userId'];
+
+      await firestore.collection('reviews').doc(reviewId).delete();
+      await firestore.collection('users').doc(userId).update({
+        'reviewIds': FieldValue.arrayRemove([reviewId]),
+      });
+    } catch (e) {
+      print("Error deleting review: $e");
+      rethrow;
     }
   }
 }

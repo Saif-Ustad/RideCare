@@ -25,7 +25,6 @@ class SelectLocationFromProfilePage extends StatefulWidget {
 
 class _SelectLocationFromProfilePageState
     extends State<SelectLocationFromProfilePage> {
-  String? selectedAddress;
 
   @override
   void initState() {
@@ -59,7 +58,7 @@ class _SelectLocationFromProfilePageState
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const Text(
-              "Select Address",
+              "Saved Addresses",
               style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
             ),
             const SizedBox(height: 15),
@@ -117,19 +116,41 @@ class _SelectLocationFromProfilePageState
             address.address,
             style: const TextStyle(fontSize: 14, color: AppColors.darkGrey),
           ),
-          trailing: Radio<String>(
-            value: address.id,
-            groupValue: selectedAddress,
-            onChanged: (value) {
-              setState(() {
-                selectedAddress = value;
-              });
-            },
-            activeColor: AppColors.primary,
+          trailing: IconButton(
+            icon: const Icon(Icons.delete, color: Colors.red),
+            onPressed: () => _confirmDelete(address),
           ),
         ),
         const Divider(color: AppColors.lightGray, thickness: 1, height: 5),
       ],
+    );
+  }
+
+  void _confirmDelete(AddressEntity address) {
+    showDialog(
+      context: context,
+      builder:
+          (context) => AlertDialog(
+        backgroundColor: Colors.white,
+        title: const Text("Delete Address"),
+        content: Text(
+          "Are you sure you want to delete ${address.title} - ${address.address} ?",
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => context.pop(),
+            child: const Text("Cancel"),
+          ),
+          TextButton(
+            onPressed: () {
+              context.read<AddressBloc>().add(DeleteAddress(address.id));
+              Navigator.of(context).pop();
+            },
+            style: TextButton.styleFrom(foregroundColor: Colors.red),
+            child: const Text("Delete"),
+          ),
+        ],
+      ),
     );
   }
 
