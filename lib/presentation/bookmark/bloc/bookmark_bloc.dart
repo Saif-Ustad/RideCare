@@ -140,7 +140,7 @@ class BookmarkBloc extends Bloc<BookmarkEvent, BookmarkState> {
       final savedLocation = await getUserLocationFromPrefs();
       final bookmarks = await getBookmarks(event.userId);
 
-      if (savedLocation != null) {
+      if (savedLocation != null && bookmarks.isNotEmpty) {
         final enriched = await DistanceMatrixHelper.addDistanceAndTime(
           userLat: savedLocation.latitude,
           userLng: savedLocation.longitude,
