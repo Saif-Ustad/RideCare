@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:ridecare/common/widgets/bottomNavigationBar/bottomNavigationBar.dart';
 import 'package:ridecare/core/configs/theme/app_colors.dart';
 import 'package:ridecare/presentation/home/widgets/HomeAppBar.dart';
@@ -46,6 +47,8 @@ class _HomePageState extends State<HomePage> {
     context.read<ServiceProviderBloc>().add(FetchAllServiceProviders());
     context.read<CategoryBloc>().add(FetchCategories());
 
+    _getCurrentLocationAndFetchProviders();
+
     _scrollController.addListener(() {
       if (_scrollController.position.userScrollDirection ==
           ScrollDirection.reverse) {
@@ -60,6 +63,99 @@ class _HomePageState extends State<HomePage> {
       }
     });
   }
+
+  Future<void> _getCurrentLocationAndFetchProviders() async {
+    try {
+      bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
+
+      if (!serviceEnabled) {
+        // Show dialog to ask user to enable location services
+        await showDialog(
+          context: context,
+          builder:
+              (context) => AlertDialog(
+                backgroundColor: Colors.white,
+                title: Text("Enable Location"),
+                content: Text(
+                  "Location services are disabled. Please enable them in settings.",
+                ),
+                actions: [
+                  TextButton(
+                    onPressed: () async {
+                      Navigator.of(context).pop();
+                      await Geolocator.openLocationSettings();
+                    },
+                    child: Text("Open Settings"),
+                  ),
+                  TextButton(
+                    onPressed: () => Navigator.of(context).pop(),
+                    child: Text("Cancel"),
+                  ),
+                ],
+              ),
+        );
+        return;
+      }
+
+      LocationPermission permission = await Geolocator.checkPermission();
+      if (permission == LocationPermission.denied) {
+        permission = await Geolocator.requestPermission();
+        if (permission == LocationPermission.denied) {
+          print("Location permission denied.");
+          return;
+        }
+      }
+
+      if (permission == LocationPermission.deniedForever) {
+        // Permissions are permanently denied, show guidance to change from app settings
+        await showDialog(
+          context: context,
+          builder:
+              (context) => AlertDialog(
+                title: Text("Location Permission Required"),
+                content: Text(
+                  "Please enable location permissions from app settings to use this feature.",
+                ),
+                actions: [
+                  TextButton(
+                    onPressed: () async {
+                      Navigator.of(context).pop();
+                      await Geolocator.openAppSettings();
+                    },
+                    child: Text("Open App Settings"),
+                  ),
+                  TextButton(
+                    onPressed: () => Navigator.of(context).pop(),
+                    child: Text("Cancel"),
+                  ),
+                ],
+              ),
+        );
+        return;
+      }
+
+      // All good, fetch location
+      Position position = await Geolocator.getCurrentPosition(
+        desiredAccuracy: LocationAccuracy.high,
+      );
+
+      if (mounted) {
+        context.read<ServiceProviderBloc>().add(
+          FetchNearbyServiceProviders(position.latitude, position.longitude),
+        );
+      }
+    } catch (e) {
+      print("Error getting location: $e");
+    }
+  }
+
+  Future<void> _onRefresh() async {
+    context.read<UserBloc>().add(LoadUserEvent());
+    context.read<SpecialOfferBloc>().add(FetchSpecialOffers());
+    context.read<CategoryBloc>().add(FetchCategories());
+    await _getCurrentLocationAndFetchProviders();
+  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -79,38 +175,42 @@ class _HomePageState extends State<HomePage> {
         child: SafeArea(
           child: Scaffold(
             backgroundColor: Colors.white,
-            body: CustomScrollView(
-              controller: _scrollController,
-              slivers: [
-                HomeAppBar(),
-                SliverToBoxAdapter(
-                  child: Padding(
-                    padding: const EdgeInsets.only(
-                      top: 20,
-                      left: 15,
-                      bottom: 20,
-                    ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        SpecialOfferSection(),
-                        SizedBox(height: 20),
-                        ChooseCategorySection(),
-                        SizedBox(height: 20),
-                        PopularServiceProviderSection(),
-                        SizedBox(height: 20),
-                        RecentBookingsSection(),
-                        SizedBox(height: 20),
-                        MembershipBenefitsSection(),
-                        SizedBox(height: 20),
-                        ReferAndEarnSection(),
-                        SizedBox(height: 20),
-                        TopReviewsSection(),
-                      ],
+            body: RefreshIndicator(
+              onRefresh: _onRefresh,
+              child: CustomScrollView(
+                controller: _scrollController,
+                physics: const AlwaysScrollableScrollPhysics(),
+                slivers: [
+                  HomeAppBar(),
+                  SliverToBoxAdapter(
+                    child: Padding(
+                      padding: const EdgeInsets.only(
+                        top: 20,
+                        left: 15,
+                        bottom: 20,
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          SpecialOfferSection(),
+                          SizedBox(height: 20),
+                          ChooseCategorySection(),
+                          SizedBox(height: 20),
+                          PopularServiceProviderSection(),
+                          SizedBox(height: 20),
+                          RecentBookingsSection(),
+                          SizedBox(height: 20),
+                          MembershipBenefitsSection(),
+                          SizedBox(height: 20),
+                          ReferAndEarnSection(),
+                          SizedBox(height: 20),
+                          TopReviewsSection(),
+                        ],
+                      ),
                     ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
 
             // Animate BottomNavigationBar height smoothly

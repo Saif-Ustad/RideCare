@@ -109,6 +109,7 @@ import '../../presentation/serviceProvider/bloc/reviews/review_bloc.dart';
 import '../../presentation/serviceProvider/bloc/services/service_bloc.dart';
 import '../../presentation/vehicles/bloc/vehicle_bloc.dart';
 import '../stripe_service/stripe_service.dart';
+import 'package:geoflutterfire3/geoflutterfire3.dart';
 
 final GetIt sl = GetIt.instance;
 
@@ -124,6 +125,8 @@ void setupServiceLocator() {
   sl.registerSingleton<StripeService>(StripeService()..init());
   sl.registerLazySingleton<StripeCustomer>(() => StripeCustomer());
 
+  sl.registerLazySingleton<GeoFlutterFire>(() => GeoFlutterFire());
+
   // ✅ Register Remote Data Source
   sl.registerLazySingleton<AuthRemoteDataSource>(
     () => AuthRemoteDataSourceImpl(
@@ -137,7 +140,7 @@ void setupServiceLocator() {
   );
 
   sl.registerLazySingleton<ServiceProviderRemoteDataSource>(
-    () => ServiceProviderRemoteDataSourceImpl(firestore: sl()),
+    () => ServiceProviderRemoteDataSourceImpl(firestore: sl(), geo: sl()),
   );
 
   sl.registerLazySingleton<ServiceRemoteDataSource>(
@@ -330,7 +333,10 @@ void setupServiceLocator() {
   );
 
   sl.registerLazySingleton<ServiceProviderBloc>(
-    () => ServiceProviderBloc(getAllServiceProviders: sl()),
+    () => ServiceProviderBloc(
+      getAllServiceProviders: sl(),
+      getNearbyServiceProviders: sl(),
+    ),
   );
 
   sl.registerLazySingleton<ServiceBloc>(

@@ -68,6 +68,8 @@ dependencies:
   dropdown_button2: ^2.3.9
   intl: ^0.20.2
   font_awesome_flutter: ^10.8.0
+  geoflutterfire3: ^1.0.1
+  location: ^5.0.0
 
 
 

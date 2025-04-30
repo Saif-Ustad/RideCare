@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:ridecare/domain/entities/service_provider_entity.dart';
 import '../../../core/configs/theme/app_colors.dart';
 
 class CustomGoogleMap extends StatefulWidget {
   final Function(GoogleMapController) onMapCreated;
+  final List<ServiceProviderEntity> serviceProviders;
 
-  const CustomGoogleMap({super.key, required this.onMapCreated});
+  const CustomGoogleMap({super.key, required this.onMapCreated, required this.serviceProviders});
 
   @override
   State<CustomGoogleMap> createState() => _CustomGoogleMapState();
@@ -17,11 +19,11 @@ class _CustomGoogleMapState extends State<CustomGoogleMap> {
   final LatLng _center = const LatLng(18.4631, 73.8937);
   final Set<Marker> _markers = {}; // Store markers
 
-  final List<Map<String, dynamic>> serviceProviders = [
-    {"name": "Bajaj Service Center", "location": LatLng(18.494698, 73.834732)},
-    {"name": "Honda Service Center", "location": LatLng(18.474748, 73.855292)},
-    {"name": "Toyota Service Center", "location": LatLng(18.452000, 73.847208)},
-  ];
+  // final List<Map<String, dynamic>> serviceProviders = [
+  //   {"name": "Bajaj Service Center", "location": LatLng(18.494698, 73.834732)},
+  //   {"name": "Honda Service Center", "location": LatLng(18.474748, 73.855292)},
+  //   {"name": "Toyota Service Center", "location": LatLng(18.452000, 73.847208)},
+  // ];
 
   @override
   void initState() {
@@ -33,12 +35,15 @@ class _CustomGoogleMapState extends State<CustomGoogleMap> {
     final Set<Marker> newMarkers = {};
     double primaryHue = HSLColor.fromColor(AppColors.primary).hue;
 
-    for (var provider in serviceProviders) {
+    for (var provider in widget.serviceProviders) {
       newMarkers.add(
         Marker(
-          markerId: MarkerId(provider["name"]),
-          position: provider["location"],
-          infoWindow: InfoWindow(title: provider["name"]),
+          markerId: MarkerId(provider.name),
+          position:LatLng(
+            provider.position!.geopoint.latitude,
+            provider.position!.geopoint.longitude,
+          ),
+          infoWindow: InfoWindow(title: provider.name),
           icon: BitmapDescriptor.defaultMarkerWithHue(primaryHue),
         ),
       );

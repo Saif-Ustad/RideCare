@@ -1,3 +1,5 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+
 class ServiceProviderEntity {
   final String id;
   final String name;
@@ -15,6 +17,7 @@ class ServiceProviderEntity {
   final ServiceChargesEntity serviceCharges;
   final List<String> categoryIds;
   final List<String> providerServiceIds;
+  final PositionEntity? position;
 
   const ServiceProviderEntity({
     required this.id,
@@ -33,6 +36,7 @@ class ServiceProviderEntity {
     required this.serviceCharges,
     required this.categoryIds,
     required this.providerServiceIds,
+    this.position,
   });
 }
 
@@ -62,5 +66,16 @@ class ServiceChargesEntity {
   const ServiceChargesEntity({
     required this.min,
     required this.max,
+  });
+}
+
+
+class PositionEntity {
+  final String geohash;
+  final GeoPoint geopoint;
+
+  const PositionEntity({
+    required this.geohash,
+    required this.geopoint,
   });
 }

@@ -15,8 +15,7 @@ class ServiceProviderRepositoryImpl implements ServiceProviderRepository {
   }
 
   @override
-  Stream<List<ServiceProviderEntity>> getNearbyProviders(double lat, double lng) {
-    // TODO: implement getNearbyProviders
-    throw UnimplementedError();
+  Stream<List<ServiceProviderEntity>> getNearbyProviders(double latitude, double longitude) {
+      return remoteDataSource.getNearbyProviders(latitude: latitude, longitude: longitude);
   }
 }

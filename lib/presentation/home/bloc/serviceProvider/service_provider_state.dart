@@ -21,6 +21,15 @@ class ServiceProviderLoaded extends ServiceProviderState {
   List<Object?> get props => [serviceProviders];
 }
 
+class NearbyServiceProviderLoaded extends ServiceProviderState {
+  final List<ServiceProviderEntity> serviceProviders;
+
+  const NearbyServiceProviderLoaded(this.serviceProviders);
+
+  @override
+  List<Object?> get props => [serviceProviders];
+}
+
 class ServiceProviderError extends ServiceProviderState {
   final String message;
 

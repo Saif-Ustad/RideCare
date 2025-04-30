@@ -12,11 +12,11 @@ class FetchAllServiceProviders extends ServiceProviderEvent {
 }
 
 class FetchNearbyServiceProviders extends ServiceProviderEvent {
-  final double lat;
-  final double lng;
+  final double latitude;
+  final double longitude;
 
-  const FetchNearbyServiceProviders(this.lat, this.lng);
+  const FetchNearbyServiceProviders(this.latitude, this.longitude);
 
   @override
-  List<Object?> get props => [lat, lng];
+  List<Object?> get props => [latitude, longitude];
 }

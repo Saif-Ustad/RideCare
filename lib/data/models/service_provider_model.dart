@@ -1,3 +1,5 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+
 import '../../domain/entities/service_provider_entity.dart';
 
 class ServiceProviderModel extends ServiceProviderEntity {
@@ -18,6 +20,7 @@ class ServiceProviderModel extends ServiceProviderEntity {
     required super.serviceCharges,
     required super.categoryIds,
     required super.providerServiceIds,
+    required super.position,
   });
 
   factory ServiceProviderModel.fromJson(
@@ -51,6 +54,10 @@ class ServiceProviderModel extends ServiceProviderEntity {
       ),
       categoryIds: List<String>.from(json['categoryIds'] ?? []),
       providerServiceIds: List<String>.from(json['providerServiceIds'] ?? []),
+      position: PositionEntity(
+        geohash: json['position']?['geohash'] ?? '',
+        geopoint: json['position']?['geopoint'] ?? const GeoPoint(0.0, 0.0),
+      ),
     );
   }
 
@@ -75,6 +82,10 @@ class ServiceProviderModel extends ServiceProviderEntity {
       'serviceCharges': {'min': serviceCharges.min, 'max': serviceCharges.max},
       'categoryIds': categoryIds,
       'providerServiceIds': providerServiceIds,
+      'position':
+          position != null
+              ? {'geohash': position!.geohash, 'geopoint': position!.geopoint}
+              : null,
     };
   }
 }
