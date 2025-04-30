@@ -206,9 +206,10 @@ class _HomePageState extends State<HomePage> {
       context: context,
       builder:
           (context) => AlertDialog(
+            backgroundColor: Colors.white,
             title: Text("Enable Location"),
             content: Text(
-              "Location services are disabled. Please enable them.",
+              "Location service is disabled. Please enable it.",
             ),
             actions: [
               TextButton(
@@ -232,6 +233,7 @@ class _HomePageState extends State<HomePage> {
       context: context,
       builder:
           (context) => AlertDialog(
+            backgroundColor: Colors.white,
             title: Text("Permission Required"),
             content: Text(
               "Please allow location permission from app settings.",

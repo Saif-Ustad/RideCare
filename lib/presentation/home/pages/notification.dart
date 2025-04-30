@@ -237,6 +237,7 @@ class NotificationPage extends StatelessWidget {
             context: context,
             builder:
                 (context) => AlertDialog(
+                  backgroundColor: Colors.white,
                   title: const Text("Delete Notification"),
                   content: const Text(
                     "Are you sure you want to delete this notification?",
