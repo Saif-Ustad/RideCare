@@ -250,7 +250,10 @@ class _MyBookingsPageState extends State<MyBookingsPage>
                             color: AppColors.primary,
                           ),
                           const SizedBox(width: 5),
-                          Text("${1.5} km", style: _infoTextStyle),
+                          Text(
+                            booking.distanceText ?? "- km",
+                            style: _infoTextStyle,
+                          ),
                           const SizedBox(width: 10),
                           const Icon(
                             Icons.timer,
@@ -258,7 +261,10 @@ class _MyBookingsPageState extends State<MyBookingsPage>
                             color: AppColors.primary,
                           ),
                           const SizedBox(width: 5),
-                          Text("${10} mins", style: _infoTextStyle),
+                          Text(
+                            booking.durationText ?? "- mins",
+                            style: _infoTextStyle,
+                          ),
                         ],
                       ),
                     ],

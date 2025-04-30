@@ -339,9 +339,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+import 'package:ridecare/domain/entities/service_provider_entity.dart';
 import '../../../core/configs/theme/app_colors.dart';
 import '../../booking/bloc/booking_bloc.dart';
 import '../../booking/bloc/booking_event.dart';
+import '../../home/bloc/serviceProvider/service_provider_bloc.dart';
+import '../../home/bloc/serviceProvider/service_provider_state.dart';
 import '../../serviceProvider/bloc/services/service_bloc.dart';
 import '../../serviceProvider/bloc/services/service_state.dart';
 import '../widgets/serviceOption.dart';
@@ -360,6 +363,7 @@ class _ChooseServicesPageState extends State<ChooseServicesPage> {
   String selectedCategory = '';
   final Map<String, List<ServiceOption>> categoryServices = {};
   String searchQuery = '';
+  late ServiceProviderEntity selectedProvider;
 
   double get subtotal {
     return categoryServices.values
@@ -378,47 +382,66 @@ class _ChooseServicesPageState extends State<ChooseServicesPage> {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: _buildAppBar(context),
-      body: BlocBuilder<ServiceBloc, ServiceState>(
-        builder: (context, state) {
-          if (state is ServiceLoading) {
-            return const Center(child: CircularProgressIndicator());
-          } else if (state is ServiceLoaded) {
-            if (categoryServices.isEmpty) {
-              _buildCategoryServices(state.services);
-            }
+      body: BlocBuilder<ServiceProviderBloc, ServiceProviderState>(
+        builder: (context, providerState) {
+          if (providerState is ServiceProviderLoaded) {
+            selectedProvider = providerState.serviceProviders.firstWhere(
+              (p) => p.id == widget.serviceProviderId,
+              orElse: () => throw Exception('Service provider not found'),
+            );
 
-            return Padding(
-              padding: const EdgeInsets.all(15),
-              child: Column(
-                children: [
-                  _buildCategoryTabs(),
-                  const SizedBox(height: 10),
-                  _buildSearchField(),
-                  Divider(color: AppColors.lightGray, thickness: 1, height: 25),
-                  Expanded(
-                    child: ListView(
+            return BlocBuilder<ServiceBloc, ServiceState>(
+              builder: (context, state) {
+                if (state is ServiceLoading) {
+                  return const Center(child: CircularProgressIndicator());
+                } else if (state is ServiceLoaded) {
+                  if (categoryServices.isEmpty) {
+                    _buildCategoryServices(state.services);
+                  }
+
+                  return Padding(
+                    padding: const EdgeInsets.all(15),
+                    child: Column(
                       children: [
-                        const Text(
-                          "Add Options",
-                          style: TextStyle(
-                            fontSize: 14,
-                            fontWeight: FontWeight.w500,
-                          ),
+                        _buildCategoryTabs(),
+                        const SizedBox(height: 10),
+                        _buildSearchField(),
+                        Divider(
+                          color: AppColors.lightGray,
+                          thickness: 1,
+                          height: 25,
                         ),
-                        const SizedBox(height: 15),
-                        ..._getFilteredServices().map(
-                          (service) => _serviceTile(service),
+                        Expanded(
+                          child: ListView(
+                            children: [
+                              const Text(
+                                "Add Options",
+                                style: TextStyle(
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              ),
+                              const SizedBox(height: 15),
+                              ..._getFilteredServices().map(
+                                (service) => _serviceTile(service),
+                              ),
+                            ],
+                          ),
                         ),
                       ],
                     ),
-                  ),
-                ],
-              ),
+                  );
+                } else if (state is ServiceError) {
+                  return Center(child: Text(state.message));
+                } else {
+                  return const SizedBox();
+                }
+              },
             );
-          } else if (state is ServiceError) {
-            return Center(child: Text(state.message));
+          } else if (providerState is ServiceProviderLoading) {
+            return const Center(child: CircularProgressIndicator());
           } else {
-            return const SizedBox();
+            return const Center(child: Text("Loading failed"));
           }
         },
       ),
@@ -666,6 +689,7 @@ class _ChooseServicesPageState extends State<ChooseServicesPage> {
                 SelectService(
                   serviceIds: selectedServices,
                   providerId: widget.serviceProviderId,
+                  serviceProvider: selectedProvider,
                 ),
               );
 

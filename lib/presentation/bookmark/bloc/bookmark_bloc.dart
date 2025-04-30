@@ -97,6 +97,10 @@
 // }
 
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:geolocator/geolocator.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import '../../../common/helper/distance_matrix_helper.dart';
+import '../../../common/helper/saveUserLocationToPrefs.dart';
 import '../../../domain/entities/service_provider_entity.dart';
 import '../../../domain/usecases/bookmark/get_bookmarked_service_providers.dart';
 import '../../../domain/usecases/bookmark/toggle_bookmark_service_provider.dart';
@@ -113,14 +117,39 @@ class BookmarkBloc extends Bloc<BookmarkEvent, BookmarkState> {
     on<ToggleBookmarkedServiceProviders>(_onToggleBookmark);
   }
 
+  //
+  // Future<void> _onLoadBookmarks(
+  //   LoadBookmarks event,
+  //   Emitter<BookmarkState> emit,
+  // ) async {
+  //   emit(BookmarkLoading());
+  //   try {
+  //     final result = await getBookmarks(event.userId);
+  //     emit(BookmarkLoaded(result));
+  //   } catch (e) {
+  //     emit(BookmarkError('Failed to load bookmarks: ${e.toString()}'));
+  //   }
+  // }
+
   Future<void> _onLoadBookmarks(
     LoadBookmarks event,
     Emitter<BookmarkState> emit,
   ) async {
     emit(BookmarkLoading());
     try {
-      final result = await getBookmarks(event.userId);
-      emit(BookmarkLoaded(result));
+      final savedLocation = await getUserLocationFromPrefs();
+      final bookmarks = await getBookmarks(event.userId);
+
+      if (savedLocation != null) {
+        final enriched = await DistanceMatrixHelper.addDistanceAndTime(
+          userLat: savedLocation.latitude,
+          userLng: savedLocation.longitude,
+          providers: bookmarks,
+        );
+        emit(BookmarkLoaded(enriched));
+      } else {
+        emit(BookmarkLoaded(bookmarks));
+      }
     } catch (e) {
       emit(BookmarkError('Failed to load bookmarks: ${e.toString()}'));
     }

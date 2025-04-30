@@ -26,6 +26,8 @@ class BookingEntity {
   final String? serviceType;
   final double? totalCharges;
   final Map<String, dynamic>? promoCodeInfo;
+  final String? distanceText;
+  final String? durationText;
 
   BookingEntity({
     this.bookingId,
@@ -47,6 +49,8 @@ class BookingEntity {
     this.serviceType,
     this.totalCharges,
     this.promoCodeInfo,
+    this.distanceText,
+    this.durationText,
   });
 
   BookingEntity copyWith({
@@ -68,6 +72,8 @@ class BookingEntity {
     String? serviceType,
     double? totalCharges,
     Map<String, dynamic>? promoCodeInfo,
+    String? distanceText,
+    String? durationText,
   }) {
     return BookingEntity(
       bookingId: bookingId,
@@ -89,6 +95,8 @@ class BookingEntity {
       serviceType: serviceType ?? this.serviceType,
       totalCharges: totalCharges ?? this.totalCharges,
       promoCodeInfo: promoCodeInfo ?? this.promoCodeInfo,
+      distanceText: distanceText ?? this.distanceText,
+      durationText: durationText ?? this.durationText,
     );
   }
 }

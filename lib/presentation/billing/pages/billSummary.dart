@@ -80,6 +80,8 @@ class _BillSummaryPageState extends State<BillSummaryPage> {
                             booking.serviceProvider != null
                                 ? _buildServiceCenterDetails(
                                   booking.serviceProvider!,
+                                  booking.distanceText ?? '- Km',
+                                  booking.durationText ?? '- Min',
                                 )
                                 : const Text("Service provider not available"),
 
@@ -122,7 +124,11 @@ class _BillSummaryPageState extends State<BillSummaryPage> {
     );
   }
 
-  Widget _buildServiceCenterDetails(ServiceProviderEntity serviceCenter) {
+  Widget _buildServiceCenterDetails(
+    ServiceProviderEntity serviceCenter,
+    String distanceText,
+    String durationText,
+  ) {
     return Row(
       children: [
         ClipRRect(
@@ -183,7 +189,7 @@ class _BillSummaryPageState extends State<BillSummaryPage> {
                   color: AppColors.primary.withOpacity(0.8),
                 ),
                 Text(
-                  "1.5 km ",
+                  distanceText,
                   style: const TextStyle(
                     fontSize: 12,
                     color: AppColors.darkGrey,
@@ -196,7 +202,7 @@ class _BillSummaryPageState extends State<BillSummaryPage> {
                   color: AppColors.primary.withOpacity(0.8),
                 ),
                 Text(
-                  "8 mins",
+                  durationText,
                   style: const TextStyle(
                     fontSize: 12,
                     color: AppColors.darkGrey,

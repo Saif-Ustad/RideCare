@@ -140,7 +140,7 @@ class ServiceProviderCard extends StatelessWidget {
                 size: 14,
               ),
               SizedBox(width: 5),
-              Text("1.5 Km", style: TextStyle(color: AppColors.darkGrey)),
+              Text( provider.distanceText ?? "- Km", style: TextStyle(color: AppColors.darkGrey)),
               SizedBox(width: 15),
               Icon(
                 Icons.access_time_filled,
@@ -148,7 +148,7 @@ class ServiceProviderCard extends StatelessWidget {
                 size: 14,
               ),
               SizedBox(width: 5),
-              Text("10 Min", style: TextStyle(color: AppColors.darkGrey)),
+              Text( provider.durationText ?? "- Min", style: TextStyle(color: AppColors.darkGrey)),
             ],
           ),
           SizedBox(height: 5),

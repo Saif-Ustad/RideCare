@@ -3,13 +3,16 @@ import 'dart:ffi';
 import 'package:ridecare/domain/entities/booking_entity.dart';
 import 'package:ridecare/domain/entities/booking_tracking_entity.dart';
 
+import '../../../domain/entities/service_provider_entity.dart';
+
 abstract class BookingEvent {}
 
 class SelectService extends BookingEvent {
   final List<String> serviceIds;
   final String providerId;
+  final ServiceProviderEntity serviceProvider;
 
-  SelectService({required this.serviceIds, required this.providerId});
+  SelectService({required this.serviceIds, required this.providerId,  required this.serviceProvider,});
 }
 
 class SetAppointment extends BookingEvent {

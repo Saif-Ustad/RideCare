@@ -7,8 +7,17 @@ abstract class ServiceProviderEvent extends Equatable {
   List<Object?> get props => [];
 }
 
+class FetchAllServiceProvidersWithoutLocation extends ServiceProviderEvent {
+  const FetchAllServiceProvidersWithoutLocation();
+}
+
 class FetchAllServiceProviders extends ServiceProviderEvent {
-  const FetchAllServiceProviders();
+  final double latitude;
+  final double longitude;
+  const FetchAllServiceProviders(this.latitude, this.longitude);
+
+  @override
+  List<Object?> get props => [latitude, longitude];
 }
 
 class FetchNearbyServiceProviders extends ServiceProviderEvent {

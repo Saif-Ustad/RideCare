@@ -19,6 +19,9 @@ class ServiceProviderEntity {
   final List<String> providerServiceIds;
   final PositionEntity? position;
 
+  final String? distanceText;
+  final String? durationText;
+
   const ServiceProviderEntity({
     required this.id,
     required this.name,
@@ -37,6 +40,8 @@ class ServiceProviderEntity {
     required this.categoryIds,
     required this.providerServiceIds,
     this.position,
+    this.distanceText,
+    this.durationText,
   });
 }
 
@@ -78,4 +83,51 @@ class PositionEntity {
     required this.geohash,
     required this.geopoint,
   });
+}
+
+
+extension ServiceProviderEntityCopy on ServiceProviderEntity {
+  ServiceProviderEntity copyWith({
+    String? id,
+    String? name,
+    String? ownerName,
+    String? about,
+    String? contactPhone,
+    String? experienceYears,
+    String? profileImageUrl,
+    String? workImageUrl,
+    List<String>? galleryImageUrls,
+    double? rating,
+    int? reviewsCount,
+    AvailabilityEntity? availability,
+    LocationEntity? location,
+    ServiceChargesEntity? serviceCharges,
+    List<String>? categoryIds,
+    List<String>? providerServiceIds,
+    PositionEntity? position,
+    String? distanceText,
+    String? durationText,
+  }) {
+    return ServiceProviderEntity(
+      id: id ?? this.id,
+      name: name ?? this.name,
+      ownerName: ownerName ?? this.ownerName,
+      about: about ?? this.about,
+      contactPhone: contactPhone ?? this.contactPhone,
+      experienceYears: experienceYears ?? this.experienceYears,
+      profileImageUrl: profileImageUrl ?? this.profileImageUrl,
+      workImageUrl: workImageUrl ?? this.workImageUrl,
+      galleryImageUrls: galleryImageUrls ?? this.galleryImageUrls,
+      rating: rating ?? this.rating,
+      reviewsCount: reviewsCount ?? this.reviewsCount,
+      availability: availability ?? this.availability,
+      location: location ?? this.location,
+      serviceCharges: serviceCharges ?? this.serviceCharges,
+      categoryIds: categoryIds ?? this.categoryIds,
+      providerServiceIds: providerServiceIds ?? this.providerServiceIds,
+      position: position ?? this.position,
+      distanceText: distanceText ?? this.distanceText,
+      durationText: durationText ?? this.durationText,
+    );
+  }
 }

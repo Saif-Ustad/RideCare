@@ -87,9 +87,9 @@ class ServiceCard extends StatelessWidget {
                         const SizedBox(height: 2),
                         Row(
                           children: [
-                            buildInfoRow(Icons.location_on, "0.5 Km"),
+                            buildInfoRow(Icons.location_on, serviceProvider.distanceText ?? "- Km"),
                             const SizedBox(width: 12),
-                            buildInfoRow(Icons.access_time_filled, "10 Min"),
+                            buildInfoRow(Icons.access_time_filled, serviceProvider.durationText ?? "- Min"),
                           ],
                         ),
 

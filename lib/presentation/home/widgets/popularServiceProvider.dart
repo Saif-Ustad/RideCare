@@ -146,9 +146,9 @@ class _ServiceProviderCard extends StatelessWidget {
               const SizedBox(height: 5),
               Row(
                 children: [
-                  _buildInfoRow(Icons.location_on, "0.5 Km"),
+                  _buildInfoRow(Icons.location_on, provider.distanceText ?? '- KM' ),
                   const SizedBox(width: 10),
-                  _buildInfoRow(Icons.access_time_filled, "2 Mins"),
+                  _buildInfoRow(Icons.access_time_filled, provider.durationText ?? "- Mins"),
                 ],
               ),
               const SizedBox(height: 5),

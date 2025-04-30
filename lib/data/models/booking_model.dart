@@ -27,6 +27,8 @@ class BookingModel extends BookingEntity {
     super.serviceType,
     super.totalCharges,
     super.promoCodeInfo,
+    super.distanceText,
+    super.durationText
   });
 
   // ✅ Convert from Firestore document
@@ -120,6 +122,8 @@ class BookingModel extends BookingEntity {
                     (json['promoCodeInfo']['discountPercentage'] as num).toDouble(),
               }
               : null,
+      durationText: json['durationText'],
+      distanceText: json['distanceText'],
     );
   }
 
@@ -173,6 +177,8 @@ class BookingModel extends BookingEntity {
       'serviceType': serviceType,
       'totalCharges': totalCharges,
       'promoCodeInfo': promoCodeInfo,
+      'distanceText' : distanceText,
+      'durationText' : durationText,
     };
   }
 
@@ -198,6 +204,8 @@ class BookingModel extends BookingEntity {
       serviceType: entity.serviceType,
       totalCharges: entity.totalCharges,
       promoCodeInfo: entity.promoCodeInfo,
+      distanceText: entity.distanceText,
+      durationText: entity.durationText
     );
   }
 }

@@ -8,6 +8,7 @@ import 'package:ridecare/presentation/home/widgets/HomeAppBar.dart';
 import 'package:ridecare/presentation/home/widgets/chooseCategory.dart';
 import 'package:ridecare/presentation/home/widgets/popularServiceProvider.dart';
 import 'package:ridecare/presentation/home/widgets/specialOfferCarousel.dart';
+import '../../../common/helper/saveUserLocationToPrefs.dart';
 import '../../bookmark/bloc/bookmark_bloc.dart';
 import '../../bookmark/bloc/bookmark_event.dart';
 import '../../vehicles/bloc/vehicle_bloc.dart';
@@ -44,7 +45,9 @@ class _HomePageState extends State<HomePage> {
     super.initState();
     context.read<UserBloc>().add(LoadUserEvent());
     context.read<SpecialOfferBloc>().add(FetchSpecialOffers());
-    context.read<ServiceProviderBloc>().add(FetchAllServiceProviders());
+    // context.read<ServiceProviderBloc>().add(
+    //   FetchAllServiceProvidersWithoutLocation(),
+    // );
     context.read<CategoryBloc>().add(FetchCategories());
 
     _getCurrentLocationAndFetchProviders();
@@ -64,88 +67,53 @@ class _HomePageState extends State<HomePage> {
     });
   }
 
-  Future<void> _getCurrentLocationAndFetchProviders() async {
+  Future<void> _getCurrentLocationAndFetchProviders({
+    bool fromRefresh = false,
+  }) async {
     try {
-      bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
+      if (!fromRefresh) {
+        final savedLocation = await getUserLocationFromPrefs();
+        if (savedLocation != null) {
+          context.read<ServiceProviderBloc>().add(
+            FetchAllServiceProviders(
+              savedLocation.latitude,
+              savedLocation.longitude,
+            ),
+          );
+          return;
+        }
+      }
 
+      bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
       if (!serviceEnabled) {
-        // Show dialog to ask user to enable location services
-        await showDialog(
-          context: context,
-          builder:
-              (context) => AlertDialog(
-                backgroundColor: Colors.white,
-                title: Text("Enable Location"),
-                content: Text(
-                  "Location services are disabled. Please enable them in settings.",
-                ),
-                actions: [
-                  TextButton(
-                    onPressed: () async {
-                      Navigator.of(context).pop();
-                      await Geolocator.openLocationSettings();
-                    },
-                    child: Text("Open Settings"),
-                  ),
-                  TextButton(
-                    onPressed: () => Navigator.of(context).pop(),
-                    child: Text("Cancel"),
-                  ),
-                ],
-              ),
-        );
+        await _showLocationDialog();
         return;
       }
 
       LocationPermission permission = await Geolocator.checkPermission();
       if (permission == LocationPermission.denied) {
         permission = await Geolocator.requestPermission();
-        if (permission == LocationPermission.denied) {
-          print("Location permission denied.");
-          return;
-        }
+        if (permission == LocationPermission.denied) return;
       }
-
       if (permission == LocationPermission.deniedForever) {
-        // Permissions are permanently denied, show guidance to change from app settings
-        await showDialog(
-          context: context,
-          builder:
-              (context) => AlertDialog(
-                title: Text("Location Permission Required"),
-                content: Text(
-                  "Please enable location permissions from app settings to use this feature.",
-                ),
-                actions: [
-                  TextButton(
-                    onPressed: () async {
-                      Navigator.of(context).pop();
-                      await Geolocator.openAppSettings();
-                    },
-                    child: Text("Open App Settings"),
-                  ),
-                  TextButton(
-                    onPressed: () => Navigator.of(context).pop(),
-                    child: Text("Cancel"),
-                  ),
-                ],
-              ),
-        );
+        await _showPermissionDialog();
         return;
       }
 
-      // All good, fetch location
-      Position position = await Geolocator.getCurrentPosition(
+      // Get location and save to prefs
+      final position = await Geolocator.getCurrentPosition(
         desiredAccuracy: LocationAccuracy.high,
       );
 
+      await saveUserLocationToPrefs(position.latitude, position.longitude);
+
       if (mounted) {
         context.read<ServiceProviderBloc>().add(
-          FetchNearbyServiceProviders(position.latitude, position.longitude),
+          FetchAllServiceProviders(position.latitude, position.longitude),
         );
       }
     } catch (e) {
-      print("Error getting location: $e");
+      print("Error fetching location: $e");
     }
   }
 
@@ -153,9 +121,8 @@ class _HomePageState extends State<HomePage> {
     context.read<UserBloc>().add(LoadUserEvent());
     context.read<SpecialOfferBloc>().add(FetchSpecialOffers());
     context.read<CategoryBloc>().add(FetchCategories());
-    await _getCurrentLocationAndFetchProviders();
+    await _getCurrentLocationAndFetchProviders(fromRefresh: true);
   }
-
 
   @override
   Widget build(BuildContext context) {
@@ -176,6 +143,7 @@ class _HomePageState extends State<HomePage> {
           child: Scaffold(
             backgroundColor: Colors.white,
             body: RefreshIndicator(
+              backgroundColor: Colors.white,
               onRefresh: _onRefresh,
               child: CustomScrollView(
                 controller: _scrollController,
@@ -230,6 +198,58 @@ class _HomePageState extends State<HomePage> {
           ),
         ),
       ),
+    );
+  }
+
+  Future<void> _showLocationDialog() async {
+    await showDialog(
+      context: context,
+      builder:
+          (context) => AlertDialog(
+            title: Text("Enable Location"),
+            content: Text(
+              "Location services are disabled. Please enable them.",
+            ),
+            actions: [
+              TextButton(
+                onPressed: () async {
+                  Navigator.pop(context);
+                  await Geolocator.openLocationSettings();
+                },
+                child: Text("Open Settings"),
+              ),
+              TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: Text("Cancel"),
+              ),
+            ],
+          ),
+    );
+  }
+
+  Future<void> _showPermissionDialog() async {
+    await showDialog(
+      context: context,
+      builder:
+          (context) => AlertDialog(
+            title: Text("Permission Required"),
+            content: Text(
+              "Please allow location permission from app settings.",
+            ),
+            actions: [
+              TextButton(
+                onPressed: () async {
+                  Navigator.pop(context);
+                  await Geolocator.openAppSettings();
+                },
+                child: Text("Open App Settings"),
+              ),
+              TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: Text("Cancel"),
+              ),
+            ],
+          ),
     );
   }
 }

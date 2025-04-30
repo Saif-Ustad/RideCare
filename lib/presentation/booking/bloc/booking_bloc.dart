@@ -13,6 +13,7 @@ import '../../../domain/entities/booking_tracking_entity.dart';
 import '../../../domain/entities/notification_entity.dart';
 import '../../home/bloc/notification/notification_bloc.dart';
 import '../../home/bloc/notification/notification_event.dart';
+import '../../home/bloc/serviceProvider/service_provider_state.dart';
 import 'booking_event.dart';
 import 'booking_state.dart';
 
@@ -33,14 +34,27 @@ class BookingBloc extends Bloc<BookingEvent, BookingState> {
     required this.createBookingTrackingUseCase,
     required this.getAllBookingUseCase,
   }) : super(BookingInitial()) {
+    // on<SelectService>((event, emit) {
+    //   _booking = _booking.copyWith(
+    //     serviceIds: event.serviceIds,
+    //     serviceProviderId: event.providerId,
+    //   );
+    //
+    //   emit(BookingUpdated(booking: _booking));
+    // });
+
     on<SelectService>((event, emit) {
       _booking = _booking.copyWith(
         serviceIds: event.serviceIds,
         serviceProviderId: event.providerId,
+        distanceText: event.serviceProvider.distanceText,
+        durationText: event.serviceProvider.durationText,
       );
 
       emit(BookingUpdated(booking: _booking));
     });
+
+
 
     on<SetAppointment>((event, emit) {
       _booking = _booking.copyWith(
@@ -160,7 +174,8 @@ class BookingBloc extends Bloc<BookingEvent, BookingState> {
 
         final NotificationEntity notification = NotificationEntity(
           title: "Service Booked Successfully",
-          body: 'Your vehicle service has been scheduled for ${_booking.scheduledAt}',
+          body:
+              'Your vehicle service has been scheduled for ${_booking.scheduledAt}',
           type: "Booking",
         );
 
