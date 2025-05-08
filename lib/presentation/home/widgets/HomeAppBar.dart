@@ -4,6 +4,7 @@ import 'package:get_it/get_it.dart';
 import 'package:go_router/go_router.dart';
 import 'package:ridecare/domain/usecases/auth/sign_out.dart';
 
+import '../../../common/helper/saveUserLocationToPrefs.dart';
 import '../../../core/configs/theme/app_colors.dart';
 import '../bloc/notification/notification_bloc.dart';
 import '../bloc/notification/notification_state.dart';
@@ -69,20 +70,33 @@ class HomeAppBar extends StatelessWidget {
           onTap: () {
             context.push("/select-location-profile");
           },
-          child: Row(
-            children: [
-              Icon(Icons.location_on, color: AppColors.orange, size: 22),
-              SizedBox(width: 2),
-              Text(
-                "Kondhwa, Pune",
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 14,
-                  fontWeight: FontWeight.w500,
-                ),
-              ),
-              Icon(Icons.arrow_drop_down, color: Colors.white, size: 26),
-            ],
+          child: FutureBuilder<Map<String, dynamic>?>(
+            future: getAddressObjectFromPrefs(),
+            builder: (context, snapshot) {
+              String city = "Unknown";
+              String state = "Unknown";
+
+              if (snapshot.hasData && snapshot.data != null) {
+                city = snapshot.data!["city"] ?? "Unknown";
+                state = snapshot.data!["state"] ?? "Unknown";
+              }
+
+              return Row(
+                children: [
+                  Icon(Icons.location_on, color: AppColors.orange, size: 22),
+                  SizedBox(width: 2),
+                  Text(
+                    "$city, $state",
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 14,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                  Icon(Icons.arrow_drop_down, color: Colors.white, size: 26),
+                ],
+              );
+            },
           ),
         ),
       ],

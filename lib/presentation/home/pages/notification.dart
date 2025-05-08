@@ -524,6 +524,7 @@ class NotificationPage extends StatelessWidget {
       context: context,
       builder:
           (ctx) => AlertDialog(
+            backgroundColor: Colors.white,
             title: const Text('Mark all as read?'),
             content: const Text(
               'Are you sure you want to mark all unread notifications as read?',
