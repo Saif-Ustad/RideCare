@@ -9,6 +9,8 @@ import 'package:ridecare/presentation/home/widgets/chooseCategory.dart';
 import 'package:ridecare/presentation/home/widgets/popularServiceProvider.dart';
 import 'package:ridecare/presentation/home/widgets/specialOfferCarousel.dart';
 import '../../../common/helper/saveUserLocationToPrefs.dart';
+import '../../booking/bloc/booking_bloc.dart';
+import '../../booking/bloc/booking_event.dart';
 import '../../bookmark/bloc/bookmark_bloc.dart';
 import '../../bookmark/bloc/bookmark_event.dart';
 import '../../vehicles/bloc/vehicle_bloc.dart';
@@ -132,6 +134,7 @@ class _HomePageState extends State<HomePage> {
           final currentUser = state.user;
           context.read<BookmarkBloc>().add(LoadBookmarks(currentUser.uid));
           context.read<VehicleBloc>().add(LoadVehicles(currentUser.uid));
+          context.read<BookingBloc>().add(GetAllBookings(userId: currentUser.uid));
           context.read<NotificationBloc>().add(
             StartListeningNotificationsEvent(userId: currentUser.uid),
           );

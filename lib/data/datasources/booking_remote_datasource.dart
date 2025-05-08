@@ -161,6 +161,12 @@ class BookingRemoteDataSourceImpl implements BookingRemoteDataSource {
       }
     }
 
+    bookings.sort(
+      (a, b) => (b.scheduledAt ?? DateTime(0)).compareTo(
+        a.scheduledAt ?? DateTime(0),
+      ),
+    );
+
     return bookings;
   }
 }
