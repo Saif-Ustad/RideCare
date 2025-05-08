@@ -1,7 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:ridecare/data/models/user_model.dart';
-import 'package:ridecare/domain/entities/user_entity.dart';
 
 abstract class AuthRemoteDataSource {
   Future<String> registerWithEmailAndPassword(
@@ -9,6 +8,8 @@ abstract class AuthRemoteDataSource {
     String lastName,
     String email,
     String password,
+    String referralCode,
+    String? referredBy,
   );
 
   Future<UserModel> signInWithEmailAndPassword(String email, String password);
@@ -28,9 +29,10 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
     String lastName,
     String email,
     String password,
+    String referralCode,
+    String? referredBy,
   ) async {
     try {
-      // Create user with email and password
       UserCredential userCredential = await auth.createUserWithEmailAndPassword(
         email: email,
         password: password,
@@ -45,7 +47,35 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
         'displayName': "$firstName $lastName",
         'email': email,
         'createdAt': DateTime.now(),
+        'referralCode': referralCode,
+        'referredBy': referredBy,
       });
+
+      // If referredBy exists, give referrer a reward
+      if (referredBy != null && referredBy.isNotEmpty) {
+        final referrerSnapshot = await fireStore
+            .collection('users')
+            .where('referralCode', isEqualTo: referredBy)
+            .limit(1)
+            .get();
+
+        if (referrerSnapshot.docs.isNotEmpty) {
+          final referrerDoc = referrerSnapshot.docs.first;
+          final referrerId = referrerDoc.id;
+
+          await fireStore.collection('users').doc(referrerId).update({
+            'referralPoints': FieldValue.increment(10),
+          });
+
+          // Optionally record referral history
+          await fireStore.collection('referrals').add({
+            'referrerId': referrerId,
+            'referredUserId': userId,
+            'timestamp': DateTime.now(),
+          });
+        }
+      }
+
       return userId;
     } catch (e) {
       rethrow;

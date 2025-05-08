@@ -1,5 +1,6 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:get_it/get_it.dart';
+import '../../../common/helper/generate_referral_code.dart';
 import '../../../domain/entities/notification_entity.dart';
 import '../../../domain/usecases/auth/register_with_email.dart';
 import '../../../domain/usecases/auth/sign_in_with_email.dart';
@@ -29,11 +30,15 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
   Future<void> _onRegister(RegisterEvent event, Emitter<AuthState> emit) async {
     emit(AuthLoading());
     try {
+      final referralCode = generateReferralCode(event.firstName);
+
       final userId = await registerWithEmail(
         event.firstName,
         event.lastName,
         event.email,
         event.password,
+        referralCode,
+        event.referredByCode,
       );
       emit(Unauthenticated()); // Redirect to login after registration
 

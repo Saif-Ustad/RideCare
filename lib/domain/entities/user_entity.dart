@@ -8,6 +8,8 @@ class UserEntity {
   final String? lastName;
   final List<String>? bookmarkIds;
   final String? gender;
+  final String? referralCode;
+  final int? referralPoints;
 
   UserEntity({
     required this.uid,
@@ -18,7 +20,9 @@ class UserEntity {
     this.lastName,
     this.userProfileImageUrl,
     this.bookmarkIds,
-    this.gender
+    this.gender,
+    this.referralCode,
+    this.referralPoints,
   });
 
   UserEntity copyWith({
@@ -31,6 +35,8 @@ class UserEntity {
     String? userProfileImageUrl,
     List<String>? bookmarkIds,
     String? gender,
+    String? referralCode,
+    int? referralPoints,
   }) {
     return UserEntity(
       uid: uid ?? this.uid,
@@ -41,7 +47,9 @@ class UserEntity {
       lastName: lastName ?? this.lastName,
       userProfileImageUrl: userProfileImageUrl ?? this.userProfileImageUrl,
       bookmarkIds: bookmarkIds ?? this.bookmarkIds,
-      gender: gender ?? this.gender
+      gender: gender ?? this.gender,
+      referralCode: referralCode ?? this.referralCode,
+      referralPoints: referralPoints ?? this.referralPoints,
     );
   }
 }

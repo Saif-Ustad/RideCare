@@ -10,7 +10,9 @@ class UserModel extends UserEntity {
     super.lastName,
     super.userProfileImageUrl,
     super.bookmarkIds,
-    super.gender
+    super.gender,
+    super.referralCode,
+    super.referralPoints,
   });
 
   // Factory method to create UserModel from Firestore JSON
@@ -28,6 +30,8 @@ class UserModel extends UserEntity {
           json['bookmarkIds'] != null
               ? List<String>.from(json['bookmarkIds'])
               : [],
+      referralCode: json['referralCode'],
+      referralPoints: json['referralPoints'],
     );
   }
 
@@ -43,6 +47,8 @@ class UserModel extends UserEntity {
       'userProfileImageUrl': userProfileImageUrl,
       'bookmarkIds': bookmarkIds ?? [],
       'gender': gender,
+      'referralCode': referralCode,
+      'referralPoints': referralPoints,
     };
   }
 
@@ -71,6 +77,8 @@ class UserModel extends UserEntity {
       userProfileImageUrl: entity.userProfileImageUrl,
       bookmarkIds: entity.bookmarkIds,
       gender: entity.gender,
+      referralCode: entity.referralCode,
+      referralPoints: entity.referralPoints,
     );
   }
 }

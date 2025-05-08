@@ -26,10 +26,23 @@ class RecentBookingsSection extends StatelessWidget {
                 return Center(child: Text("Error: ${state.message}"));
               } else if (state is BookingsLoaded) {
                 if (state.bookings.isEmpty) {
-                  return SizedBox.shrink();
+                  return const Center(
+                    child: Text(
+                      "No Bookings Found",
+                      style: TextStyle(fontSize: 14, color: AppColors.grey),
+                    ),
+                  );
                 }
 
-                final recentBookings = state.bookings.take(3).toList();
+                final recentBookings =
+                    state.bookings
+                        .where(
+                          (booking) =>
+                              booking.status?.toLowerCase() !=
+                              'Order Cancelled',
+                        )
+                        .take(3)
+                        .toList();
 
                 return ListView.builder(
                   shrinkWrap: true,
@@ -96,11 +109,18 @@ class RecentBookingsSection extends StatelessWidget {
                               ),
                               borderRadius: BorderRadius.circular(20),
                             ),
-                            child: Text(
-                              "Re-book",
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontWeight: FontWeight.w600,
+                            child: GestureDetector(
+                              onTap: () {
+                                context.push(
+                                  '/service-provider/${booking.serviceProviderId}',
+                                );
+                              },
+                              child: Text(
+                                "Re-book",
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.w600,
+                                ),
                               ),
                             ),
                           ),

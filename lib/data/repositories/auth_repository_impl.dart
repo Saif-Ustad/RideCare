@@ -13,12 +13,16 @@ class AuthRepositoryImpl implements AuthRepository {
     String lastName,
     String email,
     String password,
+    String referralCode,
+    String? referredBy,
   ) {
     return remoteDataSource.registerWithEmailAndPassword(
       firstName,
       lastName,
       email,
       password,
+      referralCode,
+      referredBy,
     );
   }
 

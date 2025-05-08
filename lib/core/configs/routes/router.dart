@@ -21,6 +21,7 @@ import 'package:ridecare/presentation/location/pages/bookingPages/addLocationFro
 import 'package:ridecare/presentation/location/pages/bookingPages/selectLocationFromBooking.dart';
 import 'package:ridecare/presentation/profile/pages/profile.dart';
 import 'package:ridecare/presentation/profile/pages/yourProfile.dart';
+import 'package:ridecare/presentation/referAndEarn/pages/referAndEarn.dart';
 import 'package:ridecare/presentation/serviceProvider/pages/appointmentBooking.dart';
 import 'package:ridecare/presentation/serviceProvider/pages/serviceProviderDetails.dart';
 import 'package:ridecare/presentation/splash/pages/splash.dart';
@@ -73,6 +74,7 @@ final GoRouter router = GoRouter(
     GoRoute(path: '/wallet', builder: (context, state) => const WalletPage()),
     GoRoute(path: '/add-money-wallet', builder: (context, state) => const AddMoneyWalletPage()),
     GoRoute(path: '/help-center', builder: (context, state) => const HelpCenterPage()),
+    GoRoute(path: '/refer-earn', builder: (context, state) => const ReferAndEarnPage()),
 
 
     GoRoute(

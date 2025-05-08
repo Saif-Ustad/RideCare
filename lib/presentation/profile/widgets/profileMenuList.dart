@@ -29,6 +29,7 @@ class ProfileMenuList extends StatelessWidget {
       'route': "/wallet",
     },
     {'icon': Icons.settings, 'title': "Settings", 'route': ""},
+    {'icon': Icons.share, 'title': "Refer & Earn", 'route': "/refer-earn"},
     {
       'icon': Icons.headset_mic,
       'title': "Help Center",

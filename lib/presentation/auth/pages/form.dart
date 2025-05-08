@@ -24,6 +24,8 @@ class _UserFormPageState extends State<UserFormPage> {
   final TextEditingController _lastNameController = TextEditingController();
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
+  final TextEditingController _referralCodeController = TextEditingController();
+
   bool _isChecked = false; // Checkbox state
 
   void _signIn() {
@@ -31,15 +33,21 @@ class _UserFormPageState extends State<UserFormPage> {
     final String lastName = _lastNameController.text.trim();
     final String email = _emailController.text.trim();
     final String password = _passwordController.text.trim();
+    final referralCode = _referralCodeController.text.trim();
 
-    if (firstName.isEmpty || lastName.isEmpty || email.isEmpty || password.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Please fill all fields.")),
-      );
+    if (firstName.isEmpty ||
+        lastName.isEmpty ||
+        email.isEmpty ||
+        password.isEmpty) {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text("Please fill all fields.")));
       return;
     }
 
-    sl<AuthBloc>().add(RegisterEvent(firstName, lastName, email, password));
+    sl<AuthBloc>().add(
+      RegisterEvent(firstName, lastName, email, password, referralCode),
+    );
   }
 
   @override
@@ -62,9 +70,9 @@ class _UserFormPageState extends State<UserFormPage> {
                   ),
                   textAlign: TextAlign.center,
                 ),
-          
+
                 const SizedBox(height: 10),
-          
+
                 const Text(
                   "Please complete your information.",
                   style: TextStyle(
@@ -74,32 +82,44 @@ class _UserFormPageState extends State<UserFormPage> {
                   ),
                   textAlign: TextAlign.center,
                 ),
-          
+
                 const SizedBox(height: 40),
-          
-                GeneralTextField(placeholder: "First Name", controller: _firstNameController,),
-          
+
+                GeneralTextField(
+                  placeholder: "First Name",
+                  controller: _firstNameController,
+                ),
+
                 const SizedBox(height: 15),
-          
-                GeneralTextField(placeholder: "Last Name", controller: _lastNameController,),
-          
+
+                GeneralTextField(
+                  placeholder: "Last Name",
+                  controller: _lastNameController,
+                ),
+
                 const SizedBox(height: 15),
-          
+
                 GeneralTextField(
                   placeholder: "Email",
                   icon: Icons.email,
                   controller: _emailController,
                 ),
-          
+
                 const SizedBox(height: 15),
-          
+
                 PasswordField(
                   placeHolder: "Password",
                   controller: _passwordController,
                 ),
-          
+
                 const SizedBox(height: 15),
-          
+
+                GeneralTextField(
+                  placeholder: "Referral Code",
+                  controller: _referralCodeController,
+                ),
+                const SizedBox(height: 15),
+
                 Row(
                   children: [
                     Checkbox(
@@ -110,7 +130,7 @@ class _UserFormPageState extends State<UserFormPage> {
                         });
                       },
                     ),
-          
+
                     Expanded(
                       child: RichText(
                         text: TextSpan(
@@ -148,9 +168,9 @@ class _UserFormPageState extends State<UserFormPage> {
                     ),
                   ],
                 ),
-          
+
                 const SizedBox(height: 15),
-          
+
                 BlocBuilder<AuthBloc, AuthState>(
                   builder: (context, state) {
                     return BlocListener<AuthBloc, AuthState>(
@@ -158,7 +178,9 @@ class _UserFormPageState extends State<UserFormPage> {
                       listener: (context, state) {
                         if (state is Unauthenticated) {
                           ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(content: Text("Sign-Up successful!")),
+                            const SnackBar(
+                              content: Text("Sign-Up successful!"),
+                            ),
                           );
                           Navigator.push(
                             context,
@@ -167,9 +189,9 @@ class _UserFormPageState extends State<UserFormPage> {
                             ),
                           );
                         } else if (state is AuthError) {
-                          ScaffoldMessenger.of(
-                            context,
-                          ).showSnackBar(SnackBar(content: Text(state.message)));
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(content: Text(state.message)),
+                          );
                         }
                       },
                       child: SquareButton(
@@ -183,9 +205,9 @@ class _UserFormPageState extends State<UserFormPage> {
                     );
                   },
                 ),
-          
+
                 SizedBox(height: 40),
-          
+
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
