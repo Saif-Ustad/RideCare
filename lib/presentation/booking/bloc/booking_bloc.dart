@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:get_it/get_it.dart';
+import 'package:intl/intl.dart';
 import 'package:ridecare/domain/entities/user_entity.dart';
 import 'package:ridecare/domain/usecases/booking/booking_created.dart';
 import 'package:ridecare/domain/usecases/booking/booking_updated.dart';
@@ -53,8 +54,6 @@ class BookingBloc extends Bloc<BookingEvent, BookingState> {
 
       emit(BookingUpdated(booking: _booking));
     });
-
-
 
     on<SetAppointment>((event, emit) {
       _booking = _booking.copyWith(
@@ -172,10 +171,13 @@ class BookingBloc extends Bloc<BookingEvent, BookingState> {
 
         emit(BookingSubmitted(id));
 
+        final formattedDate = DateFormat(
+          'EEEE, d MMMM y \'at\' hh:mm a',
+        ).format(_booking.scheduledAt!);
+
         final NotificationEntity notification = NotificationEntity(
           title: "Service Booked Successfully",
-          body:
-              'Your vehicle service has been scheduled for ${_booking.scheduledAt}',
+          body: 'Your vehicle service has been scheduled for $formattedDate',
           type: "Booking",
         );
 
