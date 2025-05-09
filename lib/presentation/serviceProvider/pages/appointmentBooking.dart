@@ -13,6 +13,7 @@ import '../widgets/serviceInfoSection.dart';
 
 class AppointmentBookingPage extends StatefulWidget {
   final String serviceProviderId;
+
   const AppointmentBookingPage({super.key, required this.serviceProviderId});
 
   @override
@@ -32,7 +33,14 @@ class _AppointmentBookingPageState extends State<AppointmentBookingPage> {
       initialDate: selectedDate,
       firstDate: DateTime.now(),
       lastDate: DateTime(2101),
+      builder: (context, child) {
+        return Theme(
+          data: Theme.of(context).copyWith(colorScheme: ColorScheme.light()),
+          child: child!,
+        );
+      },
     );
+
     if (picked != null && picked != selectedDate) {
       setState(() => selectedDate = picked);
     }
@@ -42,7 +50,14 @@ class _AppointmentBookingPageState extends State<AppointmentBookingPage> {
     final TimeOfDay? picked = await showTimePicker(
       context: context,
       initialTime: selectedTime,
+      builder: (context, child) {
+        return Theme(
+          data: Theme.of(context).copyWith(colorScheme: ColorScheme.light()),
+          child: child!,
+        );
+      },
     );
+
     if (picked != null && picked != selectedTime) {
       setState(() => selectedTime = picked);
     }
@@ -64,7 +79,10 @@ class _AppointmentBookingPageState extends State<AppointmentBookingPage> {
             body: SafeArea(
               child: Column(
                 children: [
-                  HeaderSection(images: provider.galleryImageUrls, provider: provider,),
+                  HeaderSection(
+                    images: provider.galleryImageUrls,
+                    provider: provider,
+                  ),
                   Expanded(
                     child: SingleChildScrollView(
                       physics: const BouncingScrollPhysics(),
@@ -113,11 +131,13 @@ class _AppointmentBookingPageState extends State<AppointmentBookingPage> {
                   selectedTime.minute,
                 );
 
-                context.read<BookingBloc>().add(SetAppointment(
-                  date: dateTime,
-                  note: noteController.text,
-                  serviceType: selectedServiceType,
-                ));
+                context.read<BookingBloc>().add(
+                  SetAppointment(
+                    date: dateTime,
+                    note: noteController.text,
+                    serviceType: selectedServiceType,
+                  ),
+                );
 
                 context.push("/select-vehicle-booking");
               },

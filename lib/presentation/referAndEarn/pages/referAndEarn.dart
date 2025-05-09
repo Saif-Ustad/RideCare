@@ -46,11 +46,8 @@ class ReferAndEarnPage extends StatelessWidget {
                   Container(
                     padding: const EdgeInsets.all(16),
                     decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                        colors: [
-                          Colors.purple.shade300,
-                          Colors.deepPurple.shade700,
-                        ],
+                      gradient: const LinearGradient(
+                        colors: [Color(0xFF6D5DF6), Color(0xFF9E79F2)],
                         begin: Alignment.topLeft,
                         end: Alignment.bottomRight,
                       ),
@@ -147,7 +144,7 @@ class ReferAndEarnPage extends StatelessWidget {
                       ],
                     ),
                   ),
-                  const SizedBox(height: 25),
+                  const SizedBox(height: 15),
 
                   // Redesigned Points Earned Section
                   Card(
@@ -164,7 +161,7 @@ class ReferAndEarnPage extends StatelessWidget {
                             backgroundColor: Colors.deepPurple.shade50,
                             child: const Icon(
                               Icons.stars,
-                              color: Colors.deepPurple,
+                              color: AppColors.primary,
                               size: 28,
                             ),
                           ),
@@ -195,8 +192,10 @@ class ReferAndEarnPage extends StatelessWidget {
                             padding: const EdgeInsets.symmetric(
                                 horizontal: 12, vertical: 6),
                             decoration: BoxDecoration(
-                              gradient: LinearGradient(
-                                colors: [Colors.deepPurple, Colors.purple],
+                              gradient: const LinearGradient(
+                                colors: [Color(0xFF6D5DF6), Color(0xFF9E79F2)],
+                                begin: Alignment.topLeft,
+                                end: Alignment.bottomRight,
                               ),
                               borderRadius: BorderRadius.circular(20),
                             ),
@@ -212,7 +211,7 @@ class ReferAndEarnPage extends StatelessWidget {
                       ),
                     ),
                   ),
-                  const SizedBox(height: 30),
+                  const SizedBox(height: 15),
 
                   // "How it works" Section
                   const Text(
@@ -287,7 +286,7 @@ class ReferAndEarnPage extends StatelessWidget {
         children: [
           Container(
             margin: const EdgeInsets.only(top: 4),
-            child: Icon(icon, color: Colors.deepPurple),
+            child: Icon(icon, color: AppColors.primary),
           ),
           const SizedBox(width: 12),
           Expanded(
