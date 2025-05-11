@@ -28,6 +28,7 @@ import 'package:ridecare/presentation/splash/pages/splash.dart';
 import 'package:ridecare/presentation/wallet/pages/addMoneyWallet.dart';
 import '../../../common/helper/prefService.dart';
 import '../../../presentation/auth/pages/form.dart';
+import '../../../presentation/feedback/pages/feedback_page.dart';
 import '../../../presentation/home/pages/chooseCategory.dart';
 import '../../../presentation/location/pages/profilePages/addLocationFromProfile.dart';
 import '../../../presentation/location/pages/profilePages/selectLocationFromProfile.dart';
@@ -75,6 +76,7 @@ final GoRouter router = GoRouter(
     GoRoute(path: '/add-money-wallet', builder: (context, state) => const AddMoneyWalletPage()),
     GoRoute(path: '/help-center', builder: (context, state) => const HelpCenterPage()),
     GoRoute(path: '/refer-earn', builder: (context, state) => const ReferAndEarnPage()),
+    GoRoute(path: '/feedback', builder: (context, state) => const FeedbackPage()),
 
 
     GoRoute(

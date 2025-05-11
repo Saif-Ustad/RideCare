@@ -13,6 +13,8 @@ import '../../booking/bloc/booking_bloc.dart';
 import '../../booking/bloc/booking_event.dart';
 import '../../bookmark/bloc/bookmark_bloc.dart';
 import '../../bookmark/bloc/bookmark_event.dart';
+import '../../feedback/bloc/feedback_bloc.dart';
+import '../../feedback/bloc/feedback_event.dart';
 import '../../vehicles/bloc/vehicle_bloc.dart';
 import '../../vehicles/bloc/vehicle_event.dart';
 import '../bloc/category/category_bloc.dart';
@@ -51,6 +53,7 @@ class _HomePageState extends State<HomePage> {
     //   FetchAllServiceProvidersWithoutLocation(),
     // );
     context.read<CategoryBloc>().add(FetchCategories());
+    context.read<FeedbackBloc>().add(FetchLatestVerifiedFeedbacks());
 
     _getCurrentLocationAndFetchProviders();
 
@@ -123,6 +126,7 @@ class _HomePageState extends State<HomePage> {
     context.read<UserBloc>().add(LoadUserEvent());
     context.read<SpecialOfferBloc>().add(FetchSpecialOffers());
     context.read<CategoryBloc>().add(FetchCategories());
+    context.read<FeedbackBloc>().add(FetchLatestVerifiedFeedbacks());
     await _getCurrentLocationAndFetchProviders(fromRefresh: true);
   }
 

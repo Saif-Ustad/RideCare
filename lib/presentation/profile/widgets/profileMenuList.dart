@@ -35,6 +35,7 @@ class ProfileMenuList extends StatelessWidget {
       'title': "Help Center",
       'route': "/help-center",
     },
+    {'icon': Icons.feedback, 'title': "Give Feedback", 'route': "/feedback"},
     {'icon': Icons.privacy_tip, 'title': "Privacy Policy", 'route': ""},
     {'icon': Icons.logout, 'title': "Logout", 'route': "", 'isLogout': true},
   ];
