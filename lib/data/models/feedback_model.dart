@@ -21,7 +21,7 @@ class FeedbackModel extends FeedbackEntity {
       userName: json['userName'] as String,
       message: json['message'] as String,
       rating: (json['rating'] as num).toDouble(),
-      timestamp: (json['timestamp'] as Timestamp).toDate(),
+      timestamp: (json['timestamp'] as Timestamp?)?.toDate() ?? DateTime.now(),
       isVerified: json['isVerified'],
     );
   }
@@ -32,7 +32,7 @@ class FeedbackModel extends FeedbackEntity {
       'userName': userName,
       'message': message,
       'rating': rating,
-      'timestamp': Timestamp.fromDate(timestamp!),
+      'timestamp': Timestamp.fromDate(timestamp ?? DateTime.now()),
       'isVerified': isVerified,
     };
   }
